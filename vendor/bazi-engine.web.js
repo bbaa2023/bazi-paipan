@@ -225,7 +225,8 @@
 
     // R5: China DST window (v0.15.1: official per-year dates + midnight date rollback)
     var ry = year, rm = month, rd = day;
-    if (inCnDst(ry, rm, rd)) {
+    // 中国历史夏令时只应用于中国标准时区 UTC+8；不能把该规则套到 UTC+9 等海外时区。
+    if (tzOff === 8 && inCnDst(ry, rm, rd)) {
       dstApplied = true;
       // 未知时辰时 h 为 null，不能对 null 做减法，否则会变成 -1 并错误回退到前一天。
       // 此时保留未知时辰的中午参考时刻；精确跨节气边界仍需用户补充时辰。
