@@ -31,11 +31,12 @@
           <label>日<input name="day" type="number" min="1" max="31" value="15" required></label>
           <label>时（24小时制）<select name="hour"><option value="0" >00:00–00:59</option><option value="1" >01:00–01:59</option><option value="2" >02:00–02:59</option><option value="3" >03:00–03:59</option><option value="4" >04:00–04:59</option><option value="5" >05:00–05:59</option><option value="6" >06:00–06:59</option><option value="7" >07:00–07:59</option><option value="8" >08:00–08:59</option><option value="9" >09:00–09:59</option><option value="10" >10:00–10:59</option><option value="11" >11:00–11:59</option><option value="12" selected>12:00–12:59</option><option value="13" >13:00–13:59</option><option value="14" >14:00–14:59</option><option value="15" >15:00–15:59</option><option value="16" >16:00–16:59</option><option value="17" >17:00–17:59</option><option value="18" >18:00–18:59</option><option value="19" >19:00–19:59</option><option value="20" >20:00–20:59</option><option value="21" >21:00–21:59</option><option value="22" >22:00–22:59</option><option value="23" >23:00–23:59</option><option value="">未知时辰</option></select></label>
           <label>分<input name="minute" type="number" min="0" max="59" value="0" required></label>
+          <label>出生地 UTC 时区偏移<input name="tzOffsetHours" type="number" min="-12" max="14" step="0.25" value="8" required></label>
           <label>出生地经度（选填）<input name="longitude" type="number" min="-180" max="180" step="0.0001" placeholder="例如 116.4074"></label>
           <label>性别（用于大运）<select name="gender"><option value="">暂不指定</option><option value="1">男</option><option value="0">女</option></select></label>
           <label>日柱换日口径<select name="sect"><option value="1">晚子时 23:00 换日</option><option value="2">子初 00:00 换日</option></select></label>
         </div>
-        <div class="form-foot"><p>提示：经度不填写时，不进行经度真太阳时修正；未知时辰会按三柱盘处理。</p><button class="primary" type="submit"><span>✦</span> 开始排盘</button></div>
+        <div class="form-foot"><p>提示：默认中国标准时区 UTC+8。经度不填写时，不进行经度真太阳时修正；未知时辰按三柱盘处理。海外出生请填写出生当时的 UTC 偏移；海外历史夏令时目前不会自动识别。</p><button class="primary" type="submit"><span>✦</span> 开始排盘</button></div>
       </form>
       <div id="error" class="notice error" role="alert" hidden></div>
     </section>
