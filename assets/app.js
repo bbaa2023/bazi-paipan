@@ -124,8 +124,10 @@
     const hourRaw=fd.get('hour'),hour=hourRaw===''?null:Number(hourRaw),minute=Number(fd.get('minute'));
     const longitudeRaw=fd.get('longitude'),genderRaw=fd.get('gender');
     const birth={year,month,day,hour,minute,longitude:longitudeRaw===''?null:Number(longitudeRaw),unknownTime:hour===null,sect:Number(fd.get('sect'))};
-    if (![year,month,day,minute].every(Number.isFinite) || year<1900 || year>2100 || month<1 || month>12 || day<1 || day>31 || minute<0 || minute>59 || (birth.longitude!==null && (!Number.isFinite(birth.longitude)||birth.longitude < -180||birth.longitude>180))) {
-      showError('请检查出生日期、时间和经度填写是否正确。'); return;
+    const validDate=Number.isInteger(year)&&Number.isInteger(month)&&Number.isInteger(day)&&(()=>{const d=new Date(Date.UTC(year,month-1,day));return d.getUTCFullYear()===year&&d.getUTCMonth()===month-1&&d.getUTCDate()===day;})();
+    const validHour=hour===null||(Number.isInteger(hour)&&hour>=0&&hour<=23);
+    if (![year,month,day,minute].every(Number.isFinite) || year<1900 || year>2100 || month<1 || month>12 || day<1 || day>31 || !validDate || !validHour || minute<0 || minute>59 || (birth.longitude!==null && (!Number.isFinite(birth.longitude)||birth.longitude < -180||birth.longitude>180))) {
+      showError('请检查出生日期是否真实有效（包括闰年与每月天数），并确认时分和经度范围正确。'); return;
     }
     try {
       const chart=window.BaziEngine.computeBazi(birth);
