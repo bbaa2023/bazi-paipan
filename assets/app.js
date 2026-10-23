@@ -106,7 +106,14 @@
     const direction=lastLuck.direction&&typeof lastLuck.direction==='object'?(lastLuck.direction.forward?'顺排':'逆排'):(lastLuck.direction||'—');
     const items=Array.isArray(lastLuck.pillars)?lastLuck.pillars:[];
     const cards=items.map(p=>'<div class="data-card"><h3>第'+safe(p.index)+'步 · '+safe(p.ganzhi||'—')+(p.isCurrent?'（当前）':'')+'</h3><p>'+safe(p.yearLabel||'年份未知')+'</p><p>虚岁：'+safe(p.startAgeSui??'—')+'–'+safe(p.endAgeSui??'—')+'</p><p>天干十神：'+safe(p.stemTenGod&&p.stemTenGod.god||'—')+'</p><p>地支十神：'+safe(p.branchTenGod&&p.branchTenGod.god||'—')+'</p><p>藏干：'+safe(Array.isArray(p.hideGan)?p.hideGan.join('、'):'—')+'</p><p>十二长生：'+safe(p.stage||'—')+'</p></div>').join('');
-    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">以上字段来自本地排盘引擎；不同起运口径可能产生差异。</p></div></div><h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="data-grid">'+(cards||'<div class="empty">引擎没有返回大运序列。</div>')+'</div>';
+    const unknown=lastBirth.unknownTime&&lastLuck.unknownTime;
+    let unknownNote='';
+    if(unknown){
+      const lo=unknown.low&&unknown.low.traditional||{}, hi=unknown.high&&unknown.high.traditional||{};
+      const fmt=x=>safe(x.years??'—')+'年 '+safe(x.months??'—')+'个月 '+safe(x.days??'—')+'天';
+      unknownNote='<div class="data-card"><h3>未知时辰：起运范围提示</h3><p>上方起运日期与年龄按中午参考时刻计算，不应视为精确结果。</p><p>按当天时辰范围估算：较早端约 '+fmt(lo)+'；较晚端约 '+fmt(hi)+'。</p><p>节气是否跨界：'+(unknown.jieAmbiguous?'当天不同时间可能对应不同节气，年/月柱及起运依据需重点复核。':'当前扫描范围未发现前后节气名称变化，但起运时间仍可能随出生时刻变化。')+'</p><p class="muted">要缩小范围，请补充出生时辰；若出生时刻接近立春或节气交界，建议按准确时刻重新排盘。</p></div>';
+    }
+    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">以上字段来自本地排盘引擎；不同起运口径可能产生差异。</p></div>'+unknownNote+'</div><h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="data-grid">'+(cards||'<div class="empty">引擎没有返回大运序列。</div>')+'</div>';
   }
   function renderAnnual() {
     const engine=window.BaziEngine||{};
