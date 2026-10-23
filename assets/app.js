@@ -51,7 +51,24 @@
   function renderRelations() {
     const meta = lastChart.meta || {};
     const known = Object.fromEntries(Object.entries(meta).filter(([k])=>/trueSolarTime|sectLabel|engine|version|dstApplied|absoluteInstant/i.test(k)));
-    return '<h3 class="subhead">排盘口径与干支信息</h3><div class="data-grid"><div class="data-card"><h3>排盘输入</h3><pre class="raw">'+safe(json(lastChart.input||lastBirth))+'</pre></div><div class="data-card"><h3>引擎计算说明</h3><pre class="raw">'+safe(json(known))+'</pre></div></div><div class="empty" style="margin-top:12px">地支合冲刑害、十二长生和神煞的完整可视化将在确认本地引擎返回结构后逐项接入。本版本不自行猜算这些数据。</div>';
+    const labels = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
+    const pillars = labels.map(([key,label]) => {
+      const p = lastChart.pillars && lastChart.pillars[key];
+      return p && p.ganzhi ? {label:label,gz:p.ganzhi} : null;
+    }).filter(Boolean);
+    const cards = [];
+    for (let i=0;i<pillars.length;i++) {
+      for (let j=i+1;j<pillars.length;j++) {
+        const a=pillars[i], b=pillars[j];
+        let sr=[], br=[];
+        try { if(window.BaziEngine && typeof window.BaziEngine.stemRelation==='function') sr=window.BaziEngine.stemRelation(a.gz[0],b.gz[0])||[]; } catch (_) {}
+        try { if(window.BaziEngine && typeof window.BaziEngine.branchRelations==='function') br=window.BaziEngine.branchRelations(a.gz[1],b.gz[1])||[]; } catch (_) {}
+        const items=sr.map(x=>'天干 '+x.type+(x.element?' · '+x.element:'')).concat(br.map(x=>'地支 '+x.type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:'')));
+        if(items.length) cards.push('<div class="data-card"><h3>'+a.label+' '+safe(a.gz)+' ↔ '+b.label+' '+safe(b.gz)+'</h3>'+items.map(x=>'<p>'+safe(x)+'</p>').join('')+'</div>');
+      }
+    }
+    const relationHtml=cards.length?cards.join(''):'<div class="empty">当前四柱之间没有命中已定义的两两关系，或关系函数不可用。三合、三会等多支组合将在下一轮单独接入。</div>';
+    return '<h3 class="subhead">干支关系</h3><p class="muted">逐对调用本地引擎公开函数，展示天干五合/相冲与地支六合/六冲/六害/相刑/自刑/半三合。这里只枚举规则，不直接判定吉凶。</p><div class="data-grid">'+relationHtml+'</div><h3 class="subhead" style="margin-top:22px">排盘口径与计算信息</h3><div class="data-grid"><div class="data-card"><h3>排盘输入</h3><pre class="raw">'+safe(json(lastChart.input||lastBirth))+'</pre></div><div class="data-card"><h3>引擎计算说明</h3><pre class="raw">'+safe(json(known))+'</pre></div></div>';
   }
   function renderLuck() {
     if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能尝试计算大运。</div>';
