@@ -108,10 +108,40 @@
     const cards=items.map(p=>'<div class="data-card"><h3>第'+safe(p.index)+'步 · '+safe(p.ganzhi||'—')+(p.isCurrent?'（当前）':'')+'</h3><p>'+safe(p.yearLabel||'年份未知')+'</p><p>虚岁：'+safe(p.startAgeSui??'—')+'–'+safe(p.endAgeSui??'—')+'</p><p>天干十神：'+safe(p.stemTenGod&&p.stemTenGod.god||'—')+'</p><p>地支十神：'+safe(p.branchTenGod&&p.branchTenGod.god||'—')+'</p><p>藏干：'+safe(Array.isArray(p.hideGan)?p.hideGan.join('、'):'—')+'</p><p>十二长生：'+safe(p.stage||'—')+'</p></div>').join('');
     return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">以上字段来自本地排盘引擎；不同起运口径可能产生差异。</p></div></div><h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="data-grid">'+(cards||'<div class="empty">引擎没有返回大运序列。</div>')+'</div>';
   }
+  function renderAnnual() {
+    const engine=window.BaziEngine||{};
+    if(typeof engine.yearProfile!=='function'||typeof engine.tenGodOf!=='function') return '<div class="empty">当前本地引擎未公开流年分析所需接口。</div>';
+    const dayGan=lastChart.meta&&lastChart.meta.dayMaster||lastChart.pillars&&lastChart.pillars.day&&lastChart.pillars.day.ganzhi&&lastChart.pillars.day.ganzhi.charAt(0);
+    if(!dayGan) return '<div class="empty">命盘日主不可用，暂时无法生成流年对照。</div>';
+    const natal=[['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']].map(([key,label])=>{
+      const p=lastChart.pillars&&lastChart.pillars[key];
+      return p&&p.ganzhi?{label,gz:p.ganzhi}:null;
+    }).filter(Boolean);
+    const startYear=new Date().getFullYear();
+    const cards=[];
+    for(let y=startYear;y<startYear+6;y++){
+      let profile;
+      try{profile=engine.yearProfile(y);}catch(_){profile=null;}
+      if(!profile) continue;
+      let god='—';
+      try{god=engine.tenGodOf(dayGan,profile.stem)||'—';}catch(_){}
+      const relations=[];
+      natal.forEach(p=>{
+        let sr=[],br=[];
+        try{sr=engine.stemRelation(p.gz[0],profile.stem)||[];}catch(_){}
+        try{br=engine.branchRelations(p.gz[1],profile.branch)||[];}catch(_){}
+        const all=sr.map(x=>'天干'+x.type).concat(br.map(x=>'地支'+x.type+(x.kind?'（'+x.kind+'）':'')));
+        if(all.length) relations.push('<span class="chip">'+safe(p.label)+'：'+safe(all.join('、'))+'</span>');
+      });
+      const jie=profile.lichun&&profile.lichun.text||'立春日期未返回';
+      cards.push('<div class="data-card annual-card"><div class="luck-card-top"><h3>'+safe(profile.year)+' · '+safe(profile.ganzhi)+'</h3><span class="chip">'+safe(profile.zodiacCn||profile.branch)+'</span></div><div class="annual-meta"><span>流年天干十神</span><strong>'+safe(god)+'</strong><span>五行</span><strong>'+safe(profile.stemElement)+' / '+safe(profile.branchElement)+'</strong><span>纳音</span><strong>'+safe(profile.nayin||'—')+'</strong><span>立春交界</span><strong>'+safe(jie)+'</strong></div><p>与本命干支的直接关系：</p><div class="annual-relations">'+(relations.join('')||'<span class="muted">未命中引擎定义的两两关系</span>')+'</div></div>');
+    }
+    return '<h3 class="subhead">未来六个公历年份的流年干支</h3><p class="muted">使用本地引擎的年柱资料，列出流年干支、流年天干对日主的十神、五行、纳音、立春交界，以及与本命四柱命中的直接干支关系。此页是传统历法与规则对照，不是完整的流年吉凶解读；立春前后换年需要结合具体出生/查询时刻判断。</p><div class="data-grid">'+(cards.join('')||'<div class="empty">本地引擎没有返回流年资料。</div>')+'</div>';
+  }
   function renderRaw() { return '<h3 class="subhead">引擎原始结果</h3><p class="muted">用于核对实际字段，后续功能以此结构为准。</p><pre class="raw">'+safe(json({chart:lastChart,luck:lastLuck}))+'</pre>'; }
   function renderTab() {
     document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===activeTab;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
-    const renderers={overview:renderOverview,details:renderDetails,relations:renderRelations,shensha:renderShensha,luck:renderLuck,raw:renderRaw};
+    const renderers={overview:renderOverview,details:renderDetails,relations:renderRelations,shensha:renderShensha,luck:renderLuck,annual:renderAnnual,raw:renderRaw};
     content.innerHTML=(renderers[activeTab]||renderOverview)();
   }
   function compute(event) {
