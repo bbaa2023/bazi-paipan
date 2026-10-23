@@ -31,7 +31,7 @@
     const entries = objectEntries(selected);
     if (!entries.length) return '<div class="empty">当前引擎版本没有返回可识别的五行统计字段。请在“计算详情”查看原始结果。</div>';
     const max = Math.max(1,...entries.map(([,v])=>Number(v)||0));
-    return '<h3 class="subhead">五行力量分布</h3><p class="muted">以下数值直接来自排盘引擎；不同统计口径可能产生不同结果。</p><div class="element-grid">'+entries.map(([name,value])=>'<div class="element-card '+elementClass(name)+'"><div class="element-name">'+safe(name)+'</div><div class="element-count">'+safe(value)+'</div><div class="bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(value)||0)/max*100))+'%"></span></div></div>').join('')+'</div><div class="data-grid" style="margin-top:14px">'+objectEntries(data).map(([k,v])=>'<div class="data-card"><h3>'+safe(k)+'</h3><pre class="raw">'+safe(json(v))+'</pre></div>').join('')+'</div>';
+    return '<h3 class="subhead">五行力量分布</h3><p class="muted">默认口径：藏干半权重（天干与地支主气各计 1，藏干各计 0.5）。下方列出引擎返回的其他统计口径，便于对照；不同口径的数值不可直接混为一谈。</p><div class="element-grid">'+entries.map(([name,value])=>'<div class="element-card '+elementClass(name)+'"><div class="element-name">'+safe(name)+'</div><div class="element-count">'+safe(value)+'</div><div class="bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(value)||0)/max*100))+'%"></span></div></div>').join('')+'</div><div class="data-grid" style="margin-top:14px">'+objectEntries(data).map(([k,v])=>'<div class="data-card"><h3>'+safe(k)+'</h3><pre class="raw">'+safe(json(v))+'</pre></div>').join('')+'</div>';
   }
   function renderDetails() {
     const ps = lastChart.pillars || {};
