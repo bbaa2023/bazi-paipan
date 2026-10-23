@@ -3,3 +3,20 @@
 .el-木{--el:var(--wood)}.el-火{--el:var(--fire)}.el-土{--el:var(--earth)}.el-金{--el:var(--metal)}.el-水{--el:var(--water)}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media(max-width:720px){.topbar{height:60px;padding:0 16px}.brand b{font-size:12px}.privacy{font-size:10px}.shell{width:min(100% - 22px,1000px)}.hero{padding:40px 4px 25px}.hero p{font-size:12px}.panel{padding:18px 14px;border-radius:15px}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 10px}.form-foot{align-items:stretch;flex-direction:column}.primary{width:100%}.pillars{gap:7px}.pillar{padding:13px 5px}.pillar-gz{font-size:24px}.pillar-meta{font-size:10px}.element-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.data-grid{grid-template-columns:1fr}.site-footer{flex-direction:column}.section-heading h2{font-size:20px}}
+/* 蓝色科技风第二轮视觉增强：保留五行专属颜色，统一界面强调色 */
+:root{--gold:#67d7ff;--gold2:#2789e8}
+body{background:radial-gradient(ellipse at 50% -22%,#173e68 0,transparent 52%),radial-gradient(ellipse at 100% 20%,#102a49 0,transparent 42%),var(--bg)}
+.topbar{border-bottom-color:#4bbcff2b;background:#071321e8}
+.brand-mark{border-color:#2789e8;color:#8de4ff;box-shadow:inset 0 0 18px #1687df20,0 0 18px #1687df14}
+.privacy i{box-shadow:0 0 12px #56d8ff9c}
+.panel{border-color:#285078;background:linear-gradient(145deg,#12263df7,#0c192bf7);box-shadow:0 18px 55px #0003,0 0 0 1px #3ba9f00a}
+.form-grid input:focus,.form-grid select:focus{border-color:#67d7ff;box-shadow:0 0 0 3px #3dbdff20}
+.primary{background:linear-gradient(120deg,#8be8ff,#3197ed);color:#061426;box-shadow:0 5px 22px #1687df35}
+.primary:hover{filter:brightness(1.08);box-shadow:0 8px 28px #1687df4a}
+.pillar{border-color:#2b4d6c;background:linear-gradient(160deg,#142a43,#0d1b2d);box-shadow:inset 0 1px #b4eaff08}
+.pillar:before{background:linear-gradient(90deg,transparent,#58cfff,transparent);height:2px}
+.tab.active{border-color:#245b82;background:#2ca8f012;color:#8de4ff}
+.element-card,.data-card{border-color:#263f5a;background:linear-gradient(145deg,#122238,#0e1b2c)}
+.day-master{border-color:#2874a8;color:#8de4ff;background:#0d5c8b18}
+.site-footer{border-top-color:#4bbcff20}
+@media(max-width:380px){.topbar{padding:0 10px}.brand{gap:8px}.brand-mark{width:32px;height:32px;font-size:20px}.brand b{font-size:11px}.privacy{font-size:9px}.shell{width:calc(100% - 16px)}.panel{padding:15px 10px}.pillar-gz{font-size:21px}.pillar-meta{font-size:9px}.tab{padding:9px 12px}.element-grid{gap:7px}.element-card{padding:12px 9px}}
