@@ -27,3 +27,10 @@ body{background:radial-gradient(ellipse at 50% -22%,#173e68 0,transparent 52%),r
 .mini-element b{font-size:14px;color:var(--text);margin:2px 0 5px}
 .mini-element .bar{height:4px}
 @media(max-width:480px){.mini-elements{gap:6px}.mini-element{font-size:11px}.mini-element b{font-size:12px}}
+
+.shensha-summary{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 14px;padding:12px 14px;border:1px solid #2a5679;border-radius:12px;background:linear-gradient(120deg,#0b3554aa,#10233a)}
+.shensha-summary span{font-size:12px;color:var(--muted)}
+.shensha-summary strong{font-size:17px;color:#8de4ff;margin-right:12px}
+.shensha-card{min-width:0}
+.shensha-card .luck-card-top{align-items:flex-start;gap:8px}
+.shensha-card .chip{white-space:normal;line-height:1.5}
