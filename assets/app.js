@@ -46,7 +46,7 @@
     return '<h3 class="subhead">排盘口径与干支信息</h3><div class="data-grid"><div class="data-card"><h3>排盘输入</h3><pre class="raw">'+safe(json(lastChart.input||lastBirth))+'</pre></div><div class="data-card"><h3>引擎计算说明</h3><pre class="raw">'+safe(json(known))+'</pre></div></div><div class="empty" style="margin-top:12px">地支合冲刑害、十二长生和神煞的完整可视化将在确认本地引擎返回结构后逐项接入。本版本不自行猜算这些数据。</div>';
   }
   function renderLuck() {
-    if (!lastBirth.gender) return '<div class="empty">请在上方选择性别并重新排盘，才能尝试计算大运。</div>';
+    if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能尝试计算大运。</div>';
     if (!lastLuck) return '<div class="empty">当前引擎没有成功返回大运结果。请查看“计算详情”并确认引擎版本的 API。</div>';
     const pillars = Array.isArray(lastLuck.pillars) ? lastLuck.pillars : [];
     return '<h3 class="subhead">大运信息</h3><div class="data-grid"><div class="data-card"><h3>起运与方向</h3><p>方向：'+safe(lastLuck.direction||'—')+'</p><p>起运：'+safe(json(lastLuck.start||'—'))+'</p><p>起运前：'+safe(json(lastLuck.preLuck||'—'))+'</p><p class="muted">详细口径：'+safe(lastLuck.frame||'以引擎返回为准')+'</p></div><div class="data-card"><h3>大运序列</h3>'+ (pillars.length ? pillars.map((p,i)=>'<span class="chip">'+safe(p.ganzhi||p.name||json(p))+'</span>').join('') : '<pre class="raw">'+safe(json(lastLuck))+'</pre>')+'</div></div>';
