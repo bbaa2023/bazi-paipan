@@ -87,30 +87,17 @@
   }
   function renderShensha() {
     const engine=window.BaziEngine||{};
-    const yearGz=lastChart.pillars&&lastChart.pillars.year&&lastChart.pillars.year.ganzhi||'';
-    const branches=engine.BRANCHES||[];
-    const yearBranch=yearGz.charAt(1);
-    const yearIndex=branches.indexOf(yearBranch);
-    if(yearIndex<0) return '<div class="empty">命盘年支不可用，暂时无法计算年支起神煞。</div>';
-    const stars=[
-      ['红鸾','shenshaHongLuan','感情类传统神煞之一'],
-      ['天喜','shenshaTianXi','喜庆类传统神煞之一'],
-      ['孤辰','shenshaGuChen','传统神煞之一'],
-      ['寡宿','shenshaGuaSu','传统神煞之一']
-    ];
-    const pillars=[['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
-    const cards=stars.map(([name,fn,desc])=>{
-      if(typeof engine[fn]!=='function') return '<div class="data-card"><h3>'+name+'</h3><p>当前本地引擎未公开此函数。</p></div>';
-      let target=-1;
-      try { target=engine[fn](yearIndex); } catch (_) {}
-      const branch=branches[target]||'';
-      const matches=pillars.filter(([key])=>{
-        const p=lastChart.pillars&&lastChart.pillars[key];
-        return branch&&p&&p.ganzhi&&p.ganzhi.charAt(1)===branch;
-      }).map(([,label])=>label);
-      return '<div class="data-card"><h3>'+name+'</h3><p>'+safe(desc)+'</p><p>起法：年支 '+safe(yearBranch)+'</p><p>对应地支：<span class="chip">'+safe(branch||'—')+'</span></p><p>命盘落点：'+safe(matches.length?matches.join('、'):'四柱未见对应地支')+'</p></div>';
-    }).join('');
-    return '<h3 class="subhead">神煞（第一批）</h3><p class="muted">先接入当前引擎明确公开的年支起法：红鸾、天喜、孤辰、寡宿。神煞存在不同流派与取法，本页只说明起法与落点，不据此直接作吉凶结论；其他神煞将在核实接口后逐项增加。</p><div class="data-grid">'+cards+'</div>';
+    if(typeof engine.shenshaScan!=='function') return '<div class="empty">当前本地引擎未公开神煞扫描接口；为避免另写算法，本页暂不推算。</div>';
+    const labels=[['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
+    const gz=labels.map(([key])=>{
+      const p=lastChart.pillars&&lastChart.pillars[key];
+      return p&&p.ganzhi?p.ganzhi:'';
+    });
+    let hits=[];
+    try { hits=engine.shenshaScan(gz)||[]; } catch(e) { console.warn('神煞扫描失败：',e); }
+    if(!Array.isArray(hits)) hits=[];
+    const cards=hits.map(hit=>'<div class="data-card shensha-card"><div class="luck-card-top"><h3>'+safe(hit.cn||hit.key||'未命名神煞')+'</h3><span class="chip">'+safe(hit.where||'命中位置未返回')+'</span></div><p>起法依据：'+safe(hit.anchor||'固定柱表/引擎规则')+'</p><p class="muted">此处仅记录本地引擎识别到的规则与落点，不单独据此判定吉凶。</p></div>').join('');
+    return '<h3 class="subhead">神煞扫描</h3><p class="muted">调用仓库内排盘引擎的 shenshaScan 接口，按引擎内置规则检查四柱。涵盖日干起、年支起、月支起、三合组星、固定柱表、空亡等多类规则。神煞流派存在差异，结果用于传统规则参考，不作为单独的吉凶结论。</p><div class="shensha-summary"><span>四柱已扫描</span><strong>'+gz.filter(Boolean).length+' / 4</strong><span>命中规则</span><strong>'+hits.length+'</strong></div><div class="data-grid">'+(cards||'<div class="empty">当前四柱未命中本地引擎所定义的神煞规则，或引擎返回空结果。</div>')+'</div>';
   }
   function renderLuck() {
     if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能计算大运。</div>';
