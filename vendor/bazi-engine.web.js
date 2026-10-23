@@ -555,7 +555,9 @@
     var chosen = method === 'precise' ? prec : trad;
     var diffDays = Math.round((prec.offsetDays - trad.offsetDays) * 10000) / 10000;
 
-    var anchorHourRaw = (opts.hour == null ? 12 : opts.hour) - (dstApplied ? 1 : 0);
+    // 未知时辰使用中午仅作为参考锚点；computeBazi 对未知时辰不扣夏令时小时，
+    // 因此这里也不能再次扣减，否则大运起运日期会与排盘的参考时刻不一致。
+    var anchorHourRaw = opts.hour == null ? 12 : opts.hour - (dstApplied ? 1 : 0);
     var anchor = { y: opts.year, m: opts.month, d: opts.day, h: anchorHourRaw, mi: opts.minute || 0 };
     if (anchor.h < 0) {
       anchor.h += 24;
