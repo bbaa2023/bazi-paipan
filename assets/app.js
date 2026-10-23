@@ -79,6 +79,33 @@
     const relationHtml=(cards.length?cards.join(''):'<div class="empty">当前四柱之间没有命中已定义的两两关系。</div>')+(groups.length?'<h3 class="subhead" style="grid-column:1/-1;margin-top:10px">完整多支组合</h3>'+groups.join(''):'');
     return '<h3 class="subhead">干支关系</h3><p class="muted">逐对调用本地引擎公开函数，展示天干五合/相冲与地支六合/六冲/六害/相刑/自刑/半三合；同时识别四柱中三支齐全的三合、三会组合。这里只枚举规则，不直接判定吉凶。</p><div class="data-grid">'+relationHtml+'</div><h3 class="subhead" style="margin-top:22px">排盘口径与计算信息</h3><div class="data-grid"><div class="data-card"><h3>排盘输入</h3><pre class="raw">'+safe(json(lastChart.input||lastBirth))+'</pre></div><div class="data-card"><h3>引擎计算说明</h3><pre class="raw">'+safe(json(known))+'</pre></div></div>';
   }
+  function renderShensha() {
+    const engine=window.BaziEngine||{};
+    const yearGz=lastChart.pillars&&lastChart.pillars.year&&lastChart.pillars.year.ganzhi||'';
+    const branches=engine.BRANCHES||[];
+    const yearBranch=yearGz.charAt(1);
+    const yearIndex=branches.indexOf(yearBranch);
+    if(yearIndex<0) return '<div class="empty">命盘年支不可用，暂时无法计算年支起神煞。</div>';
+    const stars=[
+      ['红鸾','shenshaHongLuan','感情类传统神煞之一'],
+      ['天喜','shenshaTianXi','喜庆类传统神煞之一'],
+      ['孤辰','shenshaGuChen','传统神煞之一'],
+      ['寡宿','shenshaGuaSu','传统神煞之一']
+    ];
+    const pillars=[['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
+    const cards=stars.map(([name,fn,desc])=>{
+      if(typeof engine[fn]!=='function') return '<div class="data-card"><h3>'+name+'</h3><p>当前本地引擎未公开此函数。</p></div>';
+      let target=-1;
+      try { target=engine[fn](yearIndex); } catch (_) {}
+      const branch=branches[target]||'';
+      const matches=pillars.filter(([key])=>{
+        const p=lastChart.pillars&&lastChart.pillars[key];
+        return branch&&p&&p.ganzhi&&p.ganzhi.charAt(1)===branch;
+      }).map(([,label])=>label);
+      return '<div class="data-card"><h3>'+name+'</h3><p>'+safe(desc)+'</p><p>起法：年支 '+safe(yearBranch)+'</p><p>对应地支：<span class="chip">'+safe(branch||'—')+'</span></p><p>命盘落点：'+safe(matches.length?matches.join('、'):'四柱未见对应地支')+'</p></div>';
+    }).join('');
+    return '<h3 class="subhead">神煞（第一批）</h3><p class="muted">先接入当前引擎明确公开的年支起法：红鸾、天喜、孤辰、寡宿。神煞存在不同流派与取法，本页只说明起法与落点，不据此直接作吉凶结论；其他神煞将在核实接口后逐项增加。</p><div class="data-grid">'+cards+'</div>';
+  }
   function renderLuck() {
     if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能计算大运。</div>';
     if (!lastLuck) return '<div class="empty">当前引擎没有成功返回大运结果，请查看“计算详情”。</div>';
@@ -91,7 +118,7 @@
   function renderRaw() { return '<h3 class="subhead">引擎原始结果</h3><p class="muted">用于核对实际字段，后续功能以此结构为准。</p><pre class="raw">'+safe(json({chart:lastChart,luck:lastLuck}))+'</pre>'; }
   function renderTab() {
     document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===activeTab;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
-    const renderers={overview:renderOverview,details:renderDetails,relations:renderRelations,luck:renderLuck,raw:renderRaw};
+    const renderers={overview:renderOverview,details:renderDetails,relations:renderRelations,shensha:renderShensha,luck:renderLuck,raw:renderRaw};
     content.innerHTML=(renderers[activeTab]||renderOverview)();
   }
   function compute(event) {
