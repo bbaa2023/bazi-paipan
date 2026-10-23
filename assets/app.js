@@ -67,8 +67,17 @@
         if(items.length) cards.push('<div class="data-card"><h3>'+a.label+' '+safe(a.gz)+' ↔ '+b.label+' '+safe(b.gz)+'</h3>'+items.map(x=>'<p>'+safe(x)+'</p>').join('')+'</div>');
       }
     }
-    const relationHtml=cards.length?cards.join(''):'<div class="empty">当前四柱之间没有命中已定义的两两关系，或关系函数不可用。三合、三会等多支组合将在下一轮单独接入。</div>';
-    return '<h3 class="subhead">干支关系</h3><p class="muted">逐对调用本地引擎公开函数，展示天干五合/相冲与地支六合/六冲/六害/相刑/自刑/半三合。这里只枚举规则，不直接判定吉凶。</p><div class="data-grid">'+relationHtml+'</div><h3 class="subhead" style="margin-top:22px">排盘口径与计算信息</h3><div class="data-grid"><div class="data-card"><h3>排盘输入</h3><pre class="raw">'+safe(json(lastChart.input||lastBirth))+'</pre></div><div class="data-card"><h3>引擎计算说明</h3><pre class="raw">'+safe(json(known))+'</pre></div></div>';
+    const presentBranches=pillars.map(p=>p.gz[1]);
+    const groups=[];
+    [['三合',window.BaziEngine&&window.BaziEngine.BRANCH_TRINE],['三会',window.BaziEngine&&window.BaziEngine.BRANCH_MEETING]].forEach(([name,defs])=>{
+      if(!Array.isArray(defs)) return;
+      defs.forEach(g=>{
+        const members=Array.isArray(g.branches)?g.branches:[];
+        if(members.length===3&&members.every(b=>presentBranches.indexOf(b)>=0)) groups.push('<div class="data-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合：'+safe(members.join('、'))+'</p><p class="muted">三支齐全；这里只标记组合结构，不自动推断合化或吉凶。</p></div>');
+      });
+    });
+    const relationHtml=(cards.length?cards.join(''):'<div class="empty">当前四柱之间没有命中已定义的两两关系。</div>')+(groups.length?'<h3 class="subhead" style="grid-column:1/-1;margin-top:10px">完整多支组合</h3>'+groups.join(''):'');
+    return '<h3 class="subhead">干支关系</h3><p class="muted">逐对调用本地引擎公开函数，展示天干五合/相冲与地支六合/六冲/六害/相刑/自刑/半三合；同时识别四柱中三支齐全的三合、三会组合。这里只枚举规则，不直接判定吉凶。</p><div class="data-grid">'+relationHtml+'</div><h3 class="subhead" style="margin-top:22px">排盘口径与计算信息</h3><div class="data-grid"><div class="data-card"><h3>排盘输入</h3><pre class="raw">'+safe(json(lastChart.input||lastBirth))+'</pre></div><div class="data-card"><h3>引擎计算说明</h3><pre class="raw">'+safe(json(known))+'</pre></div></div>';
   }
   function renderLuck() {
     if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能计算大运。</div>';
