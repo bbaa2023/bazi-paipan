@@ -20,3 +20,10 @@ body{background:radial-gradient(ellipse at 50% -22%,#173e68 0,transparent 52%),r
 .day-master{border-color:#2874a8;color:#8de4ff;background:#0d5c8b18}
 .site-footer{border-top-color:#4bbcff20}
 @media(max-width:380px){.topbar{padding:0 10px}.brand{gap:8px}.brand-mark{width:32px;height:32px;font-size:20px}.brand b{font-size:11px}.privacy{font-size:9px}.shell{width:calc(100% - 16px)}.panel{padding:15px 10px}.pillar-gz{font-size:21px}.pillar-meta{font-size:9px}.tab{padding:9px 12px}.element-grid{gap:7px}.element-card{padding:12px 9px}}
+
+.mini-elements{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.mini-element{min-width:0;color:var(--el);font-size:12px}
+.mini-element span,.mini-element b{display:block}
+.mini-element b{font-size:14px;color:var(--text);margin:2px 0 5px}
+.mini-element .bar{height:4px}
+@media(max-width:480px){.mini-elements{gap:6px}.mini-element{font-size:11px}.mini-element b{font-size:12px}}
