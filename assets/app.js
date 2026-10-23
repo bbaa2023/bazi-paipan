@@ -71,10 +71,13 @@
     return '<h3 class="subhead">干支关系</h3><p class="muted">逐对调用本地引擎公开函数，展示天干五合/相冲与地支六合/六冲/六害/相刑/自刑/半三合。这里只枚举规则，不直接判定吉凶。</p><div class="data-grid">'+relationHtml+'</div><h3 class="subhead" style="margin-top:22px">排盘口径与计算信息</h3><div class="data-grid"><div class="data-card"><h3>排盘输入</h3><pre class="raw">'+safe(json(lastChart.input||lastBirth))+'</pre></div><div class="data-card"><h3>引擎计算说明</h3><pre class="raw">'+safe(json(known))+'</pre></div></div>';
   }
   function renderLuck() {
-    if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能尝试计算大运。</div>';
-    if (!lastLuck) return '<div class="empty">当前引擎没有成功返回大运结果。请查看“计算详情”并确认引擎版本的 API。</div>';
-    const pillars = Array.isArray(lastLuck.pillars) ? lastLuck.pillars : [];
-    return '<h3 class="subhead">大运信息</h3><div class="data-grid"><div class="data-card"><h3>起运与方向</h3><p>方向：'+safe(lastLuck.direction||'—')+'</p><p>起运：'+safe(json(lastLuck.start||'—'))+'</p><p>起运前：'+safe(json(lastLuck.preLuck||'—'))+'</p><p class="muted">详细口径：'+safe(lastLuck.frame||'以引擎返回为准')+'</p></div><div class="data-card"><h3>大运序列</h3>'+ (pillars.length ? pillars.map((p,i)=>'<span class="chip">'+safe(p.ganzhi||p.name||json(p))+'</span>').join('') : '<pre class="raw">'+safe(json(lastLuck))+'</pre>')+'</div></div>';
+    if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能计算大运。</div>';
+    if (!lastLuck) return '<div class="empty">当前引擎没有成功返回大运结果，请查看“计算详情”。</div>';
+    const s=lastLuck.start||{}, chosen=s.chosen||{}, pre=lastLuck.preLuck||{};
+    const direction=lastLuck.direction&&typeof lastLuck.direction==='object'?(lastLuck.direction.forward?'顺排':'逆排'):(lastLuck.direction||'—');
+    const items=Array.isArray(lastLuck.pillars)?lastLuck.pillars:[];
+    const cards=items.map(p=>'<div class="data-card"><h3>第'+safe(p.index)+'步 · '+safe(p.ganzhi||'—')+(p.isCurrent?'（当前）':'')+'</h3><p>'+safe(p.yearLabel||'年份未知')+'</p><p>虚岁：'+safe(p.startAgeSui??'—')+'–'+safe(p.endAgeSui??'—')+'</p><p>天干十神：'+safe(p.stemTenGod&&p.stemTenGod.god||'—')+'</p><p>地支十神：'+safe(p.branchTenGod&&p.branchTenGod.god||'—')+'</p><p>藏干：'+safe(Array.isArray(p.hideGan)?p.hideGan.join('、'):'—')+'</p><p>十二长生：'+safe(p.stage||'—')+'</p></div>').join('');
+    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">以上字段来自本地排盘引擎；不同起运口径可能产生差异。</p></div></div><h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="data-grid">'+(cards||'<div class="empty">引擎没有返回大运序列。</div>')+'</div>';
   }
   function renderRaw() { return '<h3 class="subhead">引擎原始结果</h3><p class="muted">用于核对实际字段，后续功能以此结构为准。</p><pre class="raw">'+safe(json({chart:lastChart,luck:lastLuck}))+'</pre>'; }
   function renderTab() {
