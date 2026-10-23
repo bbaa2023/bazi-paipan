@@ -34,3 +34,10 @@ body{background:radial-gradient(ellipse at 50% -22%,#173e68 0,transparent 52%),r
 .shensha-card{min-width:0}
 .shensha-card .luck-card-top{align-items:flex-start;gap:8px}
 .shensha-card .chip{white-space:normal;line-height:1.5}
+
+.annual-meta{display:grid;grid-template-columns:minmax(82px,auto) 1fr;gap:7px 12px;margin:12px 0 14px;font-size:13px}
+.annual-meta span{color:var(--muted)}
+.annual-meta strong{color:var(--text);font-weight:600;overflow-wrap:anywhere}
+.annual-relations{display:flex;flex-wrap:wrap;gap:6px}
+.annual-card h3{margin-bottom:0}
+@media(max-width:380px){.annual-meta{grid-template-columns:78px minmax(0,1fr);gap:6px 8px;font-size:12px}}
