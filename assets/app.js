@@ -27,7 +27,7 @@
   }
   function renderOverview() {
     const data = lastChart.fiveElements || {};
-    const selected = data.withHiddenStems || data.stemsBranchesOnly || {};
+    const selected = data.withHiddenHalfWeight || data.withHiddenStems || data.stemsBranchesOnly || {};
     const entries = objectEntries(selected);
     if (!entries.length) return '<div class="empty">当前引擎版本没有返回可识别的五行统计字段。请在“计算详情”查看原始结果。</div>';
     const max = Math.max(1,...entries.map(([,v])=>Number(v)||0));
@@ -35,10 +35,18 @@
   }
   function renderDetails() {
     const ps = lastChart.pillars || {};
-    return '<h3 class="subhead">藏干与十神</h3><div class="data-grid">'+[['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']].map(([key,label])=>{
+    const dayGan = lastChart.meta?.dayMaster || ps.day?.ganzhi?.charAt(0);
+    const labels = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
+    const cards = labels.map(([key,label])=>{
       const p=ps[key]||{};
-      return '<div class="data-card"><h3>'+label+' · '+safe(p.ganzhi||'—')+'</h3><p>天干十神：'+safe(p.shiShenGan||'—')+'</p><p>藏干：'+(Array.isArray(p.hideGan)?p.hideGan.map(x=>'<span class="chip '+elementClass(x)+'">'+safe(x)+'</span>').join(''):'—')+'</p><p>纳音：'+safe(p.naYin||'—')+'</p></div>';
-    }).join('')+'</div><p class="muted">仅显示引擎实际返回的字段；尚未由引擎提供的数据不会用固定文案伪造。</p>';
+      const branch=String(p.ganzhi||'').charAt(1);
+      let stage='—';
+      if (branch && dayGan && window.BaziEngine && typeof window.BaziEngine.twelveStage==='function') {
+        try { const result=window.BaziEngine.twelveStage(dayGan,branch); stage=result?.stage||'—'; } catch (_) {}
+      }
+      return '<div class="data-card"><h3>'+label+' · '+safe(p.ganzhi||'—')+'</h3><p>天干十神：'+safe(p.shiShenGan||'—')+'</p><p>藏干：'+(Array.isArray(p.hideGan)?p.hideGan.map(x=>'<span class="chip '+elementClass(x)+'">'+safe(x)+'</span>').join(''):'—')+'</p><p>纳音：'+safe(p.naYin||'—')+'</p><p>十二长生：<span class="chip '+elementClass(dayGan||'')+'">'+safe(stage)+'</span></p></div>';
+    }).join('');
+    return '<h3 class="subhead">藏干、十神与十二长生</h3><p class="muted">十二长生以日干为参照，按本地引擎公开函数计算。</p><div class="data-grid">'+cards+'</div><p class="muted">仅展示引擎实际返回或通过引擎公开函数计算的数据；未支持的项目不会用固定文案伪造。</p>';
   }
   function renderRelations() {
     const meta = lastChart.meta || {};
