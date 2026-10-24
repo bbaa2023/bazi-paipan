@@ -6,7 +6,7 @@
   const results = $('#results');
   const pillarsBox = $('#pillars');
   const content = $('#tab-content');
-  let lastBirth = null, lastChart = null, lastLuck = null, activeTab = 'overview';
+  let lastBirth = null, lastChart = null, lastLuck = null, lastFavorable = null, activeTab = 'overview';
   const elementFor = {'甲':'木','乙':'木','寅':'木','卯':'木','丙':'火','丁':'火','巳':'火','午':'火','戊':'土','己':'土','辰':'土','戌':'土','丑':'土','未':'土','庚':'金','辛':'金','申':'金','酉':'金','壬':'水','癸':'水','子':'水','亥':'水'};
   const elementClass = (text) => 'el-' + (elementFor[text] || '土');
   const safe = (s) => String(s ?? '—').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -25,10 +25,30 @@
       const branch = String(gz).charAt(1) || '—';
       const el = elementClass(stem);
       const dayClass = key === 'day' ? ' pillar-day-master' : '';
-      return '<article class="pillar '+el+dayClass+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+'</div><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>天干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>地支</small><strong>'+safe(branch)+'</strong></div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
+      const palace = ({year:'祖上宫',month:'父母事业宫',day:'自身',time:'子女宫'})[key] || '—';
+      let stage='—';
+      if(stem!=='—'&&branch!=='—'&&window.BaziEngine&&typeof window.BaziEngine.twelveStage==='function'){
+        try{const stageResult=window.BaziEngine.twelveStage(stem,branch);stage=stageResult?.stage||'—';}catch(_){}
+      }
+      const tombBadge = ['辰','戌','丑','未'].includes(branch) ? '<span class="tomb-badge">墓库</span>' : '';
+      return '<article class="pillar '+el+dayClass+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+tombBadge+'</div><div class="pillar-palace">'+palace+'</div><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>天干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>地支</small><strong>'+safe(branch)+'</strong><em class="pillar-stage">'+safe(stage)+'</em></div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
     }).join('');
     const dm = chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0) || '—';
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
+  }
+  function renderFavorableCard() {
+    const data = lastFavorable || {};
+    const score = data.score || {};
+    const fuYang = data.fuYang || {};
+    const favorable = Array.isArray(fuYang.favorable) ? fuYang.favorable : [];
+    const elements = score.perElement && typeof score.perElement === 'object' ? score.perElement : null;
+    const strength = score.verdict === 'strong' ? '偏强' : score.verdict === 'weak' ? '偏弱' : score.verdict === 'balanced' ? '中和' : '—';
+    const strengthText = score.verdictCn || strength;
+    const strengthValue = score.verdict ? strength : '—';
+    const elementText = elements ? ['木','火','土','金','水'].map(k=>k+' '+(elements[k] ?? '—')).join('　·　') : '—';
+    const favorableText = favorable.length ? favorable.map(x=>x&&x.element||'—').join('、') : (fuYang.favorable ? '—' : '—');
+    const climate = data.tiaoHou && data.tiaoHou.ruleCn ? data.tiaoHou.ruleCn : '—';
+    return '<section class="favorable-card" aria-label="喜用参考"><div class="favorable-heading"><span class="favorable-seal">参</span><div><h3>喜用参考</h3><p>传统规则参考 · 本地引擎计算</p></div></div><div class="favorable-grid"><div class="favorable-item"><span>日主旺衰</span><strong>'+safe(strengthValue)+'</strong></div><div class="favorable-item favorable-wide"><span>五行力量对比</span><p>'+safe(elementText)+'</p></div><div class="favorable-item favorable-wide"><span>扶抑用神参考</span><strong>'+safe(favorableText)+'</strong></div><div class="favorable-item favorable-wide"><span>调候参考</span><p>'+safe(climate)+'</p></div></div><small class="favorable-footnote">以上为传统流派规则推演，仅供文化参考，不作为人生决策依据</small></section>';
   }
   function renderOverview() {
     const data = lastChart.fiveElements || {};
