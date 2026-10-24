@@ -6,11 +6,11 @@
   <meta name="theme-color" content="#f3f0e8">
   <meta name="description" content="传统四柱八字排盘工具：浏览器本地计算，出生信息不发送到第三方服务。">
   <title>八字排盘｜金镇安·古法修炼研修室</title>
-  <link rel="stylesheet" href="./assets/style.css?v=20261024i">
+  <link rel="stylesheet" href="./assets/style.css?v=20261024j">
   <script defer src="https://k18.mom/script.js" data-website-id="0f61d2b9-f6a5-48ca-97be-4540844a474d"></script>
   <script defer src="./vendor/lunar.js?v=20261024e"></script>
   <script defer src="./vendor/bazi-engine.web.js?v=20261024e"></script>
-  <script defer src="./assets/app.js?v=20261024i"></script>
+  <script defer src="./assets/app.js?v=20261024j"></script>
 </head>
 <body>
   <header class="topbar">
@@ -20,9 +20,7 @@
   <main class="shell">
     <section class="hero">
       <div class="hero-emblem" aria-hidden="true"><span>☯</span></div>
-      <div class="eyebrow">乾坤有序 · 阴阳相生</div>
-      <h1>四柱命盘 <span>东方命理 · 传统排盘</span></h1>
-      <p>以出生时刻排定年、月、日、时四柱，查看五行、藏干、十神、神煞、大运与流年。</p>
+      <h1>四柱命盘 <span>传统排盘</span></h1>
     </section>
     <section class="panel form-panel">
       <div class="section-heading"><div><span class="kicker">01 / BIRTH DATA</span><h2>出生信息</h2></div><span class="step">一次输入，联动查看</span></div>
@@ -43,7 +41,7 @@
       <div id="error" class="notice error" role="alert" hidden></div>
     </section>
     <section id="results" class="results" hidden>
-      <div class="section-heading result-title"><div><span class="kicker">命理总纲 · CHART OVERVIEW</span><h2>本命四柱</h2></div><span id="day-master" class="day-master"></span></div>
+      <div class="section-heading result-title"><div><span class="kicker">命盘总览</span><h2>本命四柱</h2></div><div class="result-actions"><span id="day-master" class="day-master"></span><button id="presentation-toggle" class="presentation-toggle" type="button" aria-pressed="false" hidden>直播展示模式</button></div></div>
       <!-- [布局规范 1/6] 左侧本命与五行主面板，右侧大运/流年摘要；详情仍由现有标签模块渲染 -->
       <div class="results-layout">
         <div class="results-primary">
@@ -62,10 +60,12 @@
             <button class="tab" data-tab="annual" role="tab">流年详情</button>
           </div>
           <div id="tab-content" class="tab-content" aria-live="polite"></div>
+          <p class="disclaimer results-disclaimer">本站仅为传统干支历法排盘工具，输出四柱五行等古籍命理原始数据，属于传统文化研究工具，不构成命运预测，不提供任何吉凶祸福判断，所有内容仅供娱乐参考，请勿作为人生决策依据。</p>
         </div>
       </div>
     </section>
     <footer class="site-footer">
+      <p class="disclaimer footer-disclaimer">本站仅为传统干支历法排盘工具，输出四柱五行等古籍命理原始数据，属于传统文化研究工具，不构成命运预测，不提供任何吉凶祸福判断，所有内容仅供娱乐参考，请勿作为人生决策依据。</p>
       <span>独立排盘工具 · 出生信息仅用于当前浏览器计算</span>
       <span>计算引擎 <a href="https://github.com/bazi-atlas/bazi-engine" target="_blank" rel="noopener noreferrer">BaZi Engine</a> · MIT</span>
     </footer>
