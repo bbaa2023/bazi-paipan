@@ -35,18 +35,22 @@
     const selected = data.withHiddenHalfWeight || data.withHiddenStems || data.stemsBranchesOnly || {};
     const entries = objectEntries(selected);
     if (!entries.length) return '<div class="empty">当前引擎版本没有返回可识别的五行统计字段。请重新排盘；如果问题持续，请联系维护者。</div>';
-    const max = Math.max(1,...entries.map(([,v])=>Number(v)||0));
     const keys=['木','火','土','金','水'];
-    const total=keys.reduce((sum,k)=>sum+(Number(selected[k])||0),0)||1;
-    const colors={'木':'var(--wood)','火':'var(--fire)','土':'var(--earth)','金':'var(--metal)','水':'var(--water)'};
-    let cursor=0;const stops=keys.map(k=>{const end=cursor+(Number(selected[k])||0)/total*100;const stop=colors[k]+' '+cursor.toFixed(2)+'% '+end.toFixed(2)+'%';cursor=end;return stop;});
-    const ring='<div class="element-visual"><div class="element-wheel" role="img" aria-label="五行比例图" style="background:conic-gradient('+stops.join(',')+')"><div class="element-wheel-center"><small>五行总量</small><strong>'+safe(Number(total.toFixed(1)))+'</strong><span>统计参考</span></div></div><div class="element-legend">'+keys.map(k=>'<div class="legend-item '+elementClass(k)+'"><i></i><span>'+k+' · '+safe(((Number(selected[k])||0)/total*100).toFixed(1))+'%</span><b>'+safe(selected[k]??0)+' 点</b><div class="legend-bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(selected[k])||0)/total*100))+'%"></span></div></div>').join('')+'</div></div>';
-    const labels={stemsBranchesOnly:'天干与地支主气',withHiddenHalfWeight:'藏干半权重',withHiddenFull:'藏干全权重'};
-    const compare=Object.keys(labels).filter(k=>data[k]).map(k=>{
-      const values=data[k]||{}, peak=Math.max(1,...keys.map(el=>Number(values[el])||0));
-      return '<div class="data-card"><h3>'+labels[k]+'</h3><div class="mini-elements">'+keys.map(el=>'<div class="mini-element '+elementClass(el)+'"><span>'+el+'</span><b>'+safe(values[el]??0)+'</b><div class="bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(values[el])||0)/peak*100))+'%"></span></div></div>').join('')+'</div></div>';
-    }).join('');
-    return '<h3 class="subhead">五行力量分布</h3><p class="muted">默认口径：藏干半权重（天干与地支主气各计 1，藏干各计 0.5）。环形图与下方色卡呈现同一组引擎统计值；不同统计口径不可直接混为一谈。</p>'+ring+'<div class="element-grid">'+entries.map(([name,value])=>'<div class="element-card '+elementClass(name)+'"><div class="element-name">'+safe(name)+' · '+safe(((Number(value)||0)/total*100).toFixed(1))+'%</div><div class="element-count">'+safe(value)+' <small>点</small></div><div class="bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(value)||0)/total*100))+'%"></span></div></div>').join('')+'</div><h3 class="subhead" style="margin-top:22px">统计口径对照</h3><div class="data-grid">'+compare+'</div>';
+    const values=Object.fromEntries(keys.map(k=>[k,Math.max(0,Number(selected[k])||0)]));
+    const total=keys.reduce((sum,k)=>sum+values[k],0)||1;
+    const colors={'木':'#34865d','火':'#d95442','土':'#bd8a31','金':'#8c969e','水':'#367db3'};
+    let cursor=0;
+    const stops=keys.map(k=>{const end=cursor+values[k]/total*100;const stop=colors[k]+' '+cursor.toFixed(2)+'% '+end.toFixed(2)+'%';cursor=end;return stop;});
+    const ranked=keys.slice().sort((a,b)=>values[b]-values[a]);
+    const top=ranked[0], second=ranked[1];
+    const lower=ranked.slice(-2).filter(k=>values[k]<values[top]);
+    const pct=k=>(values[k]/total*100).toFixed(1);
+    const wheel='<div class="element-visual element-visual-compact"><div class="element-wheel" role="img" aria-label="五行能量比例图，木 '+pct('木')+'%，火 '+pct('火')+'%，土 '+pct('土')+'%，金 '+pct('金')+'%，水 '+pct('水')+'%" style="background:conic-gradient('+stops.join(',')+')"><div class="element-wheel-center"><small>五行能量</small><strong>'+safe(Number(total.toFixed(1)))+'</strong><span>合计参考值</span></div></div><div class="element-legend element-legend-visual">'+keys.map(k=>'<div class="legend-item '+elementClass(k)+'"><i></i><span>'+k+'</span><b>'+safe(pct(k))+'%</b><small>'+safe(values[k])+' 点</small></div>').join('')+'</div></div>';
+    let firstText='当前五行分布中，'+top+'的占比最高（'+pct(top)+'%），其次是'+second+'（'+pct(second)+'%）。';
+    if(lower.length) firstText+='相对而言，'+lower.join('、')+'的占比较少。';
+    else firstText+='其余五行的占比与之接近。';
+    const secondText='从整体分布看，这组命盘呈现出“'+top+'较显、'+(lower.length?lower.join('与')+'相对收敛':'其余五行相对均衡')+'”的特点。五行之间讲究相生相制，观察分布时，也可以结合木生火、火生土、土生金、金生水、水生木的流转关系来理解。';
+    return '<h3 class="subhead">五行能量分布</h3>'+wheel+'<section class="element-analysis"><div class="element-analysis-title"><span class="analysis-mark">简</span><h3>五行简析</h3></div><p>'+safe(firstText)+'</p><p>'+safe(secondText)+'</p></section>';
   }
   function renderDetails() {
     const ps = lastChart.pillars || {};
