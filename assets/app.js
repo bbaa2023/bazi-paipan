@@ -199,21 +199,37 @@
     try {
       const chart=window.BaziEngine.computeBazi(birth);
       if (!chart || !chart.pillars) throw new Error('引擎未返回有效命盘数据。');
+      // computeBazi 返回四柱与五行；喜用/旺衰/调候由 v0.6.0 独立接口返回。
+      console.log('[BaziEngine.computeBazi] 完整返回结构：', chart);
+      lastFavorable = null;
+      if (typeof window.BaziEngine.computeFavorableElement === 'function') {
+        try {
+          lastFavorable = window.BaziEngine.computeFavorableElement(birth);
+          console.log('[BaziEngine.computeFavorableElement] 完整返回结构：', lastFavorable);
+        } catch (favorableError) { console.warn('喜用参考计算暂不可用：', favorableError); }
+      }
       lastBirth={...birth,gender:genderRaw===''?null:Number(genderRaw)};
       lastChart=chart; lastLuck=null;
       if (lastBirth.gender!==null && typeof window.BaziEngine.computeLuckPillars==='function') {
         try { lastLuck=window.BaziEngine.computeLuckPillars({...birth,gender:lastBirth.gender,count:10}); } catch (e) { console.warn('大运计算暂不可用：',e); }
       }
-      drawPillars(chart); results.hidden=false; activeTab='details'; renderSidePanels(); renderTab();
+      drawPillars(chart);
+      const chartFrame=pillarsBox.closest('.chart-frame');
+      if(chartFrame){
+        let card=document.getElementById('favorable-card');
+        if(!card){card=document.createElement('div');card.id='favorable-card';chartFrame.insertAdjacentElement('afterend',card);}
+        card.outerHTML=renderFavorableCard().replace('class="favorable-card"','id="favorable-card" class="favorable-card"');
+      }
+      results.hidden=false; activeTab='details'; renderSidePanels(); renderTab();
       const presentationButton=document.getElementById('presentation-toggle');
-      if(presentationButton) presentationButton.hidden=false;
+      if(presentationButton) presentationButton.hidden=true;
       results.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
     } catch (e) {
       console.error(e); showError('排盘失败：'+(e && e.message ? e.message : '未知错误')+'。请检查输入范围，或把浏览器控制台错误发给维护者。');
     }
   }
   const presentationButton=document.getElementById('presentation-toggle');
-  if(presentationButton) presentationButton.addEventListener('click',togglePresentationMode);
+  if(presentationButton){presentationButton.hidden=true;presentationButton.removeEventListener('click',togglePresentationMode);}
   form.addEventListener('submit',compute);
   document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{activeTab=b.dataset.tab;renderTab();}));
   if (!window.BaziEngine) {
