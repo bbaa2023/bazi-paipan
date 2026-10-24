@@ -14,14 +14,18 @@
   function hideError() { errorBox.hidden = true; errorBox.textContent = ''; }
   function objectEntries(obj) { return obj && typeof obj === 'object' ? Object.entries(obj) : []; }
   function drawPillars(chart) {
-    const labels = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
+    // [规范 2/6] 未知时辰时不渲染虚构时柱；日柱使用独立高亮类。
+    const labels = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']]
+      .filter(([key]) => key !== 'time' || !(lastBirth && lastBirth.unknownTime));
+    pillarsBox.classList.toggle('three-pillars', labels.length === 3);
     pillarsBox.innerHTML = labels.map(([key,label],i) => {
       const p = chart.pillars?.[key] || {};
-      const gz = p.ganzhi || (key === 'time' && chart.input?.unknownTime ? '未知' : '—');
+      const gz = p.ganzhi || '—';
       const stem = String(gz).charAt(0) || '—';
       const branch = String(gz).charAt(1) || '—';
       const el = elementClass(stem);
-      return '<article class="pillar '+el+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+'</div><span class="pillar-icon '+el+'" aria-hidden="true">'+(elementFor[stem]||'土')+'</span><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>天干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>地支</small><strong>'+safe(branch)+'</strong></div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
+      const dayClass = key === 'day' ? ' pillar-day-master' : '';
+      return '<article class="pillar '+el+dayClass+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+'</div><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>天干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>地支</small><strong>'+safe(branch)+'</strong></div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
     }).join('');
     const dm = chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0) || '—';
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
@@ -36,13 +40,13 @@
     const total=keys.reduce((sum,k)=>sum+(Number(selected[k])||0),0)||1;
     const colors={'木':'var(--wood)','火':'var(--fire)','土':'var(--earth)','金':'var(--metal)','水':'var(--water)'};
     let cursor=0;const stops=keys.map(k=>{const end=cursor+(Number(selected[k])||0)/total*100;const stop=colors[k]+' '+cursor.toFixed(2)+'% '+end.toFixed(2)+'%';cursor=end;return stop;});
-    const ring='<div class="element-visual"><div class="element-wheel" role="img" aria-label="五行比例图" style="background:conic-gradient('+stops.join(',')+')"><div class="element-wheel-center"><small>五行总量</small><strong>'+safe(Number(total.toFixed(1)))+'</strong><span>统计参考</span></div></div><div class="element-legend">'+keys.map(k=>'<div class="legend-item '+elementClass(k)+'"><i></i><span>'+k+'</span><b>'+safe(selected[k]??0)+'</b></div>').join('')+'</div></div>';
+    const ring='<div class="element-visual"><div class="element-wheel" role="img" aria-label="五行比例图" style="background:conic-gradient('+stops.join(',')+')"><div class="element-wheel-center"><small>五行总量</small><strong>'+safe(Number(total.toFixed(1)))+'</strong><span>统计参考</span></div></div><div class="element-legend">'+keys.map(k=>'<div class="legend-item '+elementClass(k)+'"><i></i><span>'+k+' · '+safe(((Number(selected[k])||0)/total*100).toFixed(1))+'%</span><b>'+safe(selected[k]??0)+' 点</b><div class="legend-bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(selected[k])||0)/total*100))+'%"></span></div></div>').join('')+'</div></div>';
     const labels={stemsBranchesOnly:'天干与地支主气',withHiddenHalfWeight:'藏干半权重',withHiddenFull:'藏干全权重'};
     const compare=Object.keys(labels).filter(k=>data[k]).map(k=>{
       const values=data[k]||{}, peak=Math.max(1,...keys.map(el=>Number(values[el])||0));
       return '<div class="data-card"><h3>'+labels[k]+'</h3><div class="mini-elements">'+keys.map(el=>'<div class="mini-element '+elementClass(el)+'"><span>'+el+'</span><b>'+safe(values[el]??0)+'</b><div class="bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(values[el])||0)/peak*100))+'%"></span></div></div>').join('')+'</div></div>';
     }).join('');
-    return '<h3 class="subhead">五行力量分布</h3><p class="muted">默认口径：藏干半权重（天干与地支主气各计 1，藏干各计 0.5）。环形图与下方色卡呈现同一组引擎统计值；不同统计口径不可直接混为一谈。</p>'+ring+'<div class="element-grid">'+entries.map(([name,value])=>'<div class="element-card '+elementClass(name)+'"><div class="element-name">'+safe(name)+'</div><div class="element-count">'+safe(value)+'</div><div class="bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(value)||0)/max*100))+'%"></span></div></div>').join('')+'</div><h3 class="subhead" style="margin-top:22px">统计口径对照</h3><div class="data-grid">'+compare+'</div>';
+    return '<h3 class="subhead">五行力量分布</h3><p class="muted">默认口径：藏干半权重（天干与地支主气各计 1，藏干各计 0.5）。环形图与下方色卡呈现同一组引擎统计值；不同统计口径不可直接混为一谈。</p>'+ring+'<div class="element-grid">'+entries.map(([name,value])=>'<div class="element-card '+elementClass(name)+'"><div class="element-name">'+safe(name)+' · '+safe(((Number(value)||0)/total*100).toFixed(1))+'%</div><div class="element-count">'+safe(value)+' <small>点</small></div><div class="bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(value)||0)/total*100))+'%"></span></div></div>').join('')+'</div><h3 class="subhead" style="margin-top:22px">统计口径对照</h3><div class="data-grid">'+compare+'</div>';
   }
   function renderDetails() {
     const ps = lastChart.pillars || {};
@@ -136,10 +140,18 @@
     }
     return '<h3 class="subhead">未来六个公历年份的流年干支</h3><p class="muted">使用本地引擎的年柱资料，列出流年干支、流年天干对日主的十神、五行、纳音、立春交界，以及与本命四柱命中的直接干支关系。此页是传统历法与规则对照，不是完整的流年吉凶解读；立春前后换年需要结合具体出生/查询时刻判断。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">本地引擎没有返回流年资料。</div>')+'</div>';
   }
+  function renderSidePanels() {
+    // [规范 1/4] 侧栏只复用已有渲染函数和引擎数据，不增加任何命理字段。
+    const luck = $('#luck-side'), annual = $('#annual-side'), overview = $('#overview-panel');
+    if (luck) luck.innerHTML = renderLuck();
+    if (annual) annual.innerHTML = renderAnnual();
+    if (overview) overview.innerHTML = renderOverview();
+  }
   function renderTab() {
     document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===activeTab;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
-    const renderers={overview:renderOverview,details:renderDetails,relations:renderRelations,shensha:renderShensha,luck:renderLuck,annual:renderAnnual};
-    content.innerHTML=(renderers[activeTab]||renderOverview)();
+    const renderers={details:renderDetails,relations:renderRelations,shensha:renderShensha,luck:renderLuck,annual:renderAnnual,overview:renderOverview};
+    content.innerHTML=(renderers[activeTab]||renderDetails)();
+    if (activeTab === 'overview') content.innerHTML = '<p class="muted">五行总览已固定显示在本命面板中。</p>';
   }
   function compute(event) {
     event.preventDefault(); hideError();
@@ -164,7 +176,7 @@
       if (lastBirth.gender!==null && typeof window.BaziEngine.computeLuckPillars==='function') {
         try { lastLuck=window.BaziEngine.computeLuckPillars({...birth,gender:lastBirth.gender,count:10}); } catch (e) { console.warn('大运计算暂不可用：',e); }
       }
-      drawPillars(chart); results.hidden=false; activeTab='overview'; renderTab();
+      drawPillars(chart); results.hidden=false; activeTab='details'; renderSidePanels(); renderTab();
       results.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
     } catch (e) {
       console.error(e); showError('排盘失败：'+(e && e.message ? e.message : '未知错误')+'。请检查输入范围，或把浏览器控制台错误发给维护者。');
