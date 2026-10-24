@@ -26,12 +26,8 @@
       const el = elementClass(stem);
       const dayClass = key === 'day' ? ' pillar-day-master' : '';
       const palace = ({year:'祖上宫',month:'父母事业宫',day:'自身',time:'子女宫'})[key] || '—';
-      let stage='—';
-      if(stem!=='—'&&branch!=='—'&&window.BaziEngine&&typeof window.BaziEngine.twelveStage==='function'){
-        try{const stageResult=window.BaziEngine.twelveStage(stem,branch);stage=stageResult?.stage||'—';}catch(_){}
-      }
       const tombBadge = ['辰','戌','丑','未'].includes(branch) ? '<span class="tomb-badge">墓库</span>' : '';
-      return '<article class="pillar '+el+dayClass+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+tombBadge+'</div><div class="pillar-palace">'+palace+'</div><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>天干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>地支</small><strong>'+safe(branch)+'</strong><em class="pillar-stage">'+safe(stage)+'</em></div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
+      return '<article class="pillar '+el+dayClass+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+tombBadge+'</div><div class="pillar-palace">'+palace+'</div><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>天干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>地支</small><strong>'+safe(branch)+'</strong></div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
     }).join('');
     const dm = chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0) || '—';
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
@@ -69,6 +65,21 @@
     firstText+=lower.length?'相对而言，'+lower.join('、')+'的占比较少。':'其余五行的占比与之接近。';
     const secondText='整体呈现出“'+top+'较显、'+(lower.length?lower.join('与')+'相对收敛':'其余五行相对均衡')+'”的分布特点。传统五行讲究相生相制，也可以结合木生火、火生土、土生金、金生水、水生木的流转关系来理解。';
     return '<h3 class="subhead">五行能量分布</h3>'+ring+'<section class="element-analysis"><div class="element-analysis-title"><span class="analysis-mark">简</span><h3>五行简析</h3></div><p>'+safe(firstText)+'</p><p>'+safe(secondText)+'</p></section>';
+  }
+  function renderTwelveStages() {
+    const pillars = lastChart?.pillars || {};
+    const rows = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']]
+      .filter(([key]) => key !== 'time' || !(lastBirth && lastBirth.unknownTime));
+    return '<h3 class="subhead">十二长生</h3><p class="muted">以各柱天干为参照，按本地排盘引擎计算。</p><div class="twelve-stage-grid">'+rows.map(([key,label])=>{
+      const p=pillars[key]||{};
+      const gz=String(p.ganzhi||'');
+      const stem=gz.charAt(0), branch=gz.charAt(1);
+      let stage='—';
+      if(stem&&branch&&window.BaziEngine&&typeof window.BaziEngine.twelveStage==='function'){
+        try{const result=window.BaziEngine.twelveStage(stem,branch);stage=result?.stage||'—';}catch(_){}
+      }
+      return '<article class="twelve-stage-card"><span>'+label+'</span><div class="twelve-stage-gz">'+safe(gz||'—')+'</div><strong>'+safe(stage)+'</strong><small>天干坐支</small></article>';
+    }).join('')+'</div>';
   }
   function renderDetails() {
     const ps = lastChart.pillars || {};
@@ -177,7 +188,7 @@
   }
   function renderTab() {
     document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===activeTab;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
-    const renderers={details:renderDetails,relations:renderRelations,shensha:renderShensha,luck:renderLuck,annual:renderAnnual,overview:renderOverview};
+    const renderers={details:renderDetails,relations:renderRelations,shensha:renderShensha,luck:renderLuck,annual:renderAnnual,twelve:renderTwelveStages,overview:renderOverview};
     content.innerHTML=(renderers[activeTab]||renderDetails)();
     if (activeTab === 'overview') content.innerHTML = '<p class="muted">五行总览已固定显示在本命面板中。</p>';
   }
