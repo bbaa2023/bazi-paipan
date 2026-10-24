@@ -58,3 +58,17 @@
 .twelve-stage-card>strong{color:#8d6528;font-size:23px;font-weight:750}
 .twelve-stage-card>small{color:#898477;font-size:10px}
 @media(max-width:680px){.twelve-stage-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.twelve-stage-card{padding:12px}.twelve-stage-card>strong{font-size:20px}}
+
+/* 五行分布与旺衰/喜用参考合并为一个主卡片 */
+.element-combined-card{overflow:hidden;border:1px solid #e1d0ac;border-radius:14px;background:#fffdf8;box-shadow:0 5px 16px #6c5a3b0b}
+.element-combined-card>.element-visual{margin:0;border:0;border-radius:0;background:#fbf7ee}
+.element-combined-card>.element-analysis{margin:0;border:0;border-top:1px solid #e6dac4;border-radius:0;box-shadow:none}
+.element-reference{margin-top:13px;padding:12px 13px;border:1px solid #e4d5bb;border-radius:10px;background:#f8f2e6}
+.element-reference-heading{margin-bottom:8px;color:#805c22;font-size:13px;font-weight:750}
+.element-reference-row{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
+.element-reference-row span,.element-reference p span{color:#81745d;font-size:11px}
+.element-reference-row strong{color:#34465b;font-size:13px}
+.element-reference p{margin:8px 0 5px;color:#34465b;font-size:12px;line-height:1.7}
+.element-reference>small{display:block;color:#898477;font-size:10px;line-height:1.6}
+.pillar-character .tomb-badge{position:relative;z-index:1;margin:5px 0 1px}
+@media(max-width:680px){.element-reference{padding:10px}.element-reference-row{gap:6px 9px}.element-reference-row strong{font-size:12px}}
