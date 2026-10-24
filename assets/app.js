@@ -36,7 +36,7 @@
     const total=keys.reduce((sum,k)=>sum+(Number(selected[k])||0),0)||1;
     const colors={'木':'var(--wood)','火':'var(--fire)','土':'var(--earth)','金':'var(--metal)','水':'var(--water)'};
     let cursor=0;const stops=keys.map(k=>{const end=cursor+(Number(selected[k])||0)/total*100;const stop=colors[k]+' '+cursor.toFixed(2)+'% '+end.toFixed(2)+'%';cursor=end;return stop;});
-    const ring='<div class="element-visual"><div class="element-wheel" role="img" aria-label="五行比例图" style="background:conic-gradient('+stops.join(',')+')"><div class="element-wheel-center"><small>五行总量</small><strong>'+safe(total.toFixed(1).replace(/\\.0$/,''))+'</strong><span>统计参考</span></div></div><div class="element-legend">'+keys.map(k=>'<div class="legend-item '+elementClass(k)+'"><i></i><span>'+k+'</span><b>'+safe(selected[k]??0)+'</b></div>').join('')+'</div></div>';
+    const ring='<div class="element-visual"><div class="element-wheel" role="img" aria-label="五行比例图" style="background:conic-gradient('+stops.join(',')+')"><div class="element-wheel-center"><small>五行总量</small><strong>'+safe(Number(total.toFixed(1)))+'</strong><span>统计参考</span></div></div><div class="element-legend">'+keys.map(k=>'<div class="legend-item '+elementClass(k)+'"><i></i><span>'+k+'</span><b>'+safe(selected[k]??0)+'</b></div>').join('')+'</div></div>';
     const labels={stemsBranchesOnly:'天干与地支主气',withHiddenHalfWeight:'藏干半权重',withHiddenFull:'藏干全权重'};
     const compare=Object.keys(labels).filter(k=>data[k]).map(k=>{
       const values=data[k]||{}, peak=Math.max(1,...keys.map(el=>Number(values[el])||0));
