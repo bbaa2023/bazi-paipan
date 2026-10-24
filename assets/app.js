@@ -19,8 +19,10 @@
     pillarsBox.innerHTML = labels.map(([key,label],i) => {
       const p = chart.pillars?.[key] || {};
       const gz = p.ganzhi || (key === 'time' && chart.input?.unknownTime ? '未知' : '—');
-      const el = elementClass(String(gz).charAt(0));
-      return '<article class="pillar '+el+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+'</div><div class="pillar-gz">'+safe(gz)+'</div><div class="pillar-meta">天干：'+safe(String(gz).charAt(0) || '—')+'</div><div class="pillar-meta">地支：'+safe(String(gz).charAt(1) || '—')+'</div><div class="pillar-meta">'+safe(p.shiShenGan || '')+'</div><div class="pillar-meta">'+safe(p.naYin || '')+'</div></article>';
+      const stem = String(gz).charAt(0) || '—';
+      const branch = String(gz).charAt(1) || '—';
+      const el = elementClass(stem);
+      return '<article class="pillar '+el+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+'</div><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>支</small><strong>'+safe(branch)+'</strong></div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
     }).join('');
     const dm = chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0) || '—';
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
