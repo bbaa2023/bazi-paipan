@@ -141,10 +141,8 @@
     return '<h3 class="subhead">未来六个公历年份的流年干支</h3><p class="muted">使用本地引擎的年柱资料，列出流年干支、流年天干对日主的十神、五行、纳音、立春交界，以及与本命四柱命中的直接干支关系。此页是传统历法与规则对照，不是完整的流年吉凶解读；立春前后换年需要结合具体出生/查询时刻判断。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">本地引擎没有返回流年资料。</div>')+'</div>';
   }
   function renderSidePanels() {
-    // [规范 1/4] 侧栏只复用已有渲染函数和引擎数据，不增加任何命理字段。
-    const luck = $('#luck-side'), annual = $('#annual-side'), overview = $('#overview-panel');
-    if (luck) luck.innerHTML = renderLuck();
-    if (annual) annual.innerHTML = renderAnnual();
+    // [直播简洁布局] 五行总览保留在主命盘下方；大运与流年只在下方标签中按需展开。
+    const overview = $('#overview-panel');
     if (overview) overview.innerHTML = renderOverview();
   }
   function renderTab() {
