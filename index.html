@@ -6,11 +6,11 @@
   <meta name="theme-color" content="#f3f0e8">
   <meta name="description" content="传统四柱八字排盘工具：浏览器本地计算，出生信息不发送到第三方服务。">
   <title>八字排盘｜金镇安·古法修炼研修室</title>
-  <link rel="stylesheet" href="./assets/style.css?v=20261024f">
+  <link rel="stylesheet" href="./assets/style.css?v=20261024g">
   <script defer src="https://k18.mom/script.js" data-website-id="0f61d2b9-f6a5-48ca-97be-4540844a474d"></script>
   <script defer src="./vendor/lunar.js?v=20261024e"></script>
   <script defer src="./vendor/bazi-engine.web.js?v=20261024e"></script>
-  <script defer src="./assets/app.js?v=20261024f"></script>
+  <script defer src="./assets/app.js?v=20261024g"></script>
 </head>
 <body>
   <header class="topbar">
@@ -44,21 +44,30 @@
     </section>
     <section id="results" class="results" hidden>
       <div class="section-heading result-title"><div><span class="kicker">命理总纲 · CHART OVERVIEW</span><h2>本命四柱</h2></div><span id="day-master" class="day-master"></span></div>
-      <section class="chart-frame" aria-label="四柱命盘">
-        <div class="chart-frame-top"><span>四柱命盘</span><span class="chart-seal">命</span><span>天干 · 地支 · 纳音</span></div>
-        <div id="pillars" class="pillars"></div>
-        <div class="chart-frame-bottom"><span>年运有序</span><i></i><span>五行流转</span><i></i><span>阴阳相济</span></div>
-      </section>
-      <div class="module-heading"><span class="kicker">命盘详参</span><span>择一栏目，查看完整排盘信息</span></div>
-      <div class="tabs" role="tablist" aria-label="命盘模块">
-        <button class="tab active" data-tab="overview" role="tab">五行总览</button>
-        <button class="tab" data-tab="details" role="tab">藏干十神</button>
-        <button class="tab" data-tab="relations" role="tab">干支关系</button>
-        <button class="tab" data-tab="shensha" role="tab">神煞</button>
-        <button class="tab" data-tab="luck" role="tab">大运</button>
-        <button class="tab" data-tab="annual" role="tab">流年</button>
+      <!-- [布局规范 1/6] 左侧本命与五行主面板，右侧大运/流年摘要；详情仍由现有标签模块渲染 -->
+      <div class="results-layout">
+        <div class="results-primary">
+          <section class="chart-frame" aria-label="四柱命盘">
+            <div class="chart-frame-top"><span>四柱命盘</span><span class="chart-seal">命</span><span>天干 · 地支 · 纳音</span></div>
+            <div id="pillars" class="pillars"></div>
+            <div class="chart-frame-bottom"><span>年运有序</span><i></i><span>五行流转</span><i></i><span>阴阳相济</span></div>
+          </section>
+          <div id="overview-panel" class="overview-panel" aria-live="polite"></div>
+          <div class="module-heading"><span class="kicker">命盘详参</span><span>藏干、十神、关系与神煞明细</span></div>
+          <div class="tabs" role="tablist" aria-label="命盘模块">
+            <button class="tab" data-tab="details" role="tab">藏干十神</button>
+            <button class="tab" data-tab="relations" role="tab">干支关系</button>
+            <button class="tab" data-tab="shensha" role="tab">神煞</button>
+            <button class="tab" data-tab="luck" role="tab">大运详情</button>
+            <button class="tab" data-tab="annual" role="tab">流年详情</button>
+          </div>
+          <div id="tab-content" class="tab-content" aria-live="polite"></div>
+        </div>
+        <aside class="results-side" aria-label="大运与流年">
+          <section class="side-module"><div class="side-module-heading"><span class="kicker">FORTUNE CYCLE</span><h3>大运时间轴</h3></div><div id="luck-side"></div></section>
+          <section class="side-module"><div class="side-module-heading"><span class="kicker">ANNUAL CYCLE</span><h3>流年概览</h3></div><div id="annual-side"></div></section>
+        </aside>
       </div>
-      <div id="tab-content" class="tab-content" aria-live="polite"></div>
     </section>
     <footer class="site-footer">
       <span>独立排盘工具 · 出生信息仅用于当前浏览器计算</span>
