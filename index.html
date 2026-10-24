@@ -18,9 +18,10 @@
   </header>
   <main class="shell">
     <section class="hero">
-      <div class="eyebrow">传统命理 · 四柱排盘</div>
-      <h1>四柱排盘 <span>知命理 · 察五行</span></h1>
-      <p>输入出生日期与时辰，排出四柱命盘，查看五行、十神、大运与流年。出生资料仅在当前浏览器计算。</p>
+      <div class="hero-emblem" aria-hidden="true"><span>☯</span></div>
+      <div class="eyebrow">乾坤有序 · 阴阳相生</div>
+      <h1>四柱命盘 <span>东方命理 · 传统排盘</span></h1>
+      <p>以出生时刻排定年、月、日、时四柱，查看五行、藏干、十神、神煞、大运与流年。</p>
     </section>
     <section class="panel form-panel">
       <div class="section-heading"><div><span class="kicker">01 / BIRTH DATA</span><h2>出生信息</h2></div><span class="step">一次输入，联动查看</span></div>
@@ -41,8 +42,13 @@
       <div id="error" class="notice error" role="alert" hidden></div>
     </section>
     <section id="results" class="results" hidden>
-      <div class="section-heading result-title"><div><span class="kicker">02 / YOUR CHART</span><h2>命盘总览</h2></div><span id="day-master" class="day-master"></span></div>
-      <div id="pillars" class="pillars"></div>
+      <div class="section-heading result-title"><div><span class="kicker">命理总纲 · CHART OVERVIEW</span><h2>本命四柱</h2></div><span id="day-master" class="day-master"></span></div>
+      <section class="chart-frame" aria-label="四柱命盘">
+        <div class="chart-frame-top"><span>四柱命盘</span><span class="chart-seal">命</span><span>天干 · 地支 · 纳音</span></div>
+        <div id="pillars" class="pillars"></div>
+        <div class="chart-frame-bottom"><span>年运有序</span><i></i><span>五行流转</span><i></i><span>阴阳相济</span></div>
+      </section>
+      <div class="module-heading"><span class="kicker">命盘详参</span><span>择一栏目，查看完整排盘信息</span></div>
       <div class="tabs" role="tablist" aria-label="命盘模块">
         <button class="tab active" data-tab="overview" role="tab">五行总览</button>
         <button class="tab" data-tab="details" role="tab">藏干十神</button>
