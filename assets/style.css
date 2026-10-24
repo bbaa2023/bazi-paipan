@@ -48,3 +48,13 @@
  .tomb-badge{font-size:8px;padding:1px 4px}
  .pillar-stage{font-size:9px}
 }
+
+/* 十二长生独立标签页 */
+.tab[data-tab="twelve"]:before{content:"☯"}
+.twelve-stage-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
+.twelve-stage-card{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:16px;border:1px solid #e4d5bb;border-radius:12px;background:#fffdf8}
+.twelve-stage-card>span{color:#89714b;font-size:12px}
+.twelve-stage-gz{color:#34465b;font-size:20px;font-weight:700;letter-spacing:.08em}
+.twelve-stage-card>strong{color:#8d6528;font-size:23px;font-weight:750}
+.twelve-stage-card>small{color:#898477;font-size:10px}
+@media(max-width:680px){.twelve-stage-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.twelve-stage-card{padding:12px}.twelve-stage-card>strong{font-size:20px}}
