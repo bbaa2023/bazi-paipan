@@ -142,7 +142,15 @@
     }
     return '<h3 class="subhead">未来六个公历年份的流年干支</h3><p class="muted">使用本地引擎的年柱资料，列出流年干支、流年天干对日主的十神、五行、纳音、立春交界，以及与本命四柱命中的直接干支关系。此页是传统历法与规则对照，不是完整的流年吉凶解读；立春前后换年需要结合具体出生/查询时刻判断。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">本地引擎没有返回流年资料。</div>')+'</div>';
   }
-  function renderSidePanels() {
+  function togglePresentationMode() {
+    const enabled = document.body.classList.toggle('presentation-mode');
+    const button = document.getElementById('presentation-toggle');
+    if (button) {
+      button.textContent = enabled ? '退出直播展示' : '直播展示模式';
+      button.setAttribute('aria-pressed', String(enabled));
+    }
+  }
+    function renderSidePanels() {
     // [直播简洁布局] 五行总览保留在主命盘下方；大运与流年只在下方标签中按需展开。
     const overview = $('#overview-panel');
     if (overview) overview.innerHTML = renderOverview();
@@ -177,11 +185,15 @@
         try { lastLuck=window.BaziEngine.computeLuckPillars({...birth,gender:lastBirth.gender,count:10}); } catch (e) { console.warn('大运计算暂不可用：',e); }
       }
       drawPillars(chart); results.hidden=false; activeTab='details'; renderSidePanels(); renderTab();
+      const presentationButton=document.getElementById('presentation-toggle');
+      if(presentationButton) presentationButton.hidden=false;
       results.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
     } catch (e) {
       console.error(e); showError('排盘失败：'+(e && e.message ? e.message : '未知错误')+'。请检查输入范围，或把浏览器控制台错误发给维护者。');
     }
   }
+  const presentationButton=document.getElementById('presentation-toggle');
+  if(presentationButton) presentationButton.addEventListener('click',togglePresentationMode);
   form.addEventListener('submit',compute);
   document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{activeTab=b.dataset.tab;renderTab();}));
   if (!window.BaziEngine) {
