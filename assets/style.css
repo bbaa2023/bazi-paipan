@@ -18,3 +18,33 @@
 @media(max-width:900px){.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.luck-timeline{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:24px}.luck-timeline:before{display:none}.luck-item:before{top:-10px}.annual-timeline{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:680px){.topbar{height:58px;padding:0 10px}.brand{gap:7px}.brand-mark{width:32px;height:32px;flex-basis:32px;font-size:19px}.brand b{font-size:11px;letter-spacing:0}.brand small{font-size:10px}.privacy{font-size:10px}.shell{width:calc(100% - 18px)}.hero{padding:12px 4px 11px}.hero-emblem{width:48px;height:48px;margin-bottom:4px}.hero h1{font-size:27px}.hero h1 span{font-size:.45em}.panel{padding:16px 12px;border-radius:13px}.section-heading{gap:8px;margin-bottom:13px}.section-heading h2{font-size:19px}.step{font-size:10px}.form-grid{gap:11px 8px}.form-grid label{font-size:11px}.form-grid input,.form-grid select{height:41px;padding-left:8px;font-size:12px}.form-grid select{padding-right:27px;background-position:right 7px center}.form-foot{align-items:stretch;flex-direction:column;gap:12px;margin-top:14px}.primary{width:100%}.results{padding:13px 9px 10px;margin-top:16px}.result-title{align-items:flex-start}.result-actions{gap:6px}.day-master{font-size:10px;padding:5px 8px}.chart-frame{padding:10px 6px 8px}.chart-frame-top{font-size:9px;gap:7px}.chart-frame-bottom{font-size:8px;letter-spacing:0;gap:6px}.pillars{gap:6px}.pillar{padding:9px 4px 10px;border-radius:9px}.pillar-label{font-size:10px;letter-spacing:0}.pillar-god{font-size:9px;min-height:20px}.pillar-character{min-height:59px;border-radius:6px}.pillar-character strong{font-size:clamp(25px,7vw,32px)}.pillar-hidden{font-size:9px}.pillar-hidden b{font-size:9px}.module-heading{align-items:flex-start}.module-heading>span:last-child{font-size:9px}.tabs{gap:4px}.tab{padding:8px 9px;font-size:12px;gap:5px}.tab-content{padding:15px 1px}.overview-panel{padding:12px}.element-visual{flex-direction:column;gap:15px;padding:12px}.element-visual-compact{gap:15px;padding:17px 11px}.element-wheel{width:150px;height:150px;flex-basis:150px}.element-visual-compact .element-wheel{width:170px;height:170px;flex-basis:170px}.element-wheel-center strong{font-size:25px}.element-legend{width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.element-legend-visual{max-width:none;gap:12px 13px}.legend-item b{font-size:17px}.legend-item small{font-size:10px}.element-analysis{padding:13px}.element-analysis p{font-size:13px}.element-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.element-card{padding:11px 8px;border-radius:10px}.element-count{font-size:21px}.data-grid{grid-template-columns:1fr;gap:9px}.data-card{padding:13px;border-radius:11px}.subhead{font-size:17px}.mini-elements{gap:6px}.mini-element{font-size:10px}.mini-element b{font-size:12px}.luck-timeline{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding-top:4px}.luck-item:before{display:none}.luck-item .data-card{padding:11px 9px}.luck-item .data-card h3{font-size:12px}.luck-item .data-card p{font-size:10px}.annual-timeline{grid-template-columns:1fr;gap:9px}.annual-meta{grid-template-columns:82px minmax(0,1fr);gap:6px 8px}.site-footer{padding-bottom:22px}.disclaimer{padding:11px 12px;font-size:11px}}
 @media(max-width:360px){.shell{width:calc(100% - 14px)}.brand b{font-size:10px}.privacy{font-size:9px}.hero h1{font-size:25px}.pillar-character strong{font-size:23px}.pillar-character{min-height:54px}.tab{padding:7px}.element-visual-compact{padding:14px 8px}.element-legend-visual{gap:10px 8px}.legend-label{gap:5px}.legend-item b{font-size:16px}.luck-timeline{grid-template-columns:1fr 1fr}}
+
+/* 喜用参考与四柱补充信息：延续宣纸、金色体系 */
+.favorable-card{margin:14px 0 20px;padding:17px 19px;border:1px solid #e1d0ac;border-radius:14px;background:linear-gradient(135deg,#fffdf8,#f7f0e2);box-shadow:0 5px 16px #6c5a3b0b;color:var(--text)}
+.favorable-heading{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.favorable-seal{display:grid;place-items:center;width:34px;height:34px;border:1px solid #c8a66b;border-radius:50%;background:#f3e7ce;color:#946b2d;font:17px "Noto Serif SC","Songti SC",serif}
+.favorable-heading h3{margin:0;color:#2b3c51;font:600 19px "Noto Serif SC","Songti SC",serif}
+.favorable-heading p{margin:1px 0 0;color:#85816f;font-size:11px}
+.favorable-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.favorable-item{min-width:0;padding:10px 12px;border:1px solid #e6dac4;border-radius:10px;background:#fffdf8}
+.favorable-item>span{display:block;margin-bottom:4px;color:#81745d;font-size:11px}
+.favorable-item>strong{color:#805c22;font-size:17px;font-weight:750}
+.favorable-item p{margin:0;color:#34455a;font-size:13px;line-height:1.75;overflow-wrap:anywhere}
+.favorable-wide{grid-column:1/-1}
+.favorable-footnote{display:block;margin-top:11px;color:#898477;font-size:10px;line-height:1.7}
+.pillar-label{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px}
+.tomb-badge{display:inline-flex;align-items:center;padding:1px 5px;border:1px solid #d9c18f;border-radius:5px;background:#f5ead5;color:#946b2d;font-size:9px;font-weight:650;line-height:1.5;letter-spacing:0}
+.pillar-palace{min-height:14px;margin-top:2px;color:#8a8170;font-size:9px;line-height:1.35;letter-spacing:0}
+.pillar-stage{display:block;margin-top:3px;color:#8a7657;font-size:10px;font-style:normal;line-height:1.4}
+#presentation-toggle,.presentation-toggle{display:none!important}
+@media(max-width:680px){
+ .favorable-card{padding:13px 12px;margin:12px 0 16px}
+ .favorable-grid{gap:7px}
+ .favorable-item{padding:9px}
+ .favorable-item>strong{font-size:15px}
+ .favorable-item p{font-size:12px}
+ .favorable-heading h3{font-size:18px}
+ .pillar-palace{font-size:8px}
+ .tomb-badge{font-size:8px;padding:1px 4px}
+ .pillar-stage{font-size:9px}
+}
