@@ -29,7 +29,7 @@
     const data = lastChart.fiveElements || {};
     const selected = data.withHiddenHalfWeight || data.withHiddenStems || data.stemsBranchesOnly || {};
     const entries = objectEntries(selected);
-    if (!entries.length) return '<div class="empty">当前引擎版本没有返回可识别的五行统计字段。请在“计算详情”查看原始结果。</div>';
+    if (!entries.length) return '<div class="empty">当前引擎版本没有返回可识别的五行统计字段。请重新排盘；如果问题持续，请联系维护者。</div>';
     const max = Math.max(1,...entries.map(([,v])=>Number(v)||0));
     const keys=['木','火','土','金','水'];
     const labels={stemsBranchesOnly:'天干与地支主气',withHiddenHalfWeight:'藏干半权重',withHiddenFull:'藏干全权重'};
@@ -55,35 +55,21 @@
     return '<h3 class="subhead">藏干、十神与十二长生</h3><p class="muted">十二长生以日干为参照，按本地引擎公开函数计算。</p><div class="data-grid">'+cards+'</div><p class="muted">仅展示引擎实际返回或通过引擎公开函数计算的数据；未支持的项目不会用固定文案伪造。</p>';
   }
   function renderRelations() {
-    const meta = lastChart.meta || {};
-    const known = Object.fromEntries(Object.entries(meta).filter(([k])=>/trueSolarTime|sectLabel|engine|version|dstApplied|absoluteInstant/i.test(k)));
     const labels = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
-    const pillars = labels.map(([key,label]) => {
-      const p = lastChart.pillars && lastChart.pillars[key];
-      return p && p.ganzhi ? {label:label,gz:p.ganzhi} : null;
-    }).filter(Boolean);
-    const cards = [];
-    for (let i=0;i<pillars.length;i++) {
-      for (let j=i+1;j<pillars.length;j++) {
-        const a=pillars[i], b=pillars[j];
-        let sr=[], br=[];
-        try { if(window.BaziEngine && typeof window.BaziEngine.stemRelation==='function') sr=window.BaziEngine.stemRelation(a.gz[0],b.gz[0])||[]; } catch (_) {}
-        try { if(window.BaziEngine && typeof window.BaziEngine.branchRelations==='function') br=window.BaziEngine.branchRelations(a.gz[1],b.gz[1])||[]; } catch (_) {}
-        const items=sr.map(x=>'天干 '+x.type+(x.element?' · '+x.element:'')).concat(br.map(x=>'地支 '+x.type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:'')));
-        if(items.length) cards.push('<div class="data-card"><h3>'+a.label+' '+safe(a.gz)+' ↔ '+b.label+' '+safe(b.gz)+'</h3>'+items.map(x=>'<p>'+safe(x)+'</p>').join('')+'</div>');
-      }
+    const pillars = labels.map(([key,label]) => { const p=lastChart.pillars&&lastChart.pillars[key]; return p&&p.ganzhi?{label,gz:p.ganzhi}:null; }).filter(Boolean);
+    const cards=[];
+    for(let i=0;i<pillars.length;i++) for(let j=i+1;j<pillars.length;j++){
+      const a=pillars[i],b=pillars[j]; let sr=[],br=[];
+      try{if(window.BaziEngine&&typeof window.BaziEngine.stemRelation==='function')sr=window.BaziEngine.stemRelation(a.gz[0],b.gz[0])||[];}catch(_){}
+      try{if(window.BaziEngine&&typeof window.BaziEngine.branchRelations==='function')br=window.BaziEngine.branchRelations(a.gz[1],b.gz[1])||[];}catch(_){}
+      const items=sr.map(x=>'天干'+x.type+(x.element?' · '+x.element:'')).concat(br.map(x=>'地支'+x.type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:'')));
+      if(items.length)cards.push('<div class="data-card"><h3>'+safe(a.label)+' '+safe(a.gz)+'　与　'+safe(b.label)+' '+safe(b.gz)+'</h3>'+items.map(x=>'<p>'+safe(x)+'</p>').join('')+'</div>');
     }
-    const presentBranches=pillars.map(p=>p.gz[1]);
-    const groups=[];
+    const present=pillars.map(p=>p.gz[1]),groups=[];
     [['三合',window.BaziEngine&&window.BaziEngine.BRANCH_TRINE],['三会',window.BaziEngine&&window.BaziEngine.BRANCH_MEETING]].forEach(([name,defs])=>{
-      if(!Array.isArray(defs)) return;
-      defs.forEach(g=>{
-        const members=Array.isArray(g.branches)?g.branches:[];
-        if(members.length===3&&members.every(b=>presentBranches.indexOf(b)>=0)) groups.push('<div class="data-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合：'+safe(members.join('、'))+'</p><p class="muted">三支齐全；这里只标记组合结构，不自动推断合化或吉凶。</p></div>');
-      });
+      if(!Array.isArray(defs))return;defs.forEach(g=>{const m=Array.isArray(g.branches)?g.branches:[];if(m.length===3&&m.every(b=>present.includes(b)))groups.push('<div class="data-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合：'+safe(m.join('、'))+'</p><p class="muted">仅提示命中传统组合规则，不直接判定吉凶。</p></div>');});
     });
-    const relationHtml=(cards.length?cards.join(''):'<div class="empty">当前四柱之间没有命中已定义的两两关系。</div>')+(groups.length?'<h3 class="subhead" style="grid-column:1/-1;margin-top:10px">完整多支组合</h3>'+groups.join(''):'');
-    return '<h3 class="subhead">干支关系</h3><p class="muted">逐对调用本地引擎公开函数，展示天干五合/相冲与地支六合/六冲/六害/相刑/自刑/半三合；同时识别四柱中三支齐全的三合、三会组合。这里只枚举规则，不直接判定吉凶。</p><div class="data-grid">'+relationHtml+'</div><h3 class="subhead" style="margin-top:22px">排盘口径与计算信息</h3><div class="data-grid"><div class="data-card"><h3>排盘输入</h3><pre class="raw">'+safe(json(lastChart.input||lastBirth))+'</pre></div><div class="data-card"><h3>引擎计算说明</h3><pre class="raw">'+safe(json(known))+'</pre></div></div>';
+    return '<h3 class="subhead">干支关系</h3><p class="muted">查看四柱之间的合、冲、刑、害及三合、三会等传统关系。不同流派对部分规则的取法可能不同，本页仅展示命中关系，不单独据此断吉凶。</p><div class="data-grid">'+(cards.length?cards.join(''):'<div class="empty">当前四柱之间未命中已收录的两两关系。</div>')+(groups.length?'<h3 class="subhead" style="grid-column:1/-1;margin-top:10px">三支组合</h3>'+groups.join(''):'')+'</div><div class="customer-note"><span class="note-mark">金</span><div><strong>排盘说明</strong><p>命盘依据所填写的出生时间、时区与可选经度计算。若出生时间不确定，或接近节气、换日交界，建议结合可靠历书进一步核对。</p></div></div>';
   }
   function renderShensha() {
     const engine=window.BaziEngine||{};
@@ -145,10 +131,9 @@
     }
     return '<h3 class="subhead">未来六个公历年份的流年干支</h3><p class="muted">使用本地引擎的年柱资料，列出流年干支、流年天干对日主的十神、五行、纳音、立春交界，以及与本命四柱命中的直接干支关系。此页是传统历法与规则对照，不是完整的流年吉凶解读；立春前后换年需要结合具体出生/查询时刻判断。</p><div class="data-grid">'+(cards.join('')||'<div class="empty">本地引擎没有返回流年资料。</div>')+'</div>';
   }
-  function renderRaw() { return '<h3 class="subhead">引擎原始结果</h3><p class="muted">用于核对实际字段，后续功能以此结构为准。</p><pre class="raw">'+safe(json({chart:lastChart,luck:lastLuck}))+'</pre>'; }
   function renderTab() {
     document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===activeTab;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
-    const renderers={overview:renderOverview,details:renderDetails,relations:renderRelations,shensha:renderShensha,luck:renderLuck,annual:renderAnnual,raw:renderRaw};
+    const renderers={overview:renderOverview,details:renderDetails,relations:renderRelations,shensha:renderShensha,luck:renderLuck,annual:renderAnnual};
     content.innerHTML=(renderers[activeTab]||renderOverview)();
   }
   function compute(event) {
