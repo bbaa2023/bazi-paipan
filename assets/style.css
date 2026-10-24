@@ -41,3 +41,44 @@ body{background:radial-gradient(ellipse at 50% -22%,#173e68 0,transparent 52%),r
 .annual-relations{display:flex;flex-wrap:wrap;gap:6px}
 .annual-card h3{margin-bottom:0}
 @media(max-width:380px){.annual-meta{grid-template-columns:78px minmax(0,1fr);gap:6px 8px;font-size:12px}}
+
+/* Customer-facing black & gold theme */
+:root{color-scheme:dark;--bg:#100d0a;--panel:#1a1510;--panel2:#15110d;--line:#594629;--text:#f5ead4;--muted:#b9aa91;--gold:#e4c078;--gold2:#a98543;--wood:#8bb58a;--fire:#d98667;--earth:#d6b66f;--metal:#e7d7b2;--water:#8ea9bc}
+body{background:radial-gradient(ellipse at 50% -20%,#3a2a16 0,transparent 56%),var(--bg);color:var(--text)}
+.topbar{background:#100d0aef;border-bottom-color:#5a4727}
+.brand-mark{border-radius:50%;border-color:var(--gold2);color:var(--gold);background:linear-gradient(145deg,#2b2114,#100d0a)}
+.panel{background:linear-gradient(145deg,#211910f7,#17120df7);border-color:#594629;box-shadow:0 18px 55px #0005}
+.form-grid label{color:#d6c6a8}
+.form-grid input,.form-grid select{background:#100d0a;border-color:#55452d;color:#f5ead4}
+.form-grid input:focus,.form-grid select:focus{border-color:var(--gold);box-shadow:0 0 0 3px #e4c0781c}
+.primary{background:linear-gradient(120deg,#f0d99b,#b88a3e);color:#21170a;box-shadow:0 5px 18px #d6ad4b20}
+.pillar{background:linear-gradient(160deg,#2a2116,#17120d);border-color:#6a5230}
+.pillar-meta{color:#d2c4aa}
+.tabs{border-bottom-color:#594629}
+.tab.active{color:#f1d18b;border-color:#71572b;background:#e4c07812}
+.day-master{border-color:#80653a;color:#f1d18b}
+.element-card,.data-card{background:linear-gradient(145deg,#211910,#17120d);border-color:#4e3d25}
+.bar{background:#3a2e1d}
+.customer-note{display:flex;gap:13px;align-items:flex-start;margin-top:20px;padding:16px 18px;border:1px solid #594629;border-radius:12px;background:#1b150e;color:#cdbb99}
+.customer-note p{margin:5px 0 0;font-size:12px;color:var(--muted)}
+.note-mark{display:grid;place-items:center;flex:0 0 30px;height:30px;border:1px solid #a98543;border-radius:50%;color:#e4c078;font-family:serif}
+.site-footer{border-top-color:#4b3a23}
+.site-footer a{color:#e4c078}
+@media(max-width:700px){
+ .shell{width:min(100% - 20px,1000px)}
+ .topbar{height:60px;padding:0 12px}
+ .brand{gap:8px}.brand-mark{width:34px;height:34px;font-size:20px}
+ .brand b{font-size:12px}.brand small{font-size:10px}
+ .privacy{font-size:10px}
+ .hero{padding:32px 8px 22px}.hero h1{font-size:29px}
+ .panel{padding:17px 14px;border-radius:15px}
+ .form-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 10px}
+ .form-foot{align-items:stretch;flex-direction:column}.primary{width:100%}
+ .pillars{gap:7px}.pillar{padding:12px 4px;border-radius:10px}
+ .pillar-gz{font-size:25px}.pillar-meta{font-size:10px}
+ .tabs{gap:2px;margin-top:16px}.tab{padding:9px 12px;font-size:12px}
+ .tab-content{padding:18px 0}
+ .element-grid{gap:6px}.element-card{padding:10px 7px}.element-count{font-size:20px}
+ .data-grid{grid-template-columns:minmax(0,1fr)}
+ .section-heading h2{font-size:20px}
+}
