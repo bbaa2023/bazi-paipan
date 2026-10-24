@@ -27,24 +27,10 @@
       const dayClass = key === 'day' ? ' pillar-day-master' : '';
       const palace = ({year:'祖上宫',month:'父母事业宫',day:'自身',time:'子女宫'})[key] || '—';
       const tombBadge = ['辰','戌','丑','未'].includes(branch) ? '<span class="tomb-badge">墓库</span>' : '';
-      return '<article class="pillar '+el+dayClass+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+tombBadge+'</div><div class="pillar-palace">'+palace+'</div><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>天干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>地支</small><strong>'+safe(branch)+'</strong></div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
+      return '<article class="pillar '+el+dayClass+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+'</div><div class="pillar-palace">'+palace+'</div><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>天干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>地支</small><strong>'+safe(branch)+'</strong>'+tombBadge+'</div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
     }).join('');
     const dm = chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0) || '—';
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
-  }
-  function renderFavorableCard() {
-    const data = lastFavorable || {};
-    const score = data.score || {};
-    const fuYang = data.fuYang || {};
-    const favorable = Array.isArray(fuYang.favorable) ? fuYang.favorable : [];
-    const elements = score.perElement && typeof score.perElement === 'object' ? score.perElement : null;
-    const strength = score.verdict === 'strong' ? '偏强' : score.verdict === 'weak' ? '偏弱' : score.verdict === 'balanced' ? '中和' : '—';
-    const strengthText = score.verdictCn || strength;
-    const strengthValue = score.verdict ? strength : '—';
-    const elementText = elements ? ['木','火','土','金','水'].map(k=>k+' '+(elements[k] ?? '—')).join('　·　') : '—';
-    const favorableText = favorable.length ? favorable.map(x=>x&&x.element||'—').join('、') : (fuYang.favorable ? '—' : '—');
-    const climate = data.tiaoHou && data.tiaoHou.ruleCn ? data.tiaoHou.ruleCn : '—';
-    return '<section class="favorable-card" aria-label="喜用参考"><div class="favorable-heading"><span class="favorable-seal">参</span><div><h3>喜用参考</h3><p>传统规则参考 · 本地引擎计算</p></div></div><div class="favorable-grid"><div class="favorable-item"><span>日主旺衰</span><strong>'+safe(strengthValue)+'</strong></div><div class="favorable-item favorable-wide"><span>五行力量对比</span><p>'+safe(elementText)+'</p></div><div class="favorable-item favorable-wide"><span>扶抑用神参考</span><strong>'+safe(favorableText)+'</strong></div><div class="favorable-item favorable-wide"><span>调候参考</span><p>'+safe(climate)+'</p></div></div><small class="favorable-footnote">以上为传统流派规则推演，仅供文化参考，不作为人生决策依据</small></section>';
   }
   function renderOverview() {
     const data = lastChart.fiveElements || {};
@@ -64,7 +50,15 @@
     let firstText='当前五行分布中，'+top+'的占比最高（'+pct(top)+'%），其次是'+second+'（'+pct(second)+'%）。';
     firstText+=lower.length?'相对而言，'+lower.join('、')+'的占比较少。':'其余五行的占比与之接近。';
     const secondText='整体呈现出“'+top+'较显、'+(lower.length?lower.join('与')+'相对收敛':'其余五行相对均衡')+'”的分布特点。传统五行讲究相生相制，也可以结合木生火、火生土、土生金、金生水、水生木的流转关系来理解。';
-    return '<h3 class="subhead">五行能量分布</h3>'+ring+'<section class="element-analysis"><div class="element-analysis-title"><span class="analysis-mark">简</span><h3>五行简析</h3></div><p>'+safe(firstText)+'</p><p>'+safe(secondText)+'</p></section>';
+    const fav=lastFavorable||{};
+    const score=fav.score||{};
+    const fy=fav.fuYang||{};
+    const favItems=Array.isArray(fy.favorable)?fy.favorable:[];
+    const strength=score.verdict==='strong'?'偏强':score.verdict==='weak'?'偏弱':score.verdict==='balanced'?'中和':'—';
+    const favText=favItems.length?favItems.map(x=>x&&x.element||'—').join('、'):'—';
+    const climate=fav.tiaoHou&&fav.tiaoHou.ruleCn?fav.tiaoHou.ruleCn:'—';
+    const reference='<div class="element-reference"><div class="element-reference-heading">旺衰与喜用参考</div><div class="element-reference-row"><span>日主旺衰</span><strong>'+safe(strength)+'</strong><span>扶抑参考</span><strong>'+safe(favText)+'</strong></div><p><span>调候参考：</span>'+safe(climate)+'</p><small>以上为传统流派规则推演，仅供文化参考，不作为人生决策依据</small></div>';
+    return '<h3 class="subhead">五行能量分布</h3><section class="element-combined-card">'+ring+'<section class="element-analysis"><div class="element-analysis-title"><span class="analysis-mark">简</span><h3>五行简析</h3></div><p>'+safe(firstText)+'</p><p>'+safe(secondText)+'</p>'+reference+'</section></section>';
   }
   function renderTwelveStages() {
     const pillars = lastChart?.pillars || {};
@@ -225,12 +219,6 @@
         try { lastLuck=window.BaziEngine.computeLuckPillars({...birth,gender:lastBirth.gender,count:10}); } catch (e) { console.warn('大运计算暂不可用：',e); }
       }
       drawPillars(chart);
-      const chartFrame=pillarsBox.closest('.chart-frame');
-      if(chartFrame){
-        let card=document.getElementById('favorable-card');
-        if(!card){card=document.createElement('div');card.id='favorable-card';chartFrame.insertAdjacentElement('afterend',card);}
-        card.outerHTML=renderFavorableCard().replace('class="favorable-card"','id="favorable-card" class="favorable-card"');
-      }
       results.hidden=false; activeTab='details'; renderSidePanels(); renderTab();
       const presentationButton=document.getElementById('presentation-toggle');
       if(presentationButton) presentationButton.hidden=true;
