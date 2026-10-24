@@ -10,7 +10,6 @@
   const elementFor = {'甲':'木','乙':'木','寅':'木','卯':'木','丙':'火','丁':'火','巳':'火','午':'火','戊':'土','己':'土','辰':'土','戌':'土','丑':'土','未':'土','庚':'金','辛':'金','申':'金','酉':'金','壬':'水','癸':'水','子':'水','亥':'水'};
   const elementClass = (text) => 'el-' + (elementFor[text] || '土');
   const safe = (s) => String(s ?? '—').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const json = (v) => JSON.stringify(v, null, 2);
   function showError(message) { errorBox.textContent = message; errorBox.hidden = false; }
   function hideError() { errorBox.hidden = true; errorBox.textContent = ''; }
   function objectEntries(obj) { return obj && typeof obj === 'object' ? Object.entries(obj) : []; }
@@ -22,7 +21,7 @@
       const stem = String(gz).charAt(0) || '—';
       const branch = String(gz).charAt(1) || '—';
       const el = elementClass(stem);
-      return '<article class="pillar '+el+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+'</div><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>支</small><strong>'+safe(branch)+'</strong></div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
+      return '<article class="pillar '+el+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+'</div><span class="pillar-icon '+el+'" aria-hidden="true">'+(elementFor[stem]||'土')+'</span><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>天干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>地支</small><strong>'+safe(branch)+'</strong></div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
     }).join('');
     const dm = chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0) || '—';
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
@@ -34,12 +33,16 @@
     if (!entries.length) return '<div class="empty">当前引擎版本没有返回可识别的五行统计字段。请重新排盘；如果问题持续，请联系维护者。</div>';
     const max = Math.max(1,...entries.map(([,v])=>Number(v)||0));
     const keys=['木','火','土','金','水'];
+    const total=keys.reduce((sum,k)=>sum+(Number(selected[k])||0),0)||1;
+    const colors={'木':'var(--wood)','火':'var(--fire)','土':'var(--earth)','金':'var(--metal)','水':'var(--water)'};
+    let cursor=0;const stops=keys.map(k=>{const end=cursor+(Number(selected[k])||0)/total*100;const stop=colors[k]+' '+cursor.toFixed(2)+'% '+end.toFixed(2)+'%';cursor=end;return stop;});
+    const ring='<div class="element-visual"><div class="element-wheel" role="img" aria-label="五行比例图" style="background:conic-gradient('+stops.join(',')+')"><div class="element-wheel-center"><small>五行总量</small><strong>'+safe(total.toFixed(1).replace(/\\.0$/,''))+'</strong><span>统计参考</span></div></div><div class="element-legend">'+keys.map(k=>'<div class="legend-item '+elementClass(k)+'"><i></i><span>'+k+'</span><b>'+safe(selected[k]??0)+'</b></div>').join('')+'</div></div>';
     const labels={stemsBranchesOnly:'天干与地支主气',withHiddenHalfWeight:'藏干半权重',withHiddenFull:'藏干全权重'};
     const compare=Object.keys(labels).filter(k=>data[k]).map(k=>{
       const values=data[k]||{}, peak=Math.max(1,...keys.map(el=>Number(values[el])||0));
       return '<div class="data-card"><h3>'+labels[k]+'</h3><div class="mini-elements">'+keys.map(el=>'<div class="mini-element '+elementClass(el)+'"><span>'+el+'</span><b>'+safe(values[el]??0)+'</b><div class="bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(values[el])||0)/peak*100))+'%"></span></div></div>').join('')+'</div></div>';
     }).join('');
-    return '<h3 class="subhead">五行力量分布</h3><p class="muted">默认口径：藏干半权重（天干与地支主气各计 1，藏干各计 0.5）。下方用图形对照引擎返回的三种统计口径；不同口径不可直接混为一谈。</p><div class="element-grid">'+entries.map(([name,value])=>'<div class="element-card '+elementClass(name)+'"><div class="element-name">'+safe(name)+'</div><div class="element-count">'+safe(value)+'</div><div class="bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(value)||0)/max*100))+'%"></span></div></div>').join('')+'</div><h3 class="subhead" style="margin-top:22px">统计口径对照</h3><div class="data-grid">'+compare+'</div>';
+    return '<h3 class="subhead">五行力量分布</h3><p class="muted">默认口径：藏干半权重（天干与地支主气各计 1，藏干各计 0.5）。环形图与下方色卡呈现同一组引擎统计值；不同统计口径不可直接混为一谈。</p>'+ring+'<div class="element-grid">'+entries.map(([name,value])=>'<div class="element-card '+elementClass(name)+'"><div class="element-name">'+safe(name)+'</div><div class="element-count">'+safe(value)+'</div><div class="bar"><span style="--pct:'+Math.max(0,Math.min(100,(Number(value)||0)/max*100))+'%"></span></div></div>').join('')+'</div><h3 class="subhead" style="margin-top:22px">统计口径对照</h3><div class="data-grid">'+compare+'</div>';
   }
   function renderDetails() {
     const ps = lastChart.pillars || {};
@@ -65,7 +68,7 @@
       try{if(window.BaziEngine&&typeof window.BaziEngine.stemRelation==='function')sr=window.BaziEngine.stemRelation(a.gz[0],b.gz[0])||[];}catch(_){}
       try{if(window.BaziEngine&&typeof window.BaziEngine.branchRelations==='function')br=window.BaziEngine.branchRelations(a.gz[1],b.gz[1])||[];}catch(_){}
       const items=sr.map(x=>'天干'+x.type+(x.element?' · '+x.element:'')).concat(br.map(x=>'地支'+x.type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:'')));
-      if(items.length)cards.push('<div class="data-card"><h3>'+safe(a.label)+' '+safe(a.gz)+'　与　'+safe(b.label)+' '+safe(b.gz)+'</h3>'+items.map(x=>'<p>'+safe(x)+'</p>').join('')+'</div>');
+      if(items.length)cards.push('<div class="data-card"><h3><span class="relation-icon" aria-hidden="true">⟷</span>'+safe(a.label)+' '+safe(a.gz)+'　与　'+safe(b.label)+' '+safe(b.gz)+'</h3>'+items.map(x=>'<p><span class="chip">'+safe(x)+'</span></p>').join('')+'</div>');
     }
     const present=pillars.map(p=>p.gz[1]),groups=[];
     [['三合',window.BaziEngine&&window.BaziEngine.BRANCH_TRINE],['三会',window.BaziEngine&&window.BaziEngine.BRANCH_MEETING]].forEach(([name,defs])=>{
@@ -84,16 +87,16 @@
     let hits=[];
     try { hits=engine.shenshaScan(gz)||[]; } catch(e) { console.warn('神煞扫描失败：',e); }
     if(!Array.isArray(hits)) hits=[];
-    const cards=hits.map(hit=>'<div class="data-card shensha-card"><div class="luck-card-top"><h3>'+safe(hit.cn||hit.key||'未命名神煞')+'</h3><span class="chip">'+safe(hit.where||'命中位置未返回')+'</span></div><p>起法依据：'+safe(hit.anchor||'固定柱表/引擎规则')+'</p><p class="muted">此处仅记录本地引擎识别到的规则与落点，不单独据此判定吉凶。</p></div>').join('');
+    const cards=hits.map(hit=>'<div class="data-card shensha-card"><div class="luck-card-top"><h3><span class="relation-icon" aria-hidden="true">✧</span>'+safe(hit.cn||hit.key||'未命名神煞')+'</h3><span class="chip">'+safe(hit.where||'命中位置未返回')+'</span></div><p>起法依据：'+safe(hit.anchor||'固定柱表/引擎规则')+'</p><p class="muted">此处仅记录本地引擎识别到的规则与落点，不单独据此判定吉凶。</p></div>').join('');
     return '<h3 class="subhead">神煞扫描</h3><p class="muted">调用仓库内排盘引擎的 shenshaScan 接口，按引擎内置规则检查四柱。涵盖日干起、年支起、月支起、三合组星、固定柱表、空亡等多类规则。神煞流派存在差异，结果用于传统规则参考，不作为单独的吉凶结论。</p><div class="shensha-summary"><span>四柱已扫描</span><strong>'+gz.filter(Boolean).length+' / 4</strong><span>命中规则</span><strong>'+hits.length+'</strong></div><div class="data-grid">'+(cards||'<div class="empty">当前四柱未命中本地引擎所定义的神煞规则，或引擎返回空结果。</div>')+'</div>';
   }
   function renderLuck() {
     if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能计算大运。</div>';
-    if (!lastLuck) return '<div class="empty">当前引擎没有成功返回大运结果，请查看“计算详情”。</div>';
+    if (!lastLuck) return '<div class="empty">当前引擎没有成功返回大运结果，请重新排盘或稍后再试。</div>';
     const s=lastLuck.start||{}, chosen=s.chosen||{}, pre=lastLuck.preLuck||{};
     const direction=lastLuck.direction&&typeof lastLuck.direction==='object'?(lastLuck.direction.forward?'顺排':'逆排'):(lastLuck.direction||'—');
     const items=Array.isArray(lastLuck.pillars)?lastLuck.pillars:[];
-    const cards=items.map(p=>'<div class="data-card"><h3>第'+safe(p.index)+'步 · '+safe(p.ganzhi||'—')+(p.isCurrent?'（当前）':'')+'</h3><p>'+safe(p.yearLabel||'年份未知')+'</p><p>虚岁：'+safe(p.startAgeSui??'—')+'–'+safe(p.endAgeSui??'—')+'</p><p>天干十神：'+safe(p.stemTenGod&&p.stemTenGod.god||'—')+'</p><p>地支十神：'+safe(p.branchTenGod&&p.branchTenGod.god||'—')+'</p><p>藏干：'+safe(Array.isArray(p.hideGan)?p.hideGan.join('、'):'—')+'</p><p>十二长生：'+safe(p.stage||'—')+'</p></div>').join('');
+    const cards=items.map(p=>'<div class="luck-item '+(p.isCurrent?'current':'')+'"><div class="data-card"><h3><span class="relation-icon" aria-hidden="true">⌁</span>'+safe(p.ganzhi||'—')+(p.isCurrent?' · 当前':'')+'</h3><p>第'+safe(p.index)+'步 · '+safe(p.yearLabel||'年份未知')+'</p><p>虚岁 '+safe(p.startAgeSui??'—')+'–'+safe(p.endAgeSui??'—')+'</p><p><span class="chip">天干 '+safe(p.stemTenGod&&p.stemTenGod.god||'—')+'</span></p><p><span class="chip">地支 '+safe(p.branchTenGod&&p.branchTenGod.god||'—')+'</span></p><p>藏干：'+safe(Array.isArray(p.hideGan)?p.hideGan.join('、'):'—')+'</p><p>十二长生：'+safe(p.stage||'—')+'</p></div></div>').join('');
     const unknown=lastBirth.unknownTime&&lastLuck.unknownTime;
     let unknownNote='';
     if(unknown){
@@ -101,7 +104,7 @@
       const fmt=x=>safe(x.years??'—')+'年 '+safe(x.months??'—')+'个月 '+safe(x.days??'—')+'天';
       unknownNote='<div class="data-card"><h3>未知时辰：起运范围提示</h3><p>上方起运日期与年龄按中午参考时刻计算，不应视为精确结果。</p><p>按当天时辰范围估算：较早端约 '+fmt(lo)+'；较晚端约 '+fmt(hi)+'。</p><p>节气是否跨界：'+(unknown.jieAmbiguous?'当天不同时间可能对应不同节气，年/月柱及起运依据需重点复核。':'当前扫描范围未发现前后节气名称变化，但起运时间仍可能随出生时刻变化。')+'</p><p class="muted">要缩小范围，请补充出生时辰；若出生时刻接近立春或节气交界，建议按准确时刻重新排盘。</p></div>';
     }
-    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">以上字段来自本地排盘引擎；不同起运口径可能产生差异。</p></div>'+unknownNote+'</div><h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="data-grid">'+(cards||'<div class="empty">引擎没有返回大运序列。</div>')+'</div>';
+    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">以上字段来自本地排盘引擎；不同起运口径可能产生差异。</p></div>'+unknownNote+'</div><h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="luck-timeline">'+(cards||'<div class="empty">引擎没有返回大运序列。</div>')+'</div>';
   }
   function renderAnnual() {
     const engine=window.BaziEngine||{};
