@@ -44,7 +44,7 @@
     const ranked=keys.slice().sort((a,b)=>values[b]-values[a]);
     const top=ranked[0], second=ranked[1], lower=ranked.slice(-2).filter(k=>values[k]<values[top]);
     const pct=k=>(values[k]/total*100).toFixed(1);
-    const ring='<div class="element-visual element-visual-compact"><div class="element-wheel" role="img" aria-label="五行能量比例图" style="background:conic-gradient('+stops.join(',')+')"><div class="element-wheel-center"><small>五行能量</small><strong>'+safe(Number(total.toFixed(1)))+'</strong><span>合计参考值</span></div></div><div class="element-legend element-legend-visual">'+keys.map(k=>'<div class="legend-item '+elementClass(k)+'"><i></i><span>'+k+'</span><b>'+safe(pct(k))+'%</b><small>'+safe(values[k])+' 点</small></div>').join('')+'</div></div>';
+    const ring='<div class="element-visual element-visual-compact"><div class="element-wheel" role="img" aria-label="五行能量比例图" style="background:conic-gradient('+stops.join(',')+')"><div class="element-wheel-center"><small>五行能量</small><strong>'+safe(Number(total.toFixed(1)))+'</strong></div></div><div class="element-legend element-legend-visual">'+keys.map(k=>'<div class="legend-item '+elementClass(k)+'"><div class="legend-label"><i></i><span>'+k+'</span><b>'+safe(pct(k))+'%</b></div><div class="legend-bar"><span style="--pct:'+Math.max(0,Math.min(100,Number(pct(k))))+'%"></span></div><small>'+safe(values[k])+' 点</small></div>').join('')+'</div></div>';
     let firstText='当前五行分布中，'+top+'的占比最高（'+pct(top)+'%），其次是'+second+'（'+pct(second)+'%）。';
     firstText+=lower.length?'相对而言，'+lower.join('、')+'的占比较少。':'其余五行的占比与之接近。';
     const secondText='整体呈现出“'+top+'较显、'+(lower.length?lower.join('与')+'相对收敛':'其余五行相对均衡')+'”的分布特点。传统五行讲究相生相制，也可以结合木生火、火生土、土生金、金生水、水生木的流转关系来理解。';
