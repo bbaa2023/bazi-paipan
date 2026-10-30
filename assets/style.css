@@ -98,3 +98,48 @@
  .hidden-stem-chip>b{font-size:12px}
  .hidden-stem-chip>span,.hidden-stem-chip>em,.hidden-stem-chip>small{font-size:8px}
 }
+
+/* 四柱卡片排版优化：属性移至干支右侧，减少重复注释，明细分区留白 */
+.pillar-character{
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(8px,1.2vw,15px);
+  min-height:76px;
+  padding:8px 6px;
+}
+.pillar-character>small{display:none}
+.pillar-character>strong{flex:0 0 auto;line-height:1.2}
+.pillar-character .pillar-attrs{display:flex;align-items:center;justify-content:flex-start;margin:0;}
+.pillar-attr{gap:4px;padding:4px 7px;font-size:11px;line-height:1.35}
+.pillar-attr i{font-size:12px}
+.pillar-attr b{font-size:11px;white-space:nowrap}
+.pillar-hidden{align-items:stretch;gap:9px;margin-top:10px;padding:9px 7px 2px;border-top:1px solid #e8dece;text-align:left}
+.pillar-hidden-group{display:flex;flex-direction:column;align-items:flex-start;gap:6px;width:100%;min-width:0}
+.pillar-hidden-title,.pillar-nayin>span{color:#8a7657;font-size:10px;font-weight:700;letter-spacing:.04em}
+.hidden-stem-list{justify-content:flex-start;gap:6px;margin:0}
+.hidden-stem-chip{min-width:0;padding:5px 7px;gap:2px 6px;border-radius:7px}
+.hidden-stem-chip>b{font-size:15px}
+.hidden-stem-chip>span,.hidden-stem-chip>em,.hidden-stem-chip>small{font-size:10px}
+.pillar-nayin{display:flex;align-items:center;gap:9px;width:100%;padding-top:7px;border-top:1px dashed #e6dac7}
+.pillar-nayin>b{color:#34455a;font-size:12px;font-weight:700}
+@media(max-width:680px){
+  .pillar-character{min-height:58px;gap:5px;padding:6px 3px}
+  .pillar-character strong{font-size:clamp(25px,6.4vw,31px)}
+  .pillar-attr{gap:2px;padding:3px 4px}
+  .pillar-attr i{font-size:10px}
+  .pillar-attr b{font-size:9px}
+  .pillar-hidden{gap:7px;margin-top:8px;padding:7px 3px 1px}
+  .pillar-hidden-title,.pillar-nayin>span{font-size:9px}
+  .hidden-stem-list{gap:4px}
+  .hidden-stem-chip{padding:4px 5px;gap:2px 4px}
+  .hidden-stem-chip>b{font-size:13px}
+  .hidden-stem-chip>span,.hidden-stem-chip>em,.hidden-stem-chip>small{font-size:8px}
+  .pillar-nayin{gap:6px;padding-top:6px}
+  .pillar-nayin>b{font-size:10px}
+}
+@media(max-width:360px){
+  .pillar-character{gap:3px}
+  .pillar-attr{padding:2px 3px}
+  .pillar-attr b{font-size:8px}
+}
