@@ -190,3 +190,11 @@
 .hidden-stem-element.el-土{color:#b88732}
 .hidden-stem-element.el-金{color:#84909a}
 .hidden-stem-element.el-水{color:#3784b8}
+
+
+/* 强制覆盖藏干区域继承的五行灰色，确保五行文字本身按元素着色 */
+.hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-木{color:#39845b!important}
+.hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-火{color:#d95745!important}
+.hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-土{color:#b88732!important}
+.hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-金{color:#84909a!important}
+.hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-水{color:#3784b8!important}
