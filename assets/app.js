@@ -36,7 +36,7 @@
       const element = ['木','火','土','金','水'].includes(attr.element) ? attr.element : '未知';
       const label = polarity && element !== '未知' ? polarity + element : '—';
       const title = kind === '干' ? '天干' : '地支';
-      return '<span class="pillar-attr '+elementColorClass(attr.element)+'" aria-label="'+safe(title)+'属性：'+safe(label)+'"><i aria-hidden="true">'+(elementIcon[attr.element] || '◇')+'</i><b>'+safe(label)+'</b><small>'+title+'</small></span>';
+      return '<span class="pillar-attr '+elementColorClass(attr.element)+'" aria-label="'+safe(title)+'属性：'+safe(label)+'"><i aria-hidden="true">'+(elementIcon[attr.element] || '◇')+'</i><b>'+safe(label)+'</b></span>';
     };
     pillarsBox.classList.toggle('three-pillars', labels.length === 3);
     pillarsBox.innerHTML = labels.map(([key,label],i) => {
@@ -66,9 +66,9 @@
       return '<article class="pillar'+dayClass+'" style="animation-delay:'+i*65+'ms">'+
         '<div class="pillar-label">'+label+tombBadge+'</div><div class="pillar-palace">'+palace+'</div>'+
         '<div class="pillar-stem-god">'+safe(stemGod || '—')+'</div>'+
-        '<div class="pillar-character '+elementColorClass(stemInfo.element)+'"><small>天干</small><strong>'+safe(stem)+'</strong><div class="pillar-attrs">'+attrTag(stemInfo,'干')+'</div></div>'+
-        '<div class="pillar-character '+elementColorClass(branchInfo.element)+'"><small>地支</small><strong>'+safe(branch)+'</strong><div class="pillar-attrs">'+attrTag(branchInfo,'支')+'</div></div>'+
-        '<div class="pillar-hidden"><span>藏干 · 十神</span><div class="hidden-stem-list">'+(hiddenHtml || '<span class="muted">—</span>')+'</div><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
+        '<div class="pillar-character '+elementColorClass(stemInfo.element)+'"><strong>'+safe(stem)+'</strong><div class="pillar-attrs">'+attrTag(stemInfo,'干')+'</div></div>'+
+        '<div class="pillar-character '+elementColorClass(branchInfo.element)+'"><strong>'+safe(branch)+'</strong><div class="pillar-attrs">'+attrTag(branchInfo,'支')+'</div></div>'+
+        '<div class="pillar-hidden"><div class="pillar-hidden-group"><span class="pillar-hidden-title">藏干 · 十神</span><div class="hidden-stem-list">'+(hiddenHtml || '<span class="muted">—</span>')+'</div></div><div class="pillar-nayin"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></div></article>';
     }).join('');
     const dm = chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0) || '—';
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
