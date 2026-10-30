@@ -14,20 +14,54 @@
   function hideError() { errorBox.hidden = true; errorBox.textContent = ''; }
   function objectEntries(obj) { return obj && typeof obj === 'object' ? Object.entries(obj) : []; }
   function drawPillars(chart) {
-    // [规范 2/6] 未知时辰时不渲染虚构时柱；日柱使用独立高亮类。
+    // 四柱只渲染引擎真实返回的干支；属性由引擎公开常量/函数映射，不另造命理结果。
+    const engine = window.BaziEngine || {};
     const labels = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']]
       .filter(([key]) => key !== 'time' || !(lastBirth && lastBirth.unknownTime));
+    const elementIcon = {'木':'🌳','火':'🔥','土':'🟫','金':'⚙️','水':'💧'};
+    const elementColorClass = (el) => 'el-' + (['木','火','土','金','水'].includes(el) ? el : '未知');
+    const stemAttr = (gan) => {
+      const i = Array.isArray(engine.STEMS) ? engine.STEMS.indexOf(gan) : -1;
+      if (i < 0) return {element:'—',polarity:'—'};
+      return {element:engine.STEM_ELEMENT?.[i] || '—',polarity:engine.STEM_POLARITY?.[i] || '—'};
+    };
+    const branchAttr = (zhi) => {
+      const i = Array.isArray(engine.BRANCHES) ? engine.BRANCHES.indexOf(zhi) : -1;
+      if (i < 0) return {element:'—',polarity:'—'};
+      return {element:engine.BRANCH_ELEMENT?.[i] || '—',polarity:i % 2 === 0 ? '阳' : '阴'};
+    };
+    const attrTag = (attr, kind) => '<span class="pillar-attr '+elementColorClass(attr.element)+'"><i aria-hidden="true">'+(elementIcon[attr.element] || '◇')+'</i><b>'+safe(attr.element)+'</b><small>'+safe(attr.polarity)+kind+'</small></span>';
     pillarsBox.classList.toggle('three-pillars', labels.length === 3);
     pillarsBox.innerHTML = labels.map(([key,label],i) => {
       const p = chart.pillars?.[key] || {};
-      const gz = p.ganzhi || '—';
-      const stem = String(gz).charAt(0) || '—';
-      const branch = String(gz).charAt(1) || '—';
-      const el = elementClass(stem);
+      const gz = p.ganzhi || '';
+      const stem = String(gz).charAt(0);
+      const branch = String(gz).charAt(1);
+      if (!stem || !branch) return '<article class="pillar"><div class="pillar-label">'+label+'</div><div class="empty">引擎未返回此柱</div></article>';
+      const stemInfo = stemAttr(stem), branchInfo = branchAttr(branch);
       const dayClass = key === 'day' ? ' pillar-day-master' : '';
       const palace = ({year:'祖上宫',month:'父母事业宫',day:'自身',time:'子女宫'})[key] || '—';
+      let stemGod = p.shiShenGan || (key === 'day' ? '日主' : '');
+      if (!stemGod && key !== 'day' && typeof engine.tenGodOf === 'function') {
+        try { stemGod = engine.tenGodOf(chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0), stem) || ''; } catch (_) {}
+      }
       const tombBadge = ['辰','戌','丑','未'].includes(branch) ? '<span class="tomb-badge">墓库</span>' : '';
-      return '<article class="pillar '+el+dayClass+'" style="animation-delay:'+i*65+'ms"><div class="pillar-label">'+label+'</div><div class="pillar-palace">'+palace+'</div><div class="pillar-god">'+safe(p.shiShenGan || (key==='day'?'日主':'—'))+'</div><div class="pillar-character '+elementClass(stem)+'"><small>天干</small><strong>'+safe(stem)+'</strong></div><div class="pillar-character '+elementClass(branch)+'"><small>地支</small><strong>'+safe(branch)+'</strong>'+tombBadge+'</div><div class="pillar-hidden"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
+      const hidden = Array.isArray(p.hideGan) ? p.hideGan : [];
+      const hiddenHtml = hidden.map((gan,idx) => {
+        const info = stemAttr(gan);
+        let god = '';
+        if (typeof engine.tenGodOf === 'function') {
+          try { god = engine.tenGodOf(chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0), gan) || ''; } catch (_) {}
+        }
+        const pos = idx === 0 ? '本气' : idx === 1 ? '中气' : '余气';
+        return '<span class="hidden-stem-chip '+elementColorClass(info.element)+'"><b>'+safe(gan)+'</b><span>'+safe(info.element)+'·'+safe(info.polarity)+'</span><em>'+safe(god || '—')+'</em><small>'+pos+'</small></span>';
+      }).join('');
+      return '<article class="pillar'+dayClass+'" style="animation-delay:'+i*65+'ms">'+
+        '<div class="pillar-label">'+label+tombBadge+'</div><div class="pillar-palace">'+palace+'</div>'+
+        '<div class="pillar-stem-god">'+safe(stemGod || '—')+'</div>'+
+        '<div class="pillar-character '+elementColorClass(stemInfo.element)+'"><small>天干</small><strong>'+safe(stem)+'</strong><div class="pillar-attrs">'+attrTag(stemInfo,'干')+'</div></div>'+
+        '<div class="pillar-character '+elementColorClass(branchInfo.element)+'"><small>地支</small><strong>'+safe(branch)+'</strong><div class="pillar-attrs">'+attrTag(branchInfo,'支')+'</div></div>'+
+        '<div class="pillar-hidden"><span>藏干 · 十神</span><div class="hidden-stem-list">'+(hiddenHtml || '<span class="muted">—</span>')+'</div><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></article>';
     }).join('');
     const dm = chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0) || '—';
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
