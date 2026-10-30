@@ -180,3 +180,13 @@
  .hidden-stem-attr,.hidden-stem-god{font-size:10px}
  .hidden-stem-pos{font-size:9px}
 }
+
+
+/* 藏干属性：顺序统一为阴阳在前、五行在后；五行文字沿用全站五行色，不使用图标 */
+.hidden-stem-attr{display:inline-flex;align-items:center;gap:2px;white-space:nowrap}
+.hidden-stem-element{font:inherit;font-weight:800}
+.hidden-stem-element.el-木{color:#39845b}
+.hidden-stem-element.el-火{color:#d95745}
+.hidden-stem-element.el-土{color:#b88732}
+.hidden-stem-element.el-金{color:#84909a}
+.hidden-stem-element.el-水{color:#3784b8}
