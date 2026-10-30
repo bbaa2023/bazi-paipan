@@ -198,3 +198,12 @@
 .hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-土{color:#b88732!important}
 .hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-金{color:#84909a!important}
 .hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-水{color:#3784b8!important}
+
+
+/* 阴阳属性独立配色：阳为蓝色、阴为紫色；五行文字继续沿用五行专属颜色 */
+.polarity{font-weight:800;letter-spacing:.02em}
+.polarity-yang{color:#2875ad!important}
+.polarity-yin{color:#9360a8!important}
+.polarity-unknown{color:#7b8490!important}
+.pillar-attr b{display:inline-flex;align-items:center;gap:1px}
+.hidden-stem-attr{display:inline-flex;align-items:center;gap:3px}
