@@ -143,3 +143,19 @@
   .pillar-attr{padding:2px 3px}
   .pillar-attr b{font-size:8px}
 }
+
+
+/* 藏干十神：按本气、中气、余气逐行横排，提升直播与手机阅读字号 */
+.hidden-stem-list{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;width:100%;margin:2px 0 5px}
+.hidden-stem-row{display:grid;grid-template-columns:34px minmax(64px,1fr) minmax(48px,.85fr) 38px;align-items:center;gap:8px;width:100%;min-width:0;padding:7px 9px;border:1px solid color-mix(in srgb,var(--el) 27%,#e5dac7);border-radius:8px;background:color-mix(in srgb,var(--el) 5%,#fffdf8);color:var(--text);line-height:1.35}
+.hidden-stem-gan{color:var(--el);font-size:19px;font-weight:800;text-align:center}
+.hidden-stem-attr{color:var(--el);font-size:14px;font-weight:650;white-space:nowrap}
+.hidden-stem-god{font-style:normal;color:#34455a;font-size:14px;font-weight:700;white-space:nowrap}
+.hidden-stem-pos{color:#947343;font-size:12px;font-weight:650;text-align:right;white-space:nowrap}
+@media(max-width:680px){
+ .hidden-stem-list{gap:5px}
+ .hidden-stem-row{grid-template-columns:28px minmax(48px,1fr) minmax(40px,.85fr) 32px;gap:4px;padding:6px 5px}
+ .hidden-stem-gan{font-size:16px}
+ .hidden-stem-attr,.hidden-stem-god{font-size:11px}
+ .hidden-stem-pos{font-size:10px}
+}
