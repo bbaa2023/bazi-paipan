@@ -36,7 +36,7 @@
       const element = ['木','火','土','金','水'].includes(attr.element) ? attr.element : '未知';
       const label = polarity && element !== '未知' ? polarity + element : '—';
       const title = kind === '干' ? '天干' : '地支';
-      return '<span class="pillar-attr '+elementColorClass(attr.element)+'" aria-label="'+safe(title)+'属性：'+safe(label)+'"><i aria-hidden="true">'+(elementIcon[attr.element] || '◇')+'</i><b>'+safe(label)+'</b></span>';
+      return '<span class="pillar-attr '+elementColorClass(attr.element)+'" aria-label="'+safe(title)+'属性：'+safe(label)+'"><i aria-hidden="true">'+(elementIcon[attr.element] || '◇')+'</i><b><span class="polarity polarity-'+(polarity === '阳' ? 'yang' : polarity === '阴' ? 'yin' : 'unknown')+'">'+safe(polarity || '—')+'</span><span class="attr-element">'+safe(element)+'</span></b></span>';
     };
     pillarsBox.classList.toggle('three-pillars', labels.length === 3);
     pillarsBox.innerHTML = labels.map(([key,label],i) => {
@@ -61,7 +61,7 @@
           try { god = engine.tenGodOf(chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0), gan) || ''; } catch (_) {}
         }
         const pos = idx === 0 ? '本气' : idx === 1 ? '中气' : '余气';
-        return '<div class="hidden-stem-row '+elementColorClass(info.element)+'"><b class="hidden-stem-gan">'+safe(gan)+'</b><span class="hidden-stem-attr">'+safe(info.polarity)+'·<b class="hidden-stem-element '+elementColorClass(info.element)+'">'+safe(info.element)+'</b>'+'</span><em class="hidden-stem-god">'+safe(god || '—')+'</em><small class="hidden-stem-pos">'+pos+'</small></div>';
+        return '<div class="hidden-stem-row '+elementColorClass(info.element)+'"><b class="hidden-stem-gan">'+safe(gan)+'</b><span class="hidden-stem-attr"><span class="polarity polarity-'+(info.polarity === '阳' ? 'yang' : info.polarity === '阴' ? 'yin' : 'unknown')+'">'+safe(info.polarity || '—')+'</span><span class="hidden-stem-element '+elementColorClass(info.element)+'">'+safe(info.element)+'</span></span><em class="hidden-stem-god">'+safe(god || '—')+'</em><small class="hidden-stem-pos">'+pos+'</small></div>';
       }).join('');
       return '<article class="pillar'+dayClass+'" style="animation-delay:'+i*65+'ms">'+
         '<div class="pillar-label">'+label+tombBadge+'</div><div class="pillar-palace">'+palace+'</div>'+
