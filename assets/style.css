@@ -72,3 +72,29 @@
 .element-reference>small{display:block;color:#898477;font-size:10px;line-height:1.6}
 .pillar-character .tomb-badge{position:relative;z-index:1;margin:5px 0 1px}
 @media(max-width:680px){.element-reference{padding:10px}.element-reference-row{gap:6px 9px}.element-reference-row strong{font-size:12px}}
+
+
+/* 四柱干支属性可视化：十神置于天干正上方，属性同时用图标与文字标注 */
+.pillar-stem-god{display:table;margin:5px auto 5px;padding:3px 10px;border:1px solid #d9c18f;border-radius:999px;background:#f5ead5;color:#805c22;font-size:11px;font-weight:750;line-height:1.5}
+.pillar-attrs{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;margin-top:4px}
+.pillar-attr{display:inline-flex;align-items:center;gap:3px;padding:2px 5px;border:1px solid color-mix(in srgb,var(--el) 35%,#e5dac7);border-radius:999px;background:color-mix(in srgb,var(--el) 8%,#fffdf8);color:var(--el);font-size:10px;line-height:1.35;white-space:nowrap}
+.pillar-attr i{font-style:normal;font-size:11px}
+.pillar-attr b{font-size:10px}
+.pillar-attr small{color:#6f7881;font-size:9px}
+.hidden-stem-list{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;width:100%;margin:2px 0 5px}
+.hidden-stem-chip{display:grid;grid-template-columns:auto auto;align-items:center;gap:1px 4px;padding:4px 6px;border:1px solid color-mix(in srgb,var(--el) 30%,#e5dac7);border-radius:8px;background:color-mix(in srgb,var(--el) 6%,#fffdf8);color:var(--text);font-size:10px;line-height:1.35}
+.hidden-stem-chip>b{color:var(--el);font-size:14px}
+.hidden-stem-chip>span{color:var(--el);font-size:9px}
+.hidden-stem-chip>em{font-style:normal;color:#596779;font-size:9px}
+.hidden-stem-chip>small{color:#947343;font-size:9px;text-align:right}
+.pillar-character .pillar-attrs{position:relative;z-index:1}
+.pillar-day-master .pillar-stem-god{background:#ead8b3;border-color:#c49a51}
+@media(max-width:680px){
+ .pillar-stem-god{font-size:9px;padding:2px 6px;margin:4px auto}
+ .pillar-attr{gap:2px;padding:2px 4px;font-size:9px}
+ .pillar-attr i{font-size:10px}
+ .pillar-attr small{font-size:8px}
+ .hidden-stem-chip{padding:3px 4px;gap:1px 3px}
+ .hidden-stem-chip>b{font-size:12px}
+ .hidden-stem-chip>span,.hidden-stem-chip>em,.hidden-stem-chip>small{font-size:8px}
+}
