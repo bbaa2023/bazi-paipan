@@ -30,7 +30,14 @@
       if (i < 0) return {element:'—',polarity:'—'};
       return {element:engine.BRANCH_ELEMENT?.[i] || '—',polarity:i % 2 === 0 ? '阳' : '阴'};
     };
-    const attrTag = (attr, kind) => '<span class="pillar-attr '+elementColorClass(attr.element)+'"><i aria-hidden="true">'+(elementIcon[attr.element] || '◇')+'</i><b>'+safe(attr.element)+'</b><small>'+safe(attr.polarity)+kind+'</small></span>';
+    // 阴阳与五行合并显示为“阳木 / 阴火”等直观标签；仅格式化引擎属性，不改变排盘结果。
+    const attrTag = (attr, kind) => {
+      const polarity = attr.polarity === '阳' ? '阳' : attr.polarity === '阴' ? '阴' : '';
+      const element = ['木','火','土','金','水'].includes(attr.element) ? attr.element : '未知';
+      const label = polarity && element !== '未知' ? polarity + element : '—';
+      const title = kind === '干' ? '天干' : '地支';
+      return '<span class="pillar-attr '+elementColorClass(attr.element)+'" aria-label="'+safe(title)+'属性：'+safe(label)+'"><i aria-hidden="true">'+(elementIcon[attr.element] || '◇')+'</i><b>'+safe(label)+'</b><small>'+title+'</small></span>';
+    };
     pillarsBox.classList.toggle('three-pillars', labels.length === 3);
     pillarsBox.innerHTML = labels.map(([key,label],i) => {
       const p = chart.pillars?.[key] || {};
