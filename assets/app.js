@@ -61,7 +61,7 @@
           try { god = engine.tenGodOf(chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0), gan) || ''; } catch (_) {}
         }
         const pos = idx === 0 ? '本气' : idx === 1 ? '中气' : '余气';
-        return '<span class="hidden-stem-chip '+elementColorClass(info.element)+'"><b>'+safe(gan)+'</b><span>'+safe(info.element)+'·'+safe(info.polarity)+'</span><em>'+safe(god || '—')+'</em><small>'+pos+'</small></span>';
+        return '<div class="hidden-stem-row '+elementColorClass(info.element)+'"><b class="hidden-stem-gan">'+safe(gan)+'</b><span class="hidden-stem-attr">'+safe(info.element)+'·'+safe(info.polarity)+'</span><em class="hidden-stem-god">'+safe(god || '—')+'</em><small class="hidden-stem-pos">'+pos+'</small></div>';
       }).join('');
       return '<article class="pillar'+dayClass+'" style="animation-delay:'+i*65+'ms">'+
         '<div class="pillar-label">'+label+tombBadge+'</div><div class="pillar-palace">'+palace+'</div>'+
