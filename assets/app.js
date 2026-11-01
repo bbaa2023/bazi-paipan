@@ -330,7 +330,12 @@
     function renderSidePanels() {
     // [直播简洁布局] 五行总览保留在主命盘下方；大运与流年只在下方标签中按需展开。
     const overview = $('#overview-panel');
-    if (overview) overview.innerHTML = renderOverview();
+    if (overview) {
+      // 每次排盘都彻底清空旧节点，再写入当前版本的五行扶抑分析。
+      overview.replaceChildren();
+      overview.dataset.renderVersion = '20261101b';
+      overview.insertAdjacentHTML('afterbegin', renderOverview());
+    }
   }
   function renderTab() {
     document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===activeTab;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
