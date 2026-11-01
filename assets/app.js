@@ -84,32 +84,145 @@
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
   }
   function renderOverview() {
-    const data = lastChart.fiveElements || {};
-    const selected = data.withHiddenHalfWeight || data.withHiddenStems || data.stemsBranchesOnly || {};
-    const entries = objectEntries(selected);
-    if (!entries.length) return '<div class="empty">当前引擎版本没有返回可识别的五行统计字段。</div>';
-    const keys=['木','火','土','金','水'];
-    const values=Object.fromEntries(keys.map(k=>[k,Math.max(0,Number(selected[k])||0)]));
-    const total=keys.reduce((sum,k)=>sum+values[k],0)||1;
-    const colors={'木':'#34865d','火':'#d95442','土':'#bd8a31','金':'#8c969e','水':'#367db3'};
-    let cursor=0;
-    const stops=keys.map(k=>{const end=cursor+values[k]/total*100;const stop=colors[k]+' '+cursor.toFixed(2)+'% '+end.toFixed(2)+'%';cursor=end;return stop;});
-    const ranked=keys.slice().sort((a,b)=>values[b]-values[a]);
-    const top=ranked[0], second=ranked[1], lower=ranked.slice(-2).filter(k=>values[k]<values[top]);
-    const pct=k=>(values[k]/total*100).toFixed(1);
-    const ring='<div class="element-visual element-visual-compact"><div class="element-wheel" role="img" aria-label="五行能量比例图" style="background:conic-gradient('+stops.join(',')+')"><div class="element-wheel-center"><small>五行能量</small><strong>'+safe(Number(total.toFixed(1)))+'</strong></div></div><div class="element-legend element-legend-visual">'+keys.map(k=>'<div class="legend-item '+elementClass(k)+'"><div class="legend-label"><i></i><span>'+k+'</span><b>'+safe(pct(k))+'%</b></div><div class="legend-bar"><span style="--pct:'+Math.max(0,Math.min(100,Number(pct(k))))+'%"></span></div><small>'+safe(values[k])+' 点</small></div>').join('')+'</div></div>';
-    let firstText='当前五行分布中，'+top+'的占比最高（'+pct(top)+'%），其次是'+second+'（'+pct(second)+'%）。';
-    firstText+=lower.length?'相对而言，'+lower.join('、')+'的占比较少。':'其余五行的占比与之接近。';
-    const secondText='整体呈现出“'+top+'较显、'+(lower.length?lower.join('与')+'相对收敛':'其余五行相对均衡')+'”的分布特点。传统五行讲究相生相制，也可以结合木生火、火生土、土生金、金生水、水生木的流转关系来理解。';
-    const fav=lastFavorable||{};
-    const score=fav.score||{};
-    const fy=fav.fuYang||{};
-    const favItems=Array.isArray(fy.favorable)?fy.favorable:[];
-    const strength=score.verdict==='strong'?'偏强':score.verdict==='weak'?'偏弱':score.verdict==='balanced'?'中和':'—';
-    const favText=favItems.length?favItems.map(x=>x&&x.element||'—').join('、'):'—';
-    const climate=fav.tiaoHou&&fav.tiaoHou.ruleCn?fav.tiaoHou.ruleCn:'—';
-    const reference='<div class="element-reference"><div class="element-reference-heading">旺衰与喜用参考</div><div class="element-reference-row"><span>日主旺衰</span><strong>'+safe(strength)+'</strong><span>扶抑参考</span><strong>'+safe(favText)+'</strong></div><p><span>调候参考：</span>'+safe(climate)+'</p><small>以上为传统流派规则推演，仅供文化参考，不作为人生决策依据</small></div>';
-    return '<h3 class="subhead">五行能量分布</h3><section class="element-combined-card">'+ring+'<section class="element-analysis"><div class="element-analysis-title"><span class="analysis-mark">简</span><h3>五行简析</h3></div><p>'+safe(firstText)+'</p><p>'+safe(secondText)+'</p>'+reference+'</section></section>';
+    const engine = window.BaziEngine || {};
+    const chart = lastChart || {};
+    const fav = lastFavorable || {};
+    const score = fav.score || {};
+    const fuYang = fav.fuYang || {};
+    const pillars = chart.pillars || {};
+    const dayStem = fav.dayMaster?.stem || chart.meta?.dayMaster || pillars.day?.ganzhi?.charAt(0) || '';
+    const dayElement = fav.dayMaster?.element || chart.meta?.dayElement || '';
+    const monthBranch = fav.monthBranch || pillars.month?.ganzhi?.charAt(1) || '';
+    const validElements = ['木','火','土','金','水'];
+    const elClass = (el) => validElements.includes(el) ? 'el-' + el : '';
+    const fmt = (n) => Number.isFinite(Number(n)) ? Number(n).toFixed(1).replace(/\\.0$/, '') : '—';
+
+    if (!score.verdict || !dayElement) {
+      return '<section class="element-combined-card support-panel"><div class="support-panel-empty">当前引擎未返回完整的旺衰与扶抑参考数据，请确认本地引擎版本及排盘结果。</div></section>';
+    }
+
+    // ① 阵营分值直接沿用引擎 computeFavorableElement().score.breakdown：
+    //    月柱加权、日主天干不重复计入、藏干半权重，确保与引擎旺衰评分同口径。
+    let support = Number(score.support);
+    let drain = Number(score.drain);
+    const breakdown = Array.isArray(score.breakdown) ? score.breakdown : [];
+    if (breakdown.length && typeof engine.tenGodRelation === 'function') {
+      let supportFromBreakdown = 0, drainFromBreakdown = 0;
+      breakdown.forEach(item => {
+        const weight = Number(item && item.weight);
+        const element = item && item.element;
+        if (!Number.isFinite(weight) || !validElements.includes(element)) return;
+        let group = '';
+        try { group = engine.tenGodRelation(dayElement, element) || ''; } catch (_) {}
+        if (group === 'resource' || group === 'peers') supportFromBreakdown += weight;
+        else if (group) drainFromBreakdown += weight;
+      });
+      support = supportFromBreakdown;
+      drain = drainFromBreakdown;
+    }
+    if (!Number.isFinite(support) || support < 0) support = 0;
+    if (!Number.isFinite(drain) || drain < 0) drain = 0;
+    const total = support + drain;
+    const supportPct = total > 0 ? support / total * 100 : 0;
+    const drainPct = total > 0 ? drain / total * 100 : 0;
+
+    // ② 得令：月令本气五行生扶或同于日主，调用引擎公开的地支剖面。
+    let monthElement = '';
+    let monthStatus = '—';
+    if (monthBranch && typeof engine.branchProfile === 'function') {
+      try {
+        const profile = engine.branchProfile(monthBranch);
+        monthElement = profile && profile.element || '';
+        if (monthElement && typeof engine.tenGodRelation === 'function') {
+          const relation = engine.tenGodRelation(dayElement, monthElement);
+          monthStatus = relation === 'resource' || relation === 'peers' ? '得令' : '失令';
+        }
+      } catch (_) {}
+    }
+
+    // ③ 得根：检查四柱地支的本气藏干五行是否与日主同类；不自行推断中气、余气为本气根。
+    let rootStatus = '—';
+    if (dayElement && typeof engine.branchProfile === 'function') {
+      const branchKeys = ['year','month','day','time'];
+      let rootFound = false, branchChecked = false;
+      branchKeys.forEach(key => {
+        const gz = pillars[key] && pillars[key].ganzhi;
+        const branch = gz && String(gz).charAt(1);
+        if (!branch) return;
+        try {
+          const profile = engine.branchProfile(branch);
+          const mainHidden = profile && Array.isArray(profile.hidden) ? profile.hidden[0] : null;
+          if (mainHidden && validElements.includes(mainHidden.element)) {
+            branchChecked = true;
+            if (mainHidden.element === dayElement) rootFound = true;
+          }
+        } catch (_) {}
+      });
+      if (branchChecked) rootStatus = rootFound ? '有本气根' : '无本气根';
+    }
+
+    // ④ 得势：只描述两大阵营的相对权重，不替代引擎的旺衰结论。
+    const forceStatus = total <= 0 ? '—' : support > drain ? '帮扶较重' : support < drain ? '克泄耗较重' : '两方均衡';
+    const verdictMap = { strong:'身旺', weak:'身弱', balanced:'中和' };
+    const verdict = verdictMap[score.verdict] || '—';
+    const verdictTone = score.verdict === 'strong' ? 'strong' : score.verdict === 'weak' ? 'weak' : 'balanced';
+    const reasons = [];
+    if (monthStatus !== '—') reasons.push(monthStatus);
+    if (rootStatus !== '—') reasons.push(rootStatus);
+    if (forceStatus !== '—') reasons.push(forceStatus);
+    const basis = reasons.length
+      ? '观察：' + reasons.join('、') + '。旺衰结论按本地引擎公开的扶抑计分规则得出。'
+      : '旺衰结论按本地引擎公开的扶抑计分规则得出。';
+
+    // ⑤ 用神、忌神优先读取引擎已经返回的两组结果，不用相克关系自行反推。
+    const getElements = (items) => Array.isArray(items)
+      ? [...new Set(items.map(x => typeof x === 'string' ? x : x && x.element).filter(x => validElements.includes(x)))]
+      : [];
+    const favorable = getElements(fuYang.favorable);
+    const unfavorable = getElements(fuYang.unfavorable);
+    const elementChips = (items, emptyText) => items.length
+      ? items.map(el => '<span class="support-element-chip '+elClass(el)+'">'+safe(el)+'</span>').join('')
+      : '<span class="support-no-data">'+emptyText+'</span>';
+    const strengthLabel = monthStatus === '—' ? '月令资料不足' : monthBranch + '月令 · ' + monthStatus;
+    const monthDetail = monthElement ? '（'+monthElement+'）' : '';
+    const climate = fav.tiaoHou && fav.tiaoHou.ruleCn ? fav.tiaoHou.ruleCn : '—';
+    const supportWidth = Math.max(0, Math.min(100, supportPct));
+    const drainWidth = Math.max(0, Math.min(100, drainPct));
+
+    return '<h3 class="subhead">五行能量 · 子平扶抑参考</h3>'+
+      '<section class="element-combined-card support-panel">'+
+        '<div class="support-anchor">'+
+          '<div><span class="support-eyebrow">日主与月令</span><strong>日主 '+safe(dayStem)+' <i>'+safe(dayElement)+'</i></strong></div>'+
+          '<div class="support-month"><span>月令 '+safe(monthBranch || '—')+monthDetail+'</span><b class="'+(monthStatus==='得令'?'is-support':monthStatus==='失令'?'is-drain':'')+'">'+safe(monthStatus)+'</b></div>'+
+        '</div>'+
+        '<section class="support-balance">'+
+          '<div class="support-camp-head">'+
+            '<div class="support-camp support-camp-help"><span class="support-camp-name">帮扶</span><strong>'+safe(fmt(support))+' <small>点</small></strong><em>'+safe(supportPct.toFixed(1))+'%</em><small>印星 · 比劫</small></div>'+
+            '<div class="support-camp support-camp-drain"><span class="support-camp-name">克泄耗</span><strong>'+safe(fmt(drain))+' <small>点</small></strong><em>'+safe(drainPct.toFixed(1))+'%</em><small>食伤 · 财星 · 官杀</small></div>'+
+          '</div>'+
+          '<div class="support-balance-track" role="img" aria-label="帮扶 '+safe(supportPct.toFixed(1))+'%，克泄耗 '+safe(drainPct.toFixed(1))+'%">'+
+            '<span class="support-track-help" style="width:'+supportWidth.toFixed(2)+'%"></span>'+
+            '<span class="support-track-drain" style="width:'+drainWidth.toFixed(2)+'%"></span>'+
+            '<i aria-hidden="true"></i>'+
+          '</div>'+
+          '<div class="support-balance-caption"><span>印星＋比劫：生扶日主</span><span>食伤＋财星＋官杀：泄耗克日主</span></div>'+
+        '</section>'+
+        '<section class="support-three-metrics" aria-label="得令得根得势观察">'+
+          '<div class="support-metric"><span class="support-metric-icon">令</span><div><small>得令</small><strong class="'+(monthStatus==='得令'?'is-support':monthStatus==='失令'?'is-drain':'')+'">'+safe(monthStatus)+'</strong><em>'+safe(monthBranch || '月令未返回')+'</em></div></div>'+
+          '<div class="support-metric"><span class="support-metric-icon">根</span><div><small>得根</small><strong>'+safe(rootStatus)+'</strong><em>地支本气</em></div></div>'+
+          '<div class="support-metric"><span class="support-metric-icon">势</span><div><small>得势</small><strong>'+safe(forceStatus)+'</strong><em>帮扶与克泄耗对比</em></div></div>'+
+        '</section>'+
+        '<section class="support-verdict support-verdict-'+verdictTone+'">'+
+          '<div><span>日主旺衰结论</span><strong>'+safe(verdict)+'</strong></div>'+
+          '<p>'+safe(basis)+'</p>'+
+        '</section>'+
+        '<section class="support-gods">'+
+          '<div class="support-god-item"><div class="support-god-title"><span>扶抑用神</span><small>宜扶或宜抑的五行</small></div><div class="support-element-list">'+elementChips(favorable,'引擎未给出明确用神')+'</div></div>'+
+          '<div class="support-god-item"><div class="support-god-title"><span>扶抑忌神</span><small>引擎返回的不利五行</small></div><div class="support-element-list">'+elementChips(unfavorable,'引擎未给出明确忌神')+'</div></div>'+
+        '</section>'+
+        '<div class="support-climate"><span>调候参考</span><p>'+safe(climate)+'</p></div>'+
+        '<p class="support-footnote">本面板展示本地引擎公开规则的扶抑参考。得令、得根、得势为辅助观察项，不替代完整命局分析。</p>'+
+      '</section>';
   }
   function renderTwelveStages() {
     const pillars = lastChart?.pillars || {};
