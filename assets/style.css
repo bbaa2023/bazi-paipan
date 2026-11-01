@@ -321,3 +321,54 @@
  .support-metric{padding:8px 5px}
  .support-gods{grid-template-columns:1fr}
 }
+
+
+/* ===== 五行能量 · 子平扶抑诊断面板（2026-11 改造） ===== */
+.fy-card{overflow:hidden;border:1px solid #e1d0ac;border-radius:14px;background:#fffdf8;box-shadow:0 5px 16px #6c5a3b0b}
+.fy-anchor{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:12px 14px;background:#fffdf8;border-bottom:1px solid #e6dac4}
+.fy-k{color:#8a7a5c;font-size:13px}
+.fy-v{font-size:20px;color:#2b3c51;font-weight:700}
+.fy-v-month{color:#956b2b}
+.fy-gap{width:1px;height:18px;background:#e0d2b6}
+.fy-chip{font-size:12px;border-radius:20px;padding:2px 10px;font-style:normal}
+.fy-chip-ok{background:#e8f0e4;color:#3d7a4a;border:1px solid #c6dfc0}
+.fy-chip-no{background:#fde8e6;color:#c04432;border:1px solid #e8b8b0}
+.fy-verdict{display:flex;align-items:center;gap:14px;color:#fff;padding:16px 18px;border-radius:12px;margin:14px 16px;background:linear-gradient(135deg,#34465b,#2b3c51)}
+.fy-verdict-strong{background:linear-gradient(135deg,#7a4a2b,#6a3d22)}
+.fy-verdict-bal{background:linear-gradient(135deg,#4a5f3a,#3d5230)}
+.fy-verdict-label{font-size:13px;opacity:.85}
+.fy-verdict strong{font-size:44px;font-weight:800;line-height:1}
+.fy-verdict p{flex:1;font-size:13px;opacity:.92;line-height:1.7}
+.fy-camp{margin:0 16px 14px;padding:13px 15px;background:#fffdf8;border:1px solid #e5d9c4;border-radius:10px}
+.fy-camp-head{font-size:13px;color:#8a7a5c;margin-bottom:9px}
+.fy-camp-bar{display:flex;height:20px;border-radius:10px;overflow:hidden;border:1px solid #cfc4a6}
+.fy-camp-help{background:#34865d}
+.fy-camp-drain{background:#d95442}
+.fy-camp-legend{display:flex;justify-content:space-between;font-size:12px;color:#7a6a4d;margin-top:7px;gap:8px;flex-wrap:wrap}
+.fy-camp-legend .dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.dot-help{background:#34865d}
+.dot-drain{background:#d95442}
+.fy-triple{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 16px 14px}
+.fy-tri{background:#fffdf8;border:1px solid #e5d9c4;border-radius:10px;padding:10px 12px}
+.fy-tri span{display:block;font-size:12px;color:#8a7a5c;margin-bottom:4px}
+.fy-tri b{font-size:14px;color:#2b3c51;font-weight:600}
+.fy-cause{margin:0 16px 14px;padding:13px 15px;background:#fffdf8;border:1px solid #e5d9c4;border-radius:10px}
+.fy-cause-head{font-size:13px;color:#8a7a5c;margin-bottom:9px}
+.fy-cause-tags{display:flex;flex-wrap:wrap;gap:7px}
+.fy-cause-tag-help{background:#e8f0e4;color:#3d7a4a;border:1px solid #c6dfc0;border-radius:7px;padding:4px 9px;font-size:12px}
+.fy-cause-tag-drain{background:#fde8e6;color:#c04432;border:1px solid #e8b8b0;border-radius:7px;padding:4px 9px;font-size:12px}
+.fy-cause-note{margin-top:9px;padding-top:8px;border-top:1px dashed #e5d9c4;font-size:12px;color:#956b2b;line-height:1.7}
+.fy-use{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 16px 14px}
+.fy-use>div{border-radius:10px;padding:12px 14px}
+.fy-use span{font-size:12px;display:block;margin-bottom:3px}
+.fy-use strong{font-size:24px;font-weight:800}
+.fy-use small{font-size:12px;display:block;margin-top:3px}
+.fy-use-good{background:#e8f0e4;border:1px solid #c6dfc0;color:#2c6b3f}
+.fy-use-good span{color:#3d7a4a}
+.fy-use-good small{color:#5a8a63}
+.fy-use-bad{background:#fde8e6;border:1px solid #e8b8b0;color:#a93a2b}
+.fy-use-bad span{color:#c04432}
+.fy-use-bad small{color:#c08072}
+.fy-foot{margin:0 16px 6px;font-size:12px;color:#8a8a8a}
+.fy-disclaimer{margin:0 16px 14px;padding-top:9px;border-top:1px dashed #e5d9c4;font-size:11px;color:#b0a58a}
+@media(max-width:680px){.fy-verdict{flex-wrap:wrap;gap:8px;padding:13px 14px}.fy-verdict strong{font-size:34px}.fy-verdict p{flex:0 0 100%}.fy-triple{grid-template-columns:1fr}.fy-use{grid-template-columns:1fr}.fy-cause-tags{gap:5px}}
