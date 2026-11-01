@@ -95,7 +95,7 @@
     const monthBranch = fav.monthBranch || pillars.month?.ganzhi?.charAt(1) || '';
     const validElements = ['木','火','土','金','水'];
     const elClass = (el) => validElements.includes(el) ? 'el-' + el : '';
-    const fmt = (n) => Number.isFinite(Number(n)) ? Number(n).toFixed(1).replace(/\\.0$/, '') : '—';
+    const fmt = (n) => Number.isFinite(Number(n)) ? Number(n).toFixed(1).replace(/\.0$/, '') : '—';
 
     if (!score.verdict || !dayElement) {
       return '<section class="element-combined-card support-panel"><div class="support-panel-empty">当前引擎未返回完整的旺衰与扶抑参考数据，请确认本地引擎版本及排盘结果。</div></section>';
