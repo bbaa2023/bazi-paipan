@@ -322,8 +322,8 @@
  .support-gods{grid-template-columns:1fr}
 }
 
-
-/* ===== 五行能量 · 子平扶抑诊断面板（2026-11 改造） ===== */
+/* ===== 五行能量 · 扶抑法诊断面板（按用户提供代码） ===== */
+/* ===== 五行能量 · 扶抑法诊断面板（改造追加） ===== */
 .fy-card{overflow:hidden;border:1px solid #e1d0ac;border-radius:14px;background:#fffdf8;box-shadow:0 5px 16px #6c5a3b0b}
 .fy-anchor{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:12px 14px;background:#fffdf8;border-bottom:1px solid #e6dac4}
 .fy-k{color:#8a7a5c;font-size:13px}
