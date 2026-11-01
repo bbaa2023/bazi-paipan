@@ -288,7 +288,7 @@
     if (overview) {
       // 每次排盘都彻底清空旧节点，再写入当前版本的五行扶抑分析。
       overview.replaceChildren();
-      overview.dataset.renderVersion = '20261101b';
+      overview.dataset.renderVersion = '20261101d';
       overview.insertAdjacentHTML('afterbegin', renderOverview());
     }
   }
