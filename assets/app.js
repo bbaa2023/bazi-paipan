@@ -83,7 +83,7 @@
     const dm = chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0) || '—';
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
   }
-function renderOverview() {
+  function renderOverview() {
     const data = lastChart.fiveElements || {};
     const selected = data.withHiddenHalfWeight || data.withHiddenStems || data.stemsBranchesOnly || {};
     const entries = objectEntries(selected);
