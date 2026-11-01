@@ -224,3 +224,100 @@
  .pillar-shensha{gap:6px;padding-top:6px}
  .pillar-shensha>span,.pillar-shensha-list em,.pillar-shensha-list small{font-size:10px}
 }
+
+
+/* 子平扶抑面板：以帮扶/克泄耗阵营替代五行数量饼图 */
+.support-panel{overflow:hidden;padding:0;color:var(--text)}
+.support-anchor{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:19px 22px;background:linear-gradient(105deg,#f7f0e2,#fffdf8 62%);border-bottom:1px solid #e8dece}
+.support-eyebrow{display:block;margin-bottom:3px;color:#8a7657;font-size:11px;font-weight:700;letter-spacing:.08em}
+.support-anchor>div:first-child>strong{display:block;color:#26384c;font:750 25px/1.35 "Noto Serif SC","Songti SC",serif}
+.support-anchor>div:first-child>strong i{margin-left:4px;color:#98733b;font-size:17px;font-style:normal}
+.support-month{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid #e2d2b3;border-radius:10px;background:#fffdf8;color:#586577;font-size:13px}
+.support-month b{color:#805c22;font-size:14px}
+.support-month b.is-support,.support-metric strong.is-support{color:#34865d}
+.support-month b.is-drain,.support-metric strong.is-drain{color:#b94c3e}
+.support-balance{padding:19px 22px 17px}
+.support-camp-head{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.support-camp{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:1px 12px;min-width:0}
+.support-camp-name{grid-column:1/-1;font-size:17px;font-weight:800}
+.support-camp>strong{font-size:25px;font-variant-numeric:tabular-nums;line-height:1.25}
+.support-camp>strong small{font-size:12px;font-weight:500}
+.support-camp>em{font-size:17px;font-style:normal;font-weight:800;font-variant-numeric:tabular-nums}
+.support-camp>small{grid-column:1/-1;color:#858477;font-size:11px}
+.support-camp-help .support-camp-name,.support-camp-help>strong,.support-camp-help>em{color:#39845b}
+.support-camp-drain .support-camp-name,.support-camp-drain>strong,.support-camp-drain>em{color:#b95748}
+.support-balance-track{position:relative;display:flex;overflow:hidden;height:20px;margin:13px 0 8px;border:1px solid #ded5c5;border-radius:999px;background:#f3eee5;box-shadow:inset 0 1px 3px #5c4c3212}
+.support-track-help{height:100%;background:linear-gradient(90deg,#75aa7b,#39845b);transition:width .35s ease}
+.support-track-drain{height:100%;background:linear-gradient(90deg,#d58b73,#b95748);transition:width .35s ease}
+.support-balance-track>i{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fffdf8;box-shadow:0 0 0 1px #806c4c55;transform:translateX(-1px)}
+.support-balance-caption{display:flex;justify-content:space-between;gap:10px;color:#898477;font-size:10px}
+.support-three-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0 22px 19px}
+.support-metric{display:flex;align-items:center;gap:10px;min-width:0;padding:11px 12px;border:1px solid #e7ddcc;border-radius:11px;background:#fbf8f1}
+.support-metric-icon{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border:1px solid #d8c49f;border-radius:50%;background:#f4ead7;color:#916a30;font:700 16px "Noto Serif SC","Songti SC",serif}
+.support-metric>div{display:flex;flex-direction:column;min-width:0}
+.support-metric small{color:#898477;font-size:10px}
+.support-metric strong{color:#34455a;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+.support-metric em{color:#9a9284;font-size:9px;font-style:normal}
+.support-verdict{display:flex;align-items:center;gap:17px;margin:0 22px 17px;padding:13px 16px;border:1px solid #e4d5bb;border-radius:11px;background:#f8f2e6}
+.support-verdict>div{display:flex;flex-direction:column;flex:0 0 auto;gap:2px}
+.support-verdict>div>span{color:#81745d;font-size:10px}
+.support-verdict>div>strong{color:#805c22;font:800 26px/1.25 "Noto Serif SC","Songti SC",serif}
+.support-verdict p{margin:0;color:#586577;font-size:12px;line-height:1.7}
+.support-verdict-strong{border-color:#d9c18f;background:#f7edda}
+.support-verdict-weak{border-color:#d9c7b9;background:#f8eee8}
+.support-verdict-balanced{background:#f4f1e9}
+.support-gods{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 22px 16px}
+.support-god-item{min-width:0;padding:12px 14px;border:1px solid #e7ddcc;border-radius:11px;background:#fffdf8}
+.support-god-title{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:9px}
+.support-god-title>span{color:#34455a;font-size:14px;font-weight:800}
+.support-god-title>small{color:#999080;font-size:9px}
+.support-element-list{display:flex;flex-wrap:wrap;gap:7px}
+.support-element-chip{display:inline-flex;align-items:center;justify-content:center;min-width:35px;padding:5px 11px;border:1px solid currentColor;border-radius:999px;background:#fffdf8;font-size:15px;font-weight:800}
+.support-element-chip.el-木{color:#34865d;background:#34865d0c}
+.support-element-chip.el-火{color:#d95442;background:#d954420c}
+.support-element-chip.el-土{color:#bd8a31;background:#bd8a310c}
+.support-element-chip.el-金{color:#78838d;background:#8c969e18}
+.support-element-chip.el-水{color:#367db3;background:#367db30c}
+.support-no-data{color:#9b9589;font-size:12px}
+.support-climate{display:flex;align-items:flex-start;gap:10px;margin:0 22px;padding:11px 13px;border-top:1px dashed #e2d6c0;color:#5e6874}
+.support-climate>span{flex:0 0 auto;color:#8a7657;font-size:11px;font-weight:800}
+.support-climate p{margin:0;font-size:11px;line-height:1.7}
+.support-footnote{margin:12px 22px 0;padding:10px 0 14px;border-top:1px solid #eee6d8;color:#969082;font-size:10px;line-height:1.7}
+.support-panel-empty{padding:22px;color:#8c8271;font-size:13px}
+@media(max-width:680px){
+ .support-anchor{align-items:flex-start;flex-direction:column;gap:10px;padding:14px}
+ .support-anchor>div:first-child>strong{font-size:22px}
+ .support-month{width:100%;justify-content:space-between;padding:7px 10px;font-size:12px}
+ .support-balance{padding:15px 13px 13px}
+ .support-camp-head{gap:10px}
+ .support-camp-name{font-size:14px}
+ .support-camp>strong{font-size:21px}
+ .support-camp>em{font-size:14px}
+ .support-camp>small{font-size:9px}
+ .support-balance-track{height:16px;margin-top:11px}
+ .support-balance-caption{font-size:9px}
+ .support-three-metrics{gap:6px;padding:0 10px 14px}
+ .support-metric{align-items:flex-start;flex-direction:column;gap:5px;padding:9px 7px}
+ .support-metric-icon{width:27px;height:27px;flex-basis:27px;font-size:13px}
+ .support-metric strong{font-size:12px}
+ .support-metric em{font-size:8px}
+ .support-verdict{align-items:flex-start;flex-direction:column;gap:7px;margin:0 10px 13px;padding:11px 12px}
+ .support-verdict>div>strong{font-size:23px}
+ .support-verdict p{font-size:11px}
+ .support-gods{gap:7px;padding:0 10px 13px}
+ .support-god-item{padding:10px 8px}
+ .support-god-title{align-items:flex-start;flex-direction:column;gap:2px}
+ .support-god-title>span{font-size:12px}
+ .support-element-list{gap:5px}
+ .support-element-chip{min-width:30px;padding:4px 8px;font-size:13px}
+ .support-climate{gap:7px;margin:0 10px;padding:9px 2px}
+ .support-climate>span,.support-climate p{font-size:10px}
+ .support-footnote{margin:10px 10px 0;padding:9px 0 12px;font-size:9px}
+}
+@media(max-width:360px){
+ .support-camp-head{gap:7px}
+ .support-camp>strong{font-size:18px}
+ .support-balance-caption{font-size:8px}
+ .support-metric{padding:8px 5px}
+ .support-gods{grid-template-columns:1fr}
+}
