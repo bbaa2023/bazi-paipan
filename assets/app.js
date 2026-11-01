@@ -84,133 +84,88 @@
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
   }
   function renderOverview() {
-    const data = lastChart.fiveElements || {};
+    const data = lastChart?.fiveElements || {};
     const selected = data.withHiddenHalfWeight || data.withHiddenStems || data.stemsBranchesOnly || {};
     const entries = objectEntries(selected);
-    if (!entries.length) return '<div class="empty">当前引擎版本没有返回可识别的五行统计字段。</div>';
+    if (!entries.length) return '<section class="support-panel support-panel-empty">当前引擎没有返回可识别的五行统计字段。</section>';
+
     const keys = ['木','火','土','金','水'];
     const values = Object.fromEntries(keys.map(k => [k, Math.max(0, Number(selected[k]) || 0)]));
-    const total = keys.reduce((s, k) => s + values[k], 0) || 1;
-    const colors = {'木':'#34865d','火':'#d95442','土':'#bd8a31','金':'#8c969e','水':'#367db3'};
+    const total = keys.reduce((s,k) => s + values[k], 0) || 1;
     const pct = k => (values[k] / total * 100).toFixed(1);
 
-    // —— 五行生克角色（以日主五行为基准）：印(生我)·比劫(同我)·食伤(我生)·财(我克)·官杀(克我) ——
-    const rolesOf = (me) => {
-      const sheng = ['木','火','土','金','水'], ke = ['木','土','水','火','金'];
-      const si = sheng.indexOf(me), ki = ke.indexOf(me);
-      if (si < 0 || ki < 0) return null;
-      return { 印: sheng[(si + 4) % 5], 比劫: me, 食伤: sheng[(si + 1) % 5], 财: ke[(ki + 1) % 5], 官杀: ke[(ki + 4) % 5] };
+    const rolesOf = me => {
+      const sheng=['木','火','土','金','水'], ke=['木','土','水','火','金'];
+      const si=sheng.indexOf(me), ki=ke.indexOf(me);
+      if(si<0||ki<0) return null;
+      return {印:sheng[(si+4)%5],比劫:me,食伤:sheng[(si+1)%5],财:ke[(ki+1)%5],官杀:ke[(ki+4)%5]};
     };
-    const roleText = {'印':'生我·印','比劫':'同我·比劫','食伤':'我生·食伤','财':'我克·财','官杀':'克我·官杀'};
 
-    const dayGan = lastChart.meta?.dayMaster || lastChart.pillars?.day?.ganzhi?.charAt(0) || '—';
-    const dayElement = lastChart.meta?.dayElement || elementFor[dayGan] || '—';
-    const monthBranch = String(lastChart.pillars?.month?.ganzhi || '').charAt(1) || '';
-    const monthElement = monthBranch ? (elementFor[monthBranch] || '—') : '—';
-    const roles = rolesOf(dayElement);
+    const dayGan=lastChart.meta?.dayMaster||lastChart.pillars?.day?.ganzhi?.charAt(0)||'—';
+    const dayElement=lastChart.meta?.dayElement||elementFor[dayGan]||'—';
+    const monthBranch=String(lastChart.pillars?.month?.ganzhi||'').charAt(1)||'';
+    const monthElement=monthBranch?(elementFor[monthBranch]||'—'):'—';
+    const roles=rolesOf(dayElement);
+    const deLing=!!(roles&&(monthElement===roles['印']||monthElement===roles['比劫']));
 
-    // 得令：月支五行属「印」或「比劫」即得月令之气
-    const deLing = !!(roles && (monthElement === roles['印'] || monthElement === roles['比劫']));
-
-    // 得根：四柱地支藏干【本气】是否与日主同五行（有本气根→底气足；仅中/余气→余气根）
-    let rootLabel = '无根';
-    if (dayElement !== '—') {
-      for (const k of ['year','month','day','time']) {
-        const p = lastChart.pillars && lastChart.pillars[k]; if (!p) continue;
-        const hide = Array.isArray(p.hideGan) ? p.hideGan : [];
-        if (hide.length && elementFor[hide[0]] === dayElement) { rootLabel = '有本气根'; break; }
-        if (!['无根','余气根'].includes(rootLabel) && hide.slice(1).some(g => elementFor[g] === dayElement)) rootLabel = '余气根';
+    // 根气：本气优先；没有本气根但中气/余气同五行，则记为余气根。
+    let rootLabel='无根';
+    if(dayElement!=='—'){
+      let hasResidualRoot=false;
+      for(const k of ['year','month','day','time']){
+        const p=lastChart.pillars?.[k]; if(!p) continue;
+        const hide=Array.isArray(p.hideGan)?p.hideGan:[];
+        if(hide.length&&elementFor[hide[0]]===dayElement){rootLabel='有本气根';break;}
+        if(hide.slice(1).some(g=>elementFor[g]===dayElement)) hasResidualRoot=true;
       }
+      if(rootLabel==='无根'&&hasResidualRoot) rootLabel='有余气根';
     }
 
-    // 阵营累计：帮扶(印+比劫) vs 克泄耗(食伤+财+官杀)
-    let helpScore = 0, drainScore = 0, helpList = [], drainList = [];
-    if (roles) {
-      const hs = [roles['印'], roles['比劫']], ds = [roles['食伤'], roles['财'], roles['官杀']];
-      keys.forEach(k => {
-        if (hs.includes(k)) { helpScore += values[k]; helpList.push(k); }
-        if (ds.includes(k)) { drainScore += values[k]; drainList.push(k); }
+    let helpScore=0,drainScore=0,helpList=[],drainList=[];
+    if(roles){
+      const hs=[roles['印'],roles['比劫']], ds=[roles['食伤'],roles['财'],roles['官杀']];
+      keys.forEach(k=>{
+        if(hs.includes(k)){helpScore+=values[k];helpList.push(k);}
+        if(ds.includes(k)){drainScore+=values[k];drainList.push(k);}
       });
     }
-    const helpPct = (helpScore / total * 100).toFixed(1), drainPct = (drainScore / total * 100).toFixed(1);
-    const shiShi = Math.abs(helpScore - drainScore) < total * 0.05 ? '中和' : (helpScore > drainScore ? '帮扶' : '克泄耗');
+    const helpPct=helpScore/total*100, drainPct=drainScore/total*100;
+    const fav=lastFavorable||{}, score=fav.score||{}, fy=fav.fuYang||{};
+    const favItems=Array.isArray(fy.favorable)?fy.favorable:[];
+    const strength=score.verdict==='strong'?'偏强':score.verdict==='weak'?'偏弱':score.verdict==='balanced'?'中和':'待判断';
+    const useEls=favItems.map(x=>x&&x.element||'').filter(Boolean);
+    const jiEls=roles?drainList.filter(e=>values[e]===Math.max(...drainList.map(x=>values[x]),0)&&values[e]>0):[];
+    const climate=fav.tiaoHou?.ruleCn||'暂无调候结果';
 
-    // 旺衰与用神（来自引擎独立接口 computeFavorableElement）
-    const fav = lastFavorable || {}, score = fav.score || {}, fy = fav.fuYang || {};
-    const favItems = Array.isArray(fy.favorable) ? fy.favorable : [];
-    const strength = score.verdict === 'strong' ? '偏强' : score.verdict === 'weak' ? '偏弱' : score.verdict === 'balanced' ? '中和' : '—';
-    const useEls = favItems.map(x => x && x.element || '—').filter(e => e !== '—');
-    const climate = fav.tiaoHou && fav.tiaoHou.ruleCn ? fav.tiaoHou.ruleCn : '—';
-
-    // 忌神：克泄耗阵营中占比最高者
-    let jiEls = [];
-    if (roles) {
-      const maxD = Math.max(...drainList.map(e => values[e]), 0);
-      jiEls = drainList.filter(e => maxD > 0 && values[e] === maxD);
+    let verdictNote='旺衰结果暂缺，以下展示五行关系与阵营分布供参考。';
+    if(roles){
+      const rootTxt=rootLabel==='无根'?'未见同类藏干根气':rootLabel;
+      if(strength==='偏弱') verdictNote='月令属'+monthElement+'，'+rootTxt+'；结合引擎旺衰结果，日主偏弱，宜参考扶助方向。';
+      else if(strength==='偏强') verdictNote='月令属'+monthElement+'，'+rootTxt+'；结合引擎旺衰结果，日主偏强，宜参考疏泄方向。';
+      else if(strength==='中和') verdictNote='月令属'+monthElement+'，'+rootTxt+'；引擎判断日主中和，可结合调候继续观察。';
     }
+    const supportClass=helpScore>=drainScore?'is-support':'is-drain';
+    const drainClass=drainScore>helpScore?'is-drain':'is-support';
+    const elementChips=(arr)=>arr.length?arr.map(e=>'<span class="support-element-chip el-'+e+'">'+safe(e)+'</span>').join(''):'<span class="support-no-data">暂无数据</span>';
 
-    // 旺衰结论依据文案
-    let verdictNote = '日主五行未识别，暂以旺衰参考为准';
-    if (roles) {
-      const rootTxt = rootLabel.includes('根') ? '有根' : '无根';
-      if (strength === '偏弱') verdictNote = '月令' + monthElement + '，' + rootTxt + '；' + shiShi + '较重故身弱宜扶';
-      else if (strength === '偏强') verdictNote = '月令' + monthElement + '，' + rootTxt + '；' + shiShi + '有余故身旺宜抑';
-      else verdictNote = '月令' + monthElement + '，' + rootTxt + '；帮扶与克泄耗接近，日主中和';
-    }
-
-    // 得势标记
-    const shiShiMark = helpScore > drainScore + total * 0.05 ? '得势 ✓' : (drainScore > helpScore + total * 0.05 ? '失势 ✗' : '力量均衡');
-
-    // —— HTML 拼装 ——
-    const anchor = '<div class="fy-anchor"><span class="fy-k">日主</span><b class="fy-v">' + safe(dayGan) + '</b><i class="fy-gap"></i><span class="fy-k">月令</span><b class="fy-v fy-v-month">' + safe(monthElement) + '</b>' +
-      (deLing ? '<em class="fy-chip fy-chip-ok">得令 ✓</em>' : '<em class="fy-chip fy-chip-no">失令</em>') +
-      '<em class="fy-chip ' + (rootLabel === '无根' ? 'fy-chip-no' : 'fy-chip-ok') + '">' + safe(rootLabel) + '</em></div>';
-
-    const verdict = '<div class="fy-verdict ' + (strength === '偏弱' ? 'fy-verdict-weak' : strength === '偏强' ? 'fy-verdict-strong' : 'fy-verdict-bal') + '"><div class="fy-verdict-label">日主旺衰</div><strong>' + safe(strength) + '</strong><p>' + safe(verdictNote) + '</p></div>';
-
-    const camp = '<div class="fy-camp"><div class="fy-camp-head">力量对比 · 帮扶 vs 克泄耗</div>' +
-      '<div class="fy-camp-bar"><div class="fy-camp-help" style="width:' + helpPct + '%"></div><div class="fy-camp-drain" style="width:' + drainPct + '%"></div></div>' +
-      '<div class="fy-camp-legend"><span><i class="dot dot-help"></i>帮扶 ' + safe(helpList.join('·')) + ' ≈ ' + helpPct + '%</span><span><i class="dot dot-drain"></i>克泄耗 ' + safe(drainList.join('·')) + ' ≈ ' + drainPct + '%</span></div></div>';
-
-    const triple = '<div class="fy-triple">' +
-      '<div class="fy-tri"><span>得令</span><b>' + (deLing ? '✓ 得令' : '✗ 失令') + '</b></div>' +
-      '<div class="fy-tri"><span>得根</span><b>' + safe(rootLabel) + '</b></div>' +
-      '<div class="fy-tri"><span>得势</span><b>' + safe(shiShiMark) + '</b></div></div>';
-
-    // 因果表：五行 → 十神 → 阵营
-    let causeTags = '';
-    if (roles) {
-      keys.slice().sort((a, b) => values[b] - values[a]).forEach(k => {
-        const rel = k === roles['印'] ? roleText['印'] : k === roles['比劫'] ? roleText['比劫'] : k === roles['食伤'] ? roleText['食伤'] : k === roles['财'] ? roleText['财'] : k === roles['官杀'] ? roleText['官杀'] : '—';
-        const help = (k === roles['印'] || k === roles['比劫']);
-        causeTags += '<span class="' + (help ? 'fy-cause-tag-help' : 'fy-cause-tag-drain') + '">' + safe(k) + ' ' + safe(pct(k)) + '% · ' + safe(rel) + (help ? ' → 帮扶' : ' → 克泄耗') + '</span>';
-      });
-    }
-    let causeNote = '';
-    if (roles) {
-      if (drainScore > helpScore) {
-        const topD = drainList.slice().sort((a, b) => values[b] - values[a])[0];
-        causeNote = '关键解读：' + topD + '占比虽高，却是「' + roleText[topD] + '」属克泄耗，越多越耗身，故日主偏弱——数量 ≠ 强弱。';
-      } else if (helpScore > drainScore) {
-        const topH = helpList.slice().sort((a, b) => values[b] - values[a])[0];
-        causeNote = '关键解读：' + topH + '占比高，为「' + roleText[topH] + '」属帮扶，故日主偏旺——数量 ≠ 强弱。';
-      } else {
-        causeNote = '关键解读：帮扶与克泄耗接近，日主中和——数量 ≠ 强弱。';
-      }
-    }
-    const cause = '<div class="fy-cause"><div class="fy-cause-head">五行力量 → 十神 → 阵营</div><div class="fy-cause-tags">' + (causeTags || '<span class="fy-cause-tag-drain">—</span>') + '</div>' + (causeNote ? '<p class="fy-cause-note">' + safe(causeNote) + '</p>' : '') + '</div>';
-
-    // 用神 / 忌神
-    let useNote = '';
-    if (useEls.length) useNote = useEls.map(e => roleText[e] || '调候喜用').join('、');
-    const use = '<div class="fy-use">' +
-      '<div class="fy-use-good"><span>用神 · 扶/抑</span><strong>' + safe(useEls.length ? useEls.join('、') : '—') + '</strong><small>' + safe(useNote || '引擎未返回，暂以调候参考') + '</small></div>' +
-      '<div class="fy-use-bad"><span>忌神 · 慎用</span><strong>' + safe(jiEls.length ? jiEls.join('、') : '—') + '</strong><small>克泄耗较重，避免加重失衡</small></div></div>';
-
-    const foot = '<div class="fy-foot"><span>调候参考：</span>' + safe(climate) + '</div>' +
-      '<div class="fy-disclaimer">以上为传统流派规则推演，仅供文化参考，不作为人生决策依据</div>';
-
-    return '<h3 class="subhead">五行能量分布</h3><section class="element-combined-card fy-card">' + anchor + verdict + camp + triple + cause + use + foot + '</section>';
+    return '<section class="support-panel fy-card">'+
+      '<div class="support-anchor"><div><span class="support-eyebrow">DAY MASTER · STRENGTH ANALYSIS</span><strong>日主扶抑分析 <i>'+safe(dayGan)+' · '+safe(dayElement)+'</i></strong></div>'+
+      '<div class="support-month"><span>月令</span><b>'+safe(monthBranch||'—')+' · '+safe(monthElement)+'</b><span class="'+(deLing?'is-support':'is-drain')+'">'+(deLing?'得令':'失令')+'</span></div></div>'+
+      '<div class="support-balance"><div class="support-camp-head">'+
+      '<div class="support-camp support-camp-help"><span class="support-camp-name">帮扶力量</span><strong>'+helpPct.toFixed(1)+'<small>%</small></strong><em>'+safe(helpList.join(' · ')||'—')+'</em><small>生我、同我之五行</small></div>'+
+      '<div class="support-camp support-camp-drain"><span class="support-camp-name">克泄耗力量</span><strong>'+drainPct.toFixed(1)+'<small>%</small></strong><em>'+safe(drainList.join(' · ')||'—')+'</em><small>我生、我克、克我之五行</small></div></div>'+
+      '<div class="support-balance-track"><div class="support-track-help" style="width:'+helpPct.toFixed(2)+'%"></div><div class="support-track-drain" style="width:'+drainPct.toFixed(2)+'%"></div><i></i></div>'+
+      '<div class="support-balance-caption"><span>帮扶 '+helpPct.toFixed(1)+'%</span><span>阵营比例为五行统计值换算，不等同于完整旺衰评分</span><span>克泄耗 '+drainPct.toFixed(1)+'%</span></div></div>'+
+      '<div class="support-three-metrics">'+
+      '<div class="support-metric"><span class="support-metric-icon">令</span><div><small>得令</small><strong class="'+(deLing?'is-support':'is-drain')+'">'+(deLing?'得令':'失令')+'</strong><em>月支对日主的生扶关系</em></div></div>'+
+      '<div class="support-metric"><span class="support-metric-icon">根</span><div><small>得根</small><strong>'+safe(rootLabel)+'</strong><em>检查四支藏干根气</em></div></div>'+
+      '<div class="support-metric"><span class="support-metric-icon">势</span><div><small>得势</small><strong class="'+supportClass+'">'+(helpScore>drainScore?'帮扶占优':drainScore>helpScore?'克泄耗占优':'两方接近')+'</strong><em>按五行阵营统计比较</em></div></div></div>'+
+      '<div class="support-verdict '+(strength==='偏强'?'support-verdict-strong':strength==='偏弱'?'support-verdict-weak':'support-verdict-balanced')+'"><div><span>引擎旺衰判断</span><strong>'+safe(strength)+'</strong></div><p>'+safe(verdictNote)+'</p></div>'+
+      '<div class="support-gods"><div class="support-god-item"><div class="support-god-title"><span>用神参考 · 扶抑</span><small>来自排盘引擎结果</small></div><div class="support-element-list">'+elementChips(useEls)+'</div></div>'+
+      '<div class="support-god-item"><div class="support-god-title"><span>克泄耗较显五行</span><small>仅按当前分布排序</small></div><div class="support-element-list">'+elementChips(jiEls)+'</div></div></div>'+
+      '<div class="support-climate"><span>调候参考</span><p>'+safe(climate)+'</p></div>'+
+      '<div class="support-footnote">说明：五行阵营比例用于辅助理解，不直接代替专业旺衰判断；用神与调候仅在本地引擎返回相应结果时展示。传统命理流派取法存在差异，内容仅供文化研究参考。</div>'+
+      '</section>';
   }
   function renderTwelveStages() {
     const pillars = lastChart?.pillars || {};
