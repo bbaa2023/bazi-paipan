@@ -371,3 +371,81 @@
 .fy-foot{margin:0 16px 6px;font-size:12px;color:#8a8a8a}
 .fy-disclaimer{margin:0 16px 14px;padding-top:9px;border-top:1px dashed #e5d9c4;font-size:11px;color:#b0a58a}
 @media(max-width:680px){.fy-verdict{flex-wrap:wrap;gap:8px;padding:13px 14px}.fy-verdict strong{font-size:34px}.fy-verdict p{flex:0 0 100%}.fy-triple{grid-template-columns:1fr}.fy-use{grid-template-columns:1fr}.fy-cause-tags{gap:5px}}
+
+
+/* 五行能量·扶抑法终版诊断面板：仅供 renderOverview 使用 */
+.fy-final{overflow:hidden;border:1px solid #d9d4c8;border-radius:16px;background:#fffdf8;color:#26384c;box-shadow:0 8px 26px #25324712}
+.fy-final-empty{padding:20px;color:#8a7657;font-size:13px}
+.fy-final-heading{padding:17px 20px 12px;border-bottom:1px solid #e9e2d6}
+.fy-final-heading>div>span{color:#98733b;font-size:11px;font-weight:800;letter-spacing:.08em}
+.fy-final-heading h3{margin:4px 0 2px;color:#26384c;font:800 20px/1.4 "Songti SC",serif}
+.fy-final-heading p{margin:0;color:#8b8578;font-size:11px}
+.fy-final-anchor{display:flex;align-items:center;gap:18px;padding:13px 20px;background:#f7f4ec;border-bottom:1px solid #e9e2d6}
+.fy-final-day,.fy-final-month{display:flex;align-items:baseline;gap:7px;white-space:nowrap}
+.fy-final-day small,.fy-final-month small{color:#8a8274;font-size:11px}
+.fy-final-day strong{color:#26384c;font-size:27px;font-weight:850}
+.fy-final-day em,.fy-final-month em{color:#98733b;font-size:12px;font-style:normal;font-weight:800}
+.fy-final-month strong{color:#34455a;font-size:17px}
+.fy-final-badges{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
+.fy-final-badge{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap}
+.fy-final-badge.good{background:#e3f1e7;color:#287448;border:1px solid #b9ddc4}
+.fy-final-badge.bad{background:#fbe9e6;color:#b74436;border:1px solid #edc2bb}
+.fy-final-verdict{display:flex;align-items:center;gap:20px;margin:15px 16px;padding:17px 20px;border:1px solid #31475f;border-radius:13px;background:linear-gradient(120deg,#1d3048,#344e68 72%,#263c55);color:#fff;box-shadow:0 7px 18px #1d30482b}
+.fy-final-verdict-main{display:flex;flex:0 0 auto;flex-direction:column;gap:2px;min-width:112px}
+.fy-final-verdict-main span{color:#d8dfeb;font-size:12px;font-weight:650}
+.fy-final-verdict-main strong{color:#f0cf83;font-size:42px;font-weight:900;line-height:1.18;letter-spacing:.02em}
+.fy-final-verdict p{margin:0;color:#f0f3f7;font-size:13px;line-height:1.8}
+.fy-final-section{padding:13px 18px 15px;border-top:1px solid #eee8dc}
+.fy-final-section-title{display:flex;align-items:baseline;gap:9px;margin-bottom:10px;color:#34455a;font-size:13px;font-weight:850}
+.fy-final-section-title small{color:#9b9488;font-size:10px;font-weight:500}
+.fy-final-balance-labels{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:14px}
+.fy-final-balance-labels .help,.fy-final-composition .help{color:#34865d}
+.fy-final-balance-labels .drain,.fy-final-composition .drain{color:#d95442}
+.fy-final-bar{display:flex;overflow:hidden;height:15px;border-radius:99px;background:#eee9df;box-shadow:inset 0 1px 3px #26384c1c}
+.fy-final-bar i{display:block;height:100%}
+.fy-final-bar i.help{background:linear-gradient(90deg,#70a986,#34865d)}
+.fy-final-bar i.drain{background:linear-gradient(90deg,#e18b79,#d95442)}
+.fy-final-composition{display:grid;grid-template-columns:1fr 1fr;gap:7px 16px;margin-top:8px;font-size:11px;line-height:1.6}
+.fy-final-cause{display:grid;gap:6px}
+.fy-final-row{display:grid;grid-template-columns:minmax(76px,.8fr) 14px minmax(70px,.8fr) 14px minmax(135px,1.4fr);align-items:center;gap:6px;padding:7px 9px;border:1px solid #eee8dc;border-radius:9px;background:#fff}
+.fy-final-element{display:flex;align-items:baseline;gap:7px;font-size:15px;font-weight:900}
+.fy-final-element small{font-size:10px;font-weight:650}
+.fy-final-element.el-木{color:#34865d}.fy-final-element.el-火{color:#d95442}.fy-final-element.el-土{color:#bd8a31}.fy-final-element.el-金{color:#8c969e}.fy-final-element.el-水{color:#367db3}
+.fy-final-arrow{text-align:center;color:#aaa18f;font-size:13px}
+.fy-final-god{color:#35465a;font-size:12px;font-weight:850}
+.fy-final-god small{display:block;color:#958d80;font-size:9px;font-weight:500}
+.fy-final-camp{padding:5px 8px;border-radius:7px;font-size:11px;font-weight:800}
+.fy-final-camp.help{background:#e6f2e9;color:#287448}.fy-final-camp.drain{background:#fbe9e6;color:#b74436}
+.fy-final-insight{margin:10px 0 0;padding:10px 12px;border-left:3px solid #c49a52;border-radius:0 8px 8px 0;background:#f7f2e7;color:#5b503d;font-size:12px;line-height:1.8}
+.fy-final-gods{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 18px}
+.fy-final-god-card{display:flex;flex-direction:column;gap:7px;min-width:0;padding:13px 14px;border:1px solid;border-radius:12px}
+.fy-final-god-card.use{background:#eaf4ec;border-color:#c6dfcb;color:#2c7146}
+.fy-final-god-card.taboo{background:#fcecea;border-color:#edc5bf;color:#b74436}
+.fy-final-god-card>span{font-size:12px;font-weight:800}
+.fy-final-god-card>strong{font-size:25px;font-weight:900;line-height:1.3;overflow-wrap:anywhere}
+.fy-final-god-card>small{font-size:11px;line-height:1.6;opacity:.88}
+.fy-final-advice{margin:0 18px 16px;padding:12px 14px;border:1px solid #e5dccb;border-radius:11px;background:#f8f5ed}
+.fy-final-advice>div>strong{color:#8b682e;font-size:13px}
+.fy-final-advice p{margin:5px 0 9px;color:#435267;font-size:13px;line-height:1.8}
+.fy-final-advice>small{display:block;padding-top:8px;border-top:1px dashed #ded4c1;color:#7f786b;font-size:10px;line-height:1.7}
+.fy-final-advice footer{margin-top:8px;color:#a19a8e;font-size:10px;line-height:1.6}
+@media(max-width:680px){
+ .fy-final-heading{padding:14px 13px 10px}
+ .fy-final-anchor{align-items:flex-start;flex-wrap:wrap;gap:9px;padding:11px 13px}
+ .fy-final-day strong{font-size:24px}
+ .fy-final-badges{width:100%;margin-left:0}
+ .fy-final-verdict{align-items:flex-start;flex-direction:column;gap:8px;margin:12px 10px;padding:13px 14px}
+ .fy-final-verdict-main strong{font-size:40px}
+ .fy-final-verdict p{font-size:12px}
+ .fy-final-section{padding:12px 11px}
+ .fy-final-composition{grid-template-columns:1fr;gap:4px}
+ .fy-final-row{grid-template-columns:minmax(48px,.6fr) 10px minmax(45px,.65fr) 10px minmax(95px,1.3fr);gap:4px;padding:7px 5px}
+ .fy-final-element{gap:3px;font-size:13px}
+ .fy-final-element small{font-size:9px}
+ .fy-final-god{font-size:11px}
+ .fy-final-camp{padding:5px 5px;font-size:10px}
+ .fy-final-gods{grid-template-columns:1fr;padding:12px 11px}
+ .fy-final-god-card>strong{font-size:23px}
+ .fy-final-advice{margin:0 11px 13px;padding:11px 12px}
+ .fy-final-advice p{font-size:12px}
+}
