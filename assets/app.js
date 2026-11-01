@@ -148,7 +148,7 @@
     const causeRows = sortedElements.map(element => {
       const relation = relationOf(element);
       const action = relation.god === '印' ? '生我' : relation.god === '比劫' ? '同我' : relation.god === '食伤' ? '我生' : relation.god === '财' ? '我克' : '克我';
-      return '<div class="fy-final-row"><span class="fy-final-element el-'+element+'">'+element+' <small>'+pctText(values[element])+'</small></span><span class="fy-final-arrow">→</span><span class="fy-final-god">'+relation.god+'<small>'+action+'</small></span><span class="fy-final-arrow">→</span><span class="fy-final-camp '+relation.tone+'">'+relation.camp+' · '+relation.effect+'</span></div>';
+      return '<div class="fy-final-row"><span class="fy-final-element el-'+element+'"><b>'+element+'</b><small>'+pctText(values[element])+'</small></span><span class="fy-final-god">'+relation.god+'<small>'+action+'</small></span><span class="fy-final-camp '+relation.tone+'">'+relation.camp+' · '+relation.effect+'</span></div>';
     }).join('');
 
     const drainRanked = drainNames.slice().sort((a,b) => values[b] - values[a]);
@@ -159,9 +159,9 @@
     const tabooRoleText = tabooElements.length ? tabooElements.map(e => relationOf(e).god).join(' · ') : '当前未见突出项';
 
     let basis = '引擎暂未给出明确旺衰结论，以下阵营比例仅作五行关系参考。';
-    if (strength === '偏弱') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；帮扶占'+helpPct.toFixed(1)+'%，克泄耗占'+drainPct.toFixed(1)+'%，综合引擎判断为身弱宜扶。';
-    else if (strength === '偏强') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；结合引擎旺衰判断，日主偏强，宜适度疏泄制衡。';
-    else if (strength === '中和') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；引擎判断日主中和，宜结合全局与调候观察。';
+    if (strength === '偏弱') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；虽有令根，但克泄耗占'+drainPct.toFixed(1)+'%、帮扶占'+helpPct.toFixed(1)+'%，克泄耗一方更重，故综合仍偏弱。';
+    else if (strength === '偏强') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；'+(deLing ? '得令且有根，帮扶基础较足' : '虽失令，但帮扶力量占'+helpPct.toFixed(1)+'%，整体支持较重')+'，故综合偏强，宜适度疏泄制衡。';
+    else if (strength === '中和') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；帮扶占'+helpPct.toFixed(1)+'%，克泄耗占'+drainPct.toFixed(1)+'%，整体较为均衡。';
 
     const leadDrain = drainRanked[0] || '';
     let keyInsight = leadDrain
@@ -169,12 +169,12 @@
       : '关键：当前未统计到明显克泄耗五行；五行数量只表示分布，不直接等同日主旺衰。';
     if (strength === '偏弱' && leadDrain) keyInsight += ' 引擎综合判为身弱，宜优先扶身。';
     const advice = strength === '偏弱'
-      ? '优先参考用神方向补印生身、以比劫助身；减少继续叠加'+(tabooText === '暂无明显克泄耗五行' ? '克泄耗力量' : tabooText+'（'+tabooRoleText+'）')+'的倾向。'
+      ? '①补'+(useElements.length ? useElements.join('、') : '印比')+'（印生身、比劫助身）固本；②结合实际生活节奏沉淀积累；③慎叠加'+(tabooText === '暂无明显克泄耗五行' ? '克泄耗力量' : tabooText+'（'+tabooRoleText+'）')+'。'
       : strength === '偏强'
-        ? '参考引擎喜用方向适度疏泄、制衡，避免一味增加印比帮扶；具体取舍以完整命局为准。'
+        ? '①优先参考引擎用神方向疏泄制衡；②减少继续叠加印比帮扶；③结合完整命局与调候灵活取舍。'
         : strength === '中和'
-          ? '以维持平衡为主，结合季节调候与具体命局取舍，不宜只按单一五行数量增减。'
-          : '先以五行分布和十神关系作参考，待引擎旺衰结果明确后再确定补益方向。';
+          ? '①维持现有平衡；②结合季节调候作细节调整；③避免只按单一五行数量盲目增减。'
+          : '①先观察五行分布与十神关系；②待引擎旺衰结论明确后再定补益方向。';
     const climate = lastFavorable?.tiaoHou?.ruleCn || '暂无调候结果';
     const badge = (label,good) => '<span class="fy-final-badge '+(good?'good':'bad')+'">'+label+(good?' ✓':' ✗')+'</span>';
     const elementList = arr => arr.length ? arr.map(e=>'<b class="fy-final-pill el-'+e+'">'+e+'</b>').join('') : '<span class="fy-final-muted">暂无引擎返回数据</span>';
@@ -185,8 +185,8 @@
       '<div class="fy-final-verdict"><div class="fy-final-verdict-main"><span>日主旺衰</span><strong>'+safe(strength)+'</strong></div><p>'+safe(basis)+'</p></div>'+
       '<section class="fy-final-section"><div class="fy-final-section-title">力量对比 <small>五行阵营统计值</small></div><div class="fy-final-balance-labels"><strong class="help">帮扶 '+helpPct.toFixed(1)+'%</strong><strong class="drain">克泄耗 '+drainPct.toFixed(1)+'%</strong></div><div class="fy-final-bar"><i class="help" style="width:'+helpPct.toFixed(2)+'%"></i><i class="drain" style="width:'+drainPct.toFixed(2)+'%"></i></div><div class="fy-final-composition"><span class="help">帮扶：'+safe(helpNames.join(' · ')||'无')+'（'+safe([roles['印'],roles['比劫']].filter((e,i,arr)=>arr.indexOf(e)===i).map(e=>relationOf(e).god).join(' · '))+'）</span><span class="drain">克泄耗：'+safe(drainNames.join(' · ')||'无')+'（'+safe(drainNames.map(e=>relationOf(e).god).join(' · ')||'无')+'）</span></div></section>'+
       '<section class="fy-final-section"><div class="fy-final-section-title">五行 → 十神 → 阵营 <small>按五行点数由高到低</small></div><div class="fy-final-cause">'+causeRows+'</div><p class="fy-final-insight">'+safe(keyInsight)+'</p></section>'+
-      '<div class="fy-final-gods"><article class="fy-final-god-card use"><span>用神 · 扶身（补印比）</span><strong>'+safe(useText||'待引擎确认')+'</strong><small>'+safe(useRoleText)+' · 生身/助身 · 宜补</small></article><article class="fy-final-god-card taboo"><span>忌神参考 · 克泄耗（慎用）</span><strong>'+safe(tabooText)+'</strong><small>'+safe(tabooRoleText)+' · 克泄耗较显 · 宜避免过度叠加</small></article></div>'+
-      '<section class="fy-final-advice"><div><strong>行动建议</strong><p>'+safe(advice)+'</p></div><small>调候参考：'+safe(climate)+'</small><footer>以上为传统流派规则推演，仅供文化研究参考，不作为人生决策依据。</footer></section>'+
+      '<div class="fy-final-gods"><article class="fy-final-god-card use"><span>用神 · 扶身参考</span><strong>'+safe(useText||'待引擎确认')+'</strong><small>'+safe(useRoleText)+' · 宜补益</small></article><article class="fy-final-god-card taboo"><span>忌神参考 · 慎叠加</span><strong>'+safe(tabooText)+'</strong><small>'+safe(tabooRoleText)+' · 宜适度控制</small></article></div>'+
+      '<section class="fy-final-advice"><div><strong>行动建议</strong><p>'+safe(advice)+'</p></div><div class="fy-final-advice-meta"><small>调候参考：'+safe(climate)+'</small><footer>以上为传统流派规则推演，仅供文化研究参考，不作为人生决策依据。</footer></div></section>'+
       '</section>';
   }
   function renderTwelveStages() {
