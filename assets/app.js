@@ -18,6 +18,16 @@
     const engine = window.BaziEngine || {};
     const labels = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']]
       .filter(([key]) => key !== 'time' || !(lastBirth && lastBirth.unknownTime));
+    // 神煞只取本地引擎真实扫描结果，按命中地支归入对应四柱卡片。
+    const shenshaWhere = {year:'年支',month:'月支',day:'日支',time:'时支'};
+    let pillarShenshaHits = [];
+    if (typeof engine.shenshaScan === 'function') {
+      try {
+        const scanPillars = ['year','month','day','time'].map(k => chart.pillars?.[k]?.ganzhi || '');
+        const scanned = engine.shenshaScan(scanPillars);
+        pillarShenshaHits = Array.isArray(scanned) ? scanned : [];
+      } catch (e) { console.warn('四柱卡片神煞扫描失败：', e); }
+    }
     const elementIcon = {'木':'🌳','火':'🔥','土':'🟫','金':'⚙️','水':'💧'};
     const elementColorClass = (el) => 'el-' + (['木','火','土','金','水'].includes(el) ? el : '未知');
     const stemAttr = (gan) => {
@@ -68,7 +78,7 @@
         '<div class="pillar-stem-god">'+safe(stemGod || '—')+'</div>'+
         '<div class="pillar-character '+elementColorClass(stemInfo.element)+'"><strong>'+safe(stem)+'</strong><div class="pillar-attrs">'+attrTag(stemInfo,'干')+'</div></div>'+
         '<div class="pillar-character '+elementColorClass(branchInfo.element)+'"><strong>'+safe(branch)+'</strong><div class="pillar-attrs">'+attrTag(branchInfo,'支')+'</div></div>'+
-        '<div class="pillar-hidden"><div class="pillar-hidden-group"><span class="pillar-hidden-title">藏干 · 十神</span><div class="hidden-stem-list">'+(hiddenHtml || '<span class="muted">—</span>')+'</div></div><div class="pillar-nayin"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div></div></article>';
+        '<div class="pillar-hidden"><div class="pillar-hidden-group"><span class="pillar-hidden-title">藏干 · 十神</span><div class="hidden-stem-list">'+(hiddenHtml || '<span class="muted">—</span>')+'</div></div><div class="pillar-nayin"><span>纳音</span><b>'+safe(p.naYin || '—')+'</b></div><div class="pillar-shensha"><span>神煞</span><div class="pillar-shensha-list">'+(pillarShenshaHits.filter(hit=>String(hit.where||'').includes(shenshaWhere[key])).map(hit=>'<em>'+safe(hit.cn||hit.key||'神煞')+'</em>').join('')||'<small>—</small>')+'</div></div></div></article>';
     }).join('');
     const dm = chart.meta?.dayMaster || chart.pillars?.day?.ganzhi?.charAt(0) || '—';
     $('#day-master').textContent = '日主 ' + dm + (chart.meta?.dayElement ? ' · ' + chart.meta.dayElement : '');
