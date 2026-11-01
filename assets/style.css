@@ -207,3 +207,20 @@
 .polarity-unknown{color:#7b8490!important}
 .pillar-attr b{display:inline-flex;align-items:center;gap:1px}
 .hidden-stem-attr{display:inline-flex;align-items:center;gap:3px}
+
+
+/* 四柱信息纵向对齐：每柱统一预留三个藏干行位，纳音与神煞保持同一基线 */
+.pillar-hidden{width:100%;min-width:0;align-items:stretch}
+.hidden-stem-list{display:flex;flex-direction:column;justify-content:flex-start;min-height:108px;gap:6px}
+.pillar-nayin{min-height:34px;box-sizing:border-box}
+.pillar-shensha{display:flex;align-items:flex-start;gap:9px;width:100%;min-height:34px;padding-top:7px;border-top:1px dashed #e6dac7;box-sizing:border-box}
+.pillar-shensha>span{flex:0 0 auto;color:#8a7657;font-size:12px;font-weight:800}
+.pillar-shensha-list{display:flex;flex-wrap:wrap;gap:5px;min-width:0}
+.pillar-shensha-list em{display:inline-flex;align-items:center;padding:3px 7px;border-radius:999px;background:#f1e5d5;color:#80552f;border:1px solid #d8bea0;font-size:12px;font-style:normal;font-weight:750;line-height:1.4}
+.pillar-shensha-list small{color:#9a8875;font-size:12px}
+@media(max-width:680px){
+ .hidden-stem-list{min-height:90px;gap:5px}
+ .pillar-nayin{min-height:30px}
+ .pillar-shensha{gap:6px;padding-top:6px}
+ .pillar-shensha>span,.pillar-shensha-list em,.pillar-shensha-list small{font-size:10px}
+}
