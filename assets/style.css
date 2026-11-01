@@ -449,3 +449,45 @@
  .fy-final-advice{margin:0 11px 13px;padding:11px 12px}
  .fy-final-advice p{font-size:12px}
 }
+
+
+/* 本轮视觉微调：仅作用于 renderOverview 的 fy-final 面板 */
+.fy-final{border-radius:18px;padding:0}
+.fy-final-heading{position:relative;padding-left:62px}
+.fy-final-heading:before{content:"☯";position:absolute;left:20px;top:18px;display:grid;place-items:center;width:28px;height:28px;border:1px solid #d8c49b;border-radius:50%;background:conic-gradient(#f1dfb9 0 50%,#26384c 50% 100%);color:#fff8e9;font-size:19px;line-height:1;box-shadow:0 2px 7px #6b573322}
+.fy-final-verdict-main strong{text-shadow:0 0 9px #f0cf8366,0 0 20px #f0cf8330}
+.fy-final-badge.bad{text-decoration:underline;text-decoration-color:#d47a70;text-decoration-thickness:2px;text-underline-offset:3px}
+.fy-final-cause{gap:10px}
+.fy-final-row{grid-template-columns:minmax(76px,.85fr) minmax(76px,.85fr) minmax(132px,1.4fr);gap:12px;padding:11px 13px;border-radius:11px}
+.fy-final-element{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.fy-final-element b{font-size:21px;font-weight:950;line-height:1.2}
+.fy-final-element small{flex:0 0 auto;padding:3px 7px;border-radius:999px;background:#f3f0e9;color:#706b61;font-size:11px;font-weight:750}
+.fy-final-god{text-align:center;font-size:15px;font-weight:900}
+.fy-final-god small{margin-top:2px;font-size:11px}
+.fy-final-camp{display:inline-flex;align-items:center;justify-content:center;justify-self:start;min-height:29px;padding:5px 11px;border-radius:999px;font-size:12px;white-space:nowrap}
+.fy-final-gods{align-items:stretch}
+.fy-final-god-card{height:100%;box-sizing:border-box;min-height:126px;justify-content:flex-start;gap:8px;overflow:hidden}
+.fy-final-god-card>strong{line-height:1.2;overflow-wrap:anywhere;word-break:break-word}
+.fy-final-god-card>small{max-width:100%;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.fy-final-advice{padding:14px 16px}
+.fy-final-advice>div>strong{display:flex;align-items:center;gap:7px;font-size:14px}
+.fy-final-advice>div>strong:before{content:"☯";display:inline-grid;place-items:center;width:21px;height:21px;border-radius:50%;background:#eee3cb;color:#8b682e;font-size:14px}
+.fy-final-advice p{font-size:13px;line-height:1.9}
+.fy-final-advice-meta{margin-top:11px;padding-top:9px;border-top:1px solid #e2d8c7}
+.fy-final-advice-meta>small{padding:0;border:0}
+.fy-final-advice-meta footer{margin-top:6px}
+@media(max-width:680px){
+ .fy-final-heading{padding-left:52px}
+ .fy-final-heading:before{left:13px;top:15px;width:26px;height:26px}
+ .fy-final-row{grid-template-columns:minmax(45px,.7fr) minmax(52px,.8fr) minmax(88px,1.25fr);gap:6px;padding:9px 7px}
+ .fy-final-element{gap:4px}
+ .fy-final-element b{font-size:18px}
+ .fy-final-element small{padding:2px 5px;font-size:10px}
+ .fy-final-god{font-size:13px}
+ .fy-final-god small{font-size:10px}
+ .fy-final-camp{padding:5px 7px;font-size:10px;white-space:normal;text-align:center;line-height:1.35}
+ .fy-final-gods{grid-template-columns:1fr;gap:9px}
+ .fy-final-god-card{min-height:0;height:auto;padding:12px 13px}
+ .fy-final-god-card>small{font-size:12px}
+ .fy-final-advice{padding:12px}
+}
