@@ -377,8 +377,13 @@
           '自刑':'引擎自刑规则表收录该地支；此项表示同一地支触发自刑规则，不单独推断吉凶。',
           '半三合':'引擎三合组中同时包含这两个不同地支，故标记为半三合'+element+'。引擎注记该规则存在争议；不等于三支齐全或合化成立。'
         };
-        const source=layer==='天干'?'规则依据：本地引擎 stemRelation() / 天干规则表。':'规则依据：本地引擎 branchRelations() / 地支规则表。';
-        return {label:layer+' '+type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:''),description:descriptions[type]||'引擎返回该关系类型；当前没有更细的可核验解释，因此仅展示规则名称。',source};
+        const punishmentNameNote=type==='相刑'&&['恃势之刑','无恩之刑'].includes(x.kind)
+          ?' 刑名提示：本站引擎规则表注明，寅巳申与丑戌未两组在不同流派中存在名称互换；此处按引擎当前 kind 展示，具体分组以实际成员为准。'
+          :'';
+        const source=layer==='天干'
+          ?'规则依据：vendor/bazi-engine.web.js · stemRelation()（STEM_COMBINE / STEM_CLASH）。'
+          :'规则依据：vendor/bazi-engine.web.js · branchRelations()（地支六合、六冲、六害、刑组、自刑及半三合规则表）。';
+        return {label:layer+' '+type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:''),description:(descriptions[type]||'引擎返回该关系类型；当前没有更细的可核验解释，因此仅展示规则名称。')+punishmentNameNote,source};
       };
       const items=sr.map(x=>describeRelation(x,'天干')).concat(br.map(x=>describeRelation(x,'地支')));
       const bucket=bucketFor(a,b);
