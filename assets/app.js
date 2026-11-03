@@ -123,7 +123,7 @@
         const pos = idx === 0 ? '本气' : idx === 1 ? '中气' : '余气';
         return '<div class="hidden-stem-row '+elementColorClass(info.element)+'"><b class="hidden-stem-gan">'+safe(gan)+'</b><span class="hidden-stem-attr"><span class="polarity polarity-'+(info.polarity === '阳' ? 'yang' : info.polarity === '阴' ? 'yin' : 'unknown')+'">'+safe(info.polarity || '—')+'</span><span class="hidden-stem-element '+elementColorClass(info.element)+'">'+safe(info.element)+'</span></span><em class="hidden-stem-god">'+safe(god || '—')+'</em><small class="hidden-stem-pos">'+pos+'</small></div>';
       }).join('');
-      return '<article class="pillar'+dayClass+'" style="animation-delay:'+i*65+'ms">'+
+      return '<article id="pillar-'+key+'" class="pillar'+dayClass+'" style="animation-delay:'+i*65+'ms">'+
         '<div class="pillar-label">'+label+tombBadge+'</div><div class="pillar-palace">'+palace+'</div>'+
         '<div class="pillar-stem-god">'+safe(stemGod || '—')+'</div>'+
         '<div class="pillar-character '+elementColorClass(stemInfo.element)+'"><strong>'+safe(stem)+'</strong><div class="pillar-attrs">'+attrTag(stemInfo,'干')+'</div></div>'+
@@ -327,12 +327,12 @@
       .filter(([key])=>key!=='time'||!(lastBirth&&lastBirth.unknownTime))
       .map(([key,label])=>{
         const p=lastChart.pillars&&lastChart.pillars[key];
-        return p&&p.ganzhi?{id:'natal-'+key,layer:'本命',label,gz:p.ganzhi}:null;
+        return p&&p.ganzhi?{id:'natal-'+key,layer:'本命',label,gz:p.ganzhi,key}:null;
       }).filter(Boolean);
     const currentLuck=lastLuck&&lastLuck.current&&lastLuck.current.pill;
     const selectedLuck=getSelectedLuckPillar();
     if(selectedLuck&&selectedLuck.ganzhi&&selectedLuck.ganzhi.length>=2){
-      participants.push({id:'luck-selected',layer:'所选大运',label:'第'+selectedLuck.index+'步大运',gz:selectedLuck.ganzhi});
+      participants.push({id:'luck-selected',layer:'所选大运',label:'第'+selectedLuck.index+'步大运',gz:selectedLuck.ganzhi,index:selectedLuck.index});
     }
     const annualInfo=getCurrentAnnualInfo();
     const currentYearError=annualInfo.error;
@@ -340,7 +340,7 @@
     let selectedYearProfile=null;
     if(activeAnnualYear!=null){try{selectedYearProfile=engine.yearProfile(activeAnnualYear);}catch(_){}}
     if(selectedYearProfile&&selectedYearProfile.ganzhi){
-      participants.push({id:'annual-selected',layer:'所选流年',label:'流年 '+selectedYearProfile.year,gz:selectedYearProfile.ganzhi});
+      participants.push({id:'annual-selected',layer:'所选流年',label:'流年 '+selectedYearProfile.year,gz:selectedYearProfile.ganzhi,year:activeAnnualYear});
     }
     const cards=[];
     for(let i=0;i<participants.length;i++) for(let j=i+1;j<participants.length;j++){
@@ -350,9 +350,10 @@
       try{if(typeof engine.branchRelations==='function')br=engine.branchRelations(a.gz[1],b.gz[1])||[];}catch(_){}
       const items=sr.map(x=>'天干 '+x.type+(x.element?' · '+x.element:'')).concat(br.map(x=>'地支 '+x.type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:'')));
       if(items.length){
-        cards.push('<div class="data-card"><h3><span class="relation-icon" aria-hidden="true">⟷</span>'+safe(a.layer)+' · '+safe(a.label)+' '+safe(a.gz)+'　与　'+safe(b.layer)+' · '+safe(b.label)+' '+safe(b.gz)+'</h3>'+items.map(x=>'<p><span class="chip">'+safe(x)+'</span></p>').join('')+'</div>');
+        cards.push('<div class="data-card relation-result"><div class="relation-result-heading"><span class="relation-icon" aria-hidden="true">⟷</span><strong>命中关系</strong></div><div class="relation-participants">'+locateButton(a)+'<span class="relation-connector">与</span>'+locateButton(b)+'</div><div class="relation-result-items">'+items.map(x=>'<span class="chip">'+safe(x)+'</span>').join('')+'</div></div>');
       }
     }
+    const locateButton=p=>{let attrs='';if(p.id.startsWith('natal-'))attrs=' data-locate-kind="natal" data-locate-key="'+safe(p.key)+'"';else if(p.id==='luck-selected')attrs=' data-locate-kind="luck" data-locate-value="'+safe(p.index)+'"';else if(p.id==='annual-selected')attrs=' data-locate-kind="annual" data-locate-value="'+safe(p.year)+'"';return '<button type="button" class="relation-locator"'+attrs+'>'+safe(p.layer)+' · '+safe(p.label)+' '+safe(p.gz)+'<span aria-hidden="true"> ↗</span></button>';};
     const branches=participants.map(p=>({branch:p.gz[1],participant:p}));
     const groupCards=[];
     [['三合',engine.BRANCH_TRINE],['三会',engine.BRANCH_MEETING]].forEach(([name,defs])=>{
@@ -361,10 +362,10 @@
         const members=Array.isArray(g.branches)?g.branches:[];
         if(members.length!==3||!members.every(branch=>branches.some(x=>x.branch===branch)))return;
         const sources=members.map(branch=>{
-          const found=branches.filter(x=>x.branch===branch).map(x=>x.participant.layer+'·'+x.participant.label+' '+x.participant.gz);
-          return '<span class="chip">'+safe(branch)+'：'+safe(found.join('、'))+'</span>';
+          const found=branches.filter(x=>x.branch===branch);
+          return '<div class="relation-group-member"><strong>'+safe(branch)+'</strong>'+found.map(x=>locateButton(x.participant)).join('')+'</div>';
         });
-        groupCards.push('<div class="data-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合成员：'+safe(members.join('、'))+'</p><div class="annual-relations">'+sources.join('')+'</div><p class="muted">三个地支均在本命、所选大运或所选流年实际出现；这里只提示组合成员齐备，不判断合化或吉凶。</p></div>');
+        groupCards.push('<div class="data-card relation-group-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合成员：'+safe(members.join('、'))+'</p><div class="relation-group-members">'+sources.join('')+'</div><p class="muted">三个地支均在本命、所选大运或所选流年实际出现；这里只提示组合成员齐备，不判断合化或吉凶。</p></div>');
       });
     });
     const layerStatus=[
@@ -495,8 +496,29 @@
     if(annualButton&&content.contains(annualButton)){
       const year=Number(annualButton.dataset.pickAnnualYear);
       const current=getCurrentAnnualInfo().year;
-      if(Number.isInteger(year)&&current!=null&&year>=current&&year<current+6){
-        selectedAnnualYear=year;renderTab();
+      if(Number.isInteger(year)&&current!=null&&year>=current&&year<current+6){selectedAnnualYear=year;renderTab();}
+      return;
+    }
+    const locator=target.closest('[data-locate-kind]');
+    if(locator&&content.contains(locator)){
+      const kind=locator.dataset.locateKind;
+      let destination=null;
+      if(kind==='natal') destination=document.getElementById('pillar-'+locator.dataset.locateKey);
+      else if(kind==='luck'){
+        const index=Number(locator.dataset.locateValue);
+        if(Array.isArray(lastLuck?.pillars)&&lastLuck.pillars.some(p=>Number(p.index)===index)){
+          selectedLuckIndex=index;activeTab='luck';renderTab();destination=content.querySelector('[data-pick-luck-index="'+index+'"]');
+        }
+      }else if(kind==='annual'){
+        const year=Number(locator.dataset.locateValue),current=getCurrentAnnualInfo().year;
+        if(Number.isInteger(year)&&current!=null&&year>=current&&year<current+6){
+          selectedAnnualYear=year;activeTab='annual';renderTab();destination=content.querySelector('[data-pick-annual-year="'+year+'"]');
+        }
+      }
+      if(destination){
+        document.querySelectorAll('.relation-target-focus').forEach(el=>el.classList.remove('relation-target-focus'));
+        destination.classList.add('relation-target-focus');
+        destination.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
       }
     }
   });
