@@ -645,3 +645,10 @@
     line-height: 1;
   }
 }
+/* P2：大运/流年时间轴选择器与关系选中态 */
+.timeline-controls{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 16px;padding:13px 15px;border:1px solid #e2d7c4;border-radius:12px;background:#fbf8f0}
+.timeline-select-label{display:flex;flex:1 1 220px;flex-direction:column;gap:6px;min-width:0;color:#687381;font-size:12px}
+.timeline-select-label select{width:100%;min-width:0;height:40px;padding:0 34px 0 11px;border:1px solid #d9c9aa;border-radius:9px;background:#fffdf8;color:#34455a;font:inherit;font-size:13px}
+.luck-item.selected .data-card{border-color:#a8874e;background:#f7f0e3;box-shadow:inset 0 2px #a8874e}
+.annual-card.annual-selected{outline:2px solid #a8874e;outline-offset:1px}
+@media(max-width:680px){.timeline-controls{padding:10px;gap:9px}.timeline-select-label{flex-basis:100%}.timeline-select-label select{height:42px}}
