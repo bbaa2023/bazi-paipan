@@ -335,7 +335,6 @@
       participants.push({id:'luck-selected',layer:'所选大运',label:'第'+selectedLuck.index+'步大运',gz:selectedLuck.ganzhi});
     }
     const annualInfo=getCurrentAnnualInfo();
-    const currentYearProfile=annualInfo.profile;
     const currentYearError=annualInfo.error;
     const activeAnnualYear=selectedAnnualYear==null?annualInfo.year:selectedAnnualYear;
     let selectedYearProfile=null;
@@ -365,7 +364,7 @@
           const found=branches.filter(x=>x.branch===branch).map(x=>x.participant.layer+'·'+x.participant.label+' '+x.participant.gz);
           return '<span class="chip">'+safe(branch)+'：'+safe(found.join('、'))+'</span>';
         });
-        groupCards.push('<div class="data-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合成员：'+safe(members.join('、'))+'</p><div class="annual-relations">'+sources.join('')+'</div><p class="muted">三个地支均在本命、当前大运或当前流年实际出现；这里只提示组合成员齐备，不判断合化或吉凶。</p></div>');
+        groupCards.push('<div class="data-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合成员：'+safe(members.join('、'))+'</p><div class="annual-relations">'+sources.join('')+'</div><p class="muted">三个地支均在本命、所选大运或所选流年实际出现；这里只提示组合成员齐备，不判断合化或吉凶。</p></div>');
       });
     });
     const layerStatus=[
