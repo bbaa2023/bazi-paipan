@@ -10,6 +10,14 @@
   const elementFor = {'甲':'木','乙':'木','寅':'木','卯':'木','丙':'火','丁':'火','巳':'火','午':'火','戊':'土','己':'土','辰':'土','戌':'土','丑':'土','未':'土','庚':'金','辛':'金','申':'金','酉':'金','壬':'水','癸':'水','子':'水','亥':'水'};
   const elementClass = (text) => 'el-' + (elementFor[text] || '土');
   const safe = (s) => String(s ?? '—').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function getBeijingNow() {
+    try {
+      const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+      const values=Object.fromEntries(parts.filter(x=>x.type!=='literal').map(x=>[x.type,Number(x.value)]));
+      const result={year:values.year,month:values.month,day:values.day,hour:values.hour,minute:values.minute};
+      return Object.values(result).every(Number.isFinite)?result:null;
+    } catch (_) { return null; }
+  }
   function showError(message) { errorBox.textContent = message; errorBox.hidden = false; }
   function hideError() { errorBox.hidden = true; errorBox.textContent = ''; }
   function objectEntries(obj) { return obj && typeof obj === 'object' ? Object.entries(obj) : []; }
@@ -315,20 +323,16 @@
       const fmt=x=>safe(x.years??'—')+'年 '+safe(x.months??'—')+'个月 '+safe(x.days??'—')+'天';
       unknownNote='<div class="data-card"><h3>未知时辰：起运范围提示</h3><p>上方起运日期与年龄按中午参考时刻计算，不应视为精确结果。</p><p>按当天时辰范围估算：较早端约 '+fmt(lo)+'；较晚端约 '+fmt(hi)+'。</p><p>节气是否跨界：'+(unknown.jieAmbiguous?'当天不同时间可能对应不同节气，年/月柱及起运依据需重点复核。':'当前扫描范围未发现前后节气名称变化，但起运时间仍可能随出生时刻变化。')+'</p><p class="muted">要缩小范围，请补充出生时辰；若出生时刻接近立春或节气交界，建议按准确时刻重新排盘。</p></div>';
     }
-    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">以上字段来自本地排盘引擎；不同起运口径可能产生差异。</p></div>'+unknownNote+'</div><h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="luck-timeline">'+(cards||'<div class="empty">引擎没有返回大运序列。</div>')+'</div>';
+    const todayNote=lastLuck.today?'<p class="muted">当前大运判断日期：北京时间 '+safe(lastLuck.today)+'（引擎按日期判断当前大运步，不使用当天具体时分）。</p>':'';
+    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">以上字段来自本地排盘引擎；不同起运口径可能产生差异。</p></div>'+unknownNote+'</div>'+todayNote+'<h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="luck-timeline">'+(cards||'<div class="empty">引擎没有返回大运序列。</div>')+'</div>';
   }
   function renderAnnual() {
     const engine=window.BaziEngine||{};
     if(typeof engine.yearProfile!=='function'||typeof engine.tenGodOf!=='function'||typeof engine.lichunOf!=='function') return '<div class="empty">当前本地引擎未公开流年分析所需接口。</div>';
     const dayGan=lastChart.meta&&lastChart.meta.dayMaster||lastChart.pillars&&lastChart.pillars.day&&lastChart.pillars.day.ganzhi&&lastChart.pillars.day.ganzhi.charAt(0);
     if(!dayGan) return '<div class="empty">命盘日主不可用，暂时无法生成流年对照。</div>';
-    let beijingNow=null;
-    try{
-      const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
-      const values=Object.fromEntries(parts.filter(x=>x.type!=='literal').map(x=>[x.type,Number(x.value)]));
-      beijingNow={year:values.year,month:values.month,day:values.day,hour:values.hour,minute:values.minute};
-    }catch(_){}
-    if(!beijingNow||![beijingNow.year,beijingNow.month,beijingNow.day,beijingNow.hour,beijingNow.minute].every(Number.isFinite)) return '<div class="empty">无法取得可靠的北京时间，暂时不能确定当前流年。请使用支持时区格式化的现代浏览器。</div>';
+    const beijingNow=getBeijingNow();
+    if(!beijingNow) return '<div class="empty">无法取得可靠的北京时间，暂时不能确定当前流年。请使用支持时区格式化的现代浏览器。</div>';
     let currentYear=beijingNow.year,currentLichun=null;
     try{currentLichun=engine.lichunOf(currentYear);}catch(_){}
     if(!currentLichun) return '<div class="empty">本地引擎没有当前年份的立春资料，无法确定当前干支年。</div>';
@@ -428,7 +432,12 @@
       lastBirth={...birth,gender:genderRaw===''?null:Number(genderRaw)};
       lastChart=chart; lastLuck=null;
       if (lastBirth.gender!==null && typeof window.BaziEngine.computeLuckPillars==='function') {
-        try { lastLuck=window.BaziEngine.computeLuckPillars({...birth,gender:lastBirth.gender,count:10}); } catch (e) { console.warn('大运计算暂不可用：',e); }
+        try {
+          const beijingNow=getBeijingNow();
+          if(!beijingNow) throw new Error('无法取得北京时间，不能确定当前大运日期');
+          const today=beijingNow.year+'-'+String(beijingNow.month).padStart(2,'0')+'-'+String(beijingNow.day).padStart(2,'0');
+          lastLuck=window.BaziEngine.computeLuckPillars({...birth,gender:lastBirth.gender,count:10,today});
+        } catch (e) { console.warn('大运计算暂不可用：',e); }
       }
       drawPillars(chart);
       results.hidden=false; activeTab='details'; renderSidePanels(); renderTab();
