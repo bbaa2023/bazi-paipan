@@ -10,3 +10,20 @@ a{color:inherit}.guide-topbar{height:66px;display:flex;align-items:center;justif
 @media(max-width:760px){.guide-topbar{height:60px;padding:0 13px}.guide-brand{gap:7px}.brand-seal{width:32px;height:32px;font-size:19px}.guide-brand b{font-size:13px}.guide-topbar nav{gap:12px}.guide-topbar nav a{font-size:11px}.guide-hero{padding:43px 7px 32px}.guide-hero>p{font-size:12px}.guide-search{height:48px;margin-top:20px}.guide-categories{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.guide-category{min-height:150px;padding:14px 13px}.guide-category h3{font-size:16px}.guide-category p{font-size:11px}.category-hero{padding:26px 6px}.category-hero h1{font-size:28px}.topic-list{grid-template-columns:1fr}.guide-footer{font-size:10px}}
 @media(max-width:420px){.guide-shell{width:calc(100% - 22px)}.guide-categories{grid-template-columns:1fr}.guide-category{min-height:0}.guide-section-heading{align-items:flex-start;flex-direction:column;gap:3px}.guide-topbar nav{gap:8px}.guide-topbar nav a{font-size:10px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+
+/* 知识条目阅读页 */
+.topic-link{display:block;color:inherit;text-decoration:none;transition:border-color .15s,transform .15s}
+.topic-link:hover{border-color:#c9aa70;transform:translateY(-1px)}
+.article-shell{max-width:900px;min-height:calc(100vh - 140px)}
+.article-hero{padding:34px 18px 30px;border-bottom:1px solid var(--line)}
+.article-hero h1{margin:7px 0 10px;font:600 clamp(27px,4.5vw,36px)/1.4 "Noto Serif SC","Songti SC",serif;letter-spacing:.04em}
+.article-hero>p{max-width:760px;margin:0;color:var(--muted);font-size:14px}
+.article-body{max-width:780px;margin:0 auto;padding:20px 18px 8px}
+.article-section{padding:15px 0;border-bottom:1px solid #e9e1d3}
+.article-section h2,.article-sources h2{margin:0 0 8px;color:#34455a;font:600 18px "Noto Serif SC","Songti SC",serif}
+.article-section p{margin:0;color:#505d6b;font-size:14px;line-height:2}
+.article-note{margin:20px 0;padding:15px 17px;border-left:3px solid #c09a5c;border-radius:0 9px 9px 0;background:#f8f1e3}
+.article-note b{color:#805c22;font-size:13px}.article-note p{margin:5px 0 0;color:#6c7480;font-size:12px;line-height:1.9}
+.article-sources{padding:18px 0 12px}.article-sources ul{margin:8px 0 0;padding-left:19px;color:var(--muted)}.article-sources li{margin:7px 0;font-size:12px}.article-sources a{color:#8d6528;text-decoration:none}.article-sources a:hover{text-decoration:underline}
+.article-bottom-nav{display:flex;justify-content:space-between;gap:12px;margin:15px 18px 28px;padding-top:15px;border-top:1px solid var(--line)}.article-bottom-nav a{color:var(--gold-dark);font-size:12px;text-decoration:none}.article-bottom-nav a:hover{text-decoration:underline}
+@media(max-width:680px){.article-hero{padding:25px 7px}.article-hero>p{font-size:12px}.article-body{padding:14px 7px}.article-section h2,.article-sources h2{font-size:16px}.article-section p{font-size:13px}.article-bottom-nav{margin-left:7px;margin-right:7px}}
