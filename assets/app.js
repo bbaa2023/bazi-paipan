@@ -279,21 +279,74 @@
     return '<h3 class="subhead">藏干、十神与十二长生</h3><p class="muted">十二长生以日干为参照；以下剖面资料来自本地引擎公开接口。</p><div class="data-grid">'+unknownNote+cards+dayCard+branchCards.join('')+kongWangCard+'</div><p class="muted">地支关系资料不代表命盘已构成相应组合；旬空按日柱统一计算。所有资料均在当前浏览器本地生成。</p>';
   }
   function renderRelations() {
-    const labels = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
-    const pillars = labels.map(([key,label]) => { const p=lastChart.pillars&&lastChart.pillars[key]; return p&&p.ganzhi?{label,gz:p.ganzhi}:null; }).filter(Boolean);
-    const cards=[];
-    for(let i=0;i<pillars.length;i++) for(let j=i+1;j<pillars.length;j++){
-      const a=pillars[i],b=pillars[j]; let sr=[],br=[];
-      try{if(window.BaziEngine&&typeof window.BaziEngine.stemRelation==='function')sr=window.BaziEngine.stemRelation(a.gz[0],b.gz[0])||[];}catch(_){}
-      try{if(window.BaziEngine&&typeof window.BaziEngine.branchRelations==='function')br=window.BaziEngine.branchRelations(a.gz[1],b.gz[1])||[];}catch(_){}
-      const items=sr.map(x=>'天干'+x.type+(x.element?' · '+x.element:'')).concat(br.map(x=>'地支'+x.type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:'')));
-      if(items.length)cards.push('<div class="data-card"><h3><span class="relation-icon" aria-hidden="true">⟷</span>'+safe(a.label)+' '+safe(a.gz)+'　与　'+safe(b.label)+' '+safe(b.gz)+'</h3>'+items.map(x=>'<p><span class="chip">'+safe(x)+'</span></p>').join('')+'</div>');
+    const engine=window.BaziEngine||{};
+    const natalLabels=[['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
+    const participants=natalLabels
+      .filter(([key])=>key!=='time'||!(lastBirth&&lastBirth.unknownTime))
+      .map(([key,label])=>{
+        const p=lastChart.pillars&&lastChart.pillars[key];
+        return p&&p.ganzhi?{id:'natal-'+key,layer:'本命',label,gz:p.ganzhi}:null;
+      }).filter(Boolean);
+    const currentLuck=lastLuck&&lastLuck.current&&lastLuck.current.pill;
+    if(currentLuck&&currentLuck.ganzhi&&currentLuck.ganzhi.length>=2){
+      participants.push({id:'luck-current',layer:'当前大运',label:'当前大运 · 第'+(currentLuck.index||'—')+'步',gz:currentLuck.ganzhi});
     }
-    const present=pillars.map(p=>p.gz[1]),groups=[];
-    [['三合',window.BaziEngine&&window.BaziEngine.BRANCH_TRINE],['三会',window.BaziEngine&&window.BaziEngine.BRANCH_MEETING]].forEach(([name,defs])=>{
-      if(!Array.isArray(defs))return;defs.forEach(g=>{const m=Array.isArray(g.branches)?g.branches:[];if(m.length===3&&m.every(b=>present.includes(b)))groups.push('<div class="data-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合：'+safe(m.join('、'))+'</p><p class="muted">仅提示命中传统组合规则，不直接判定吉凶。</p></div>');});
+    let currentYearProfile=null,currentYearError='';
+    const now=getBeijingNow();
+    if(!now) currentYearError='无法取得北京时间';
+    else if(typeof engine.lichunOf!=='function'||typeof engine.yearProfile!=='function') currentYearError='本地引擎缺少流年接口';
+    else {
+      try{
+        const lichun=engine.lichunOf(now.year);
+        if(!lichun) throw new Error('缺少当前年份立春资料');
+        const before=now.month<lichun.month||
+          (now.month===lichun.month&&now.day<lichun.day)||
+          (now.month===lichun.month&&now.day===lichun.day&&now.hour<lichun.hour)||
+          (now.month===lichun.month&&now.day===lichun.day&&now.hour===lichun.hour&&now.minute<lichun.minute);
+        const year=now.year-(before?1:0);
+        if(typeof engine.zodiacIndexFromDateTime==='function'&&Array.isArray(engine.BRANCHES)){
+          const bi=engine.zodiacIndexFromDateTime(now.year,now.month,now.day,now.hour,now.minute);
+          const expected=typeof engine.yearGanzhi==='function'?engine.yearGanzhi(year).charAt(1):'';
+          if(bi==null||!expected||engine.BRANCHES[bi]!==expected) throw new Error('流年接口交叉核对不一致');
+        }
+        currentYearProfile=engine.yearProfile(year);
+        if(!currentYearProfile||!currentYearProfile.ganzhi) throw new Error('引擎未返回当前流年干支');
+      }catch(e){currentYearError=e&&e.message?e.message:'当前流年不可用';}
+    }
+    if(currentYearProfile){
+      participants.push({id:'annual-current',layer:'当前流年',label:'当前流年 '+currentYearProfile.year,gz:currentYearProfile.ganzhi});
+    }
+    const cards=[];
+    for(let i=0;i<participants.length;i++) for(let j=i+1;j<participants.length;j++){
+      const a=participants[i],b=participants[j];
+      let sr=[],br=[];
+      try{if(typeof engine.stemRelation==='function')sr=engine.stemRelation(a.gz[0],b.gz[0])||[];}catch(_){}
+      try{if(typeof engine.branchRelations==='function')br=engine.branchRelations(a.gz[1],b.gz[1])||[];}catch(_){}
+      const items=sr.map(x=>'天干 '+x.type+(x.element?' · '+x.element:'')).concat(br.map(x=>'地支 '+x.type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:'')));
+      if(items.length){
+        cards.push('<div class="data-card"><h3><span class="relation-icon" aria-hidden="true">⟷</span>'+safe(a.layer)+' · '+safe(a.label)+' '+safe(a.gz)+'　与　'+safe(b.layer)+' · '+safe(b.label)+' '+safe(b.gz)+'</h3>'+items.map(x=>'<p><span class="chip">'+safe(x)+'</span></p>').join('')+'</div>');
+      }
+    }
+    const branches=participants.map(p=>({branch:p.gz[1],participant:p}));
+    const groupCards=[];
+    [['三合',engine.BRANCH_TRINE],['三会',engine.BRANCH_MEETING]].forEach(([name,defs])=>{
+      if(!Array.isArray(defs))return;
+      defs.forEach(g=>{
+        const members=Array.isArray(g.branches)?g.branches:[];
+        if(members.length!==3||!members.every(branch=>branches.some(x=>x.branch===branch)))return;
+        const sources=members.map(branch=>{
+          const found=branches.filter(x=>x.branch===branch).map(x=>x.participant.layer+'·'+x.participant.label+' '+x.participant.gz);
+          return '<span class="chip">'+safe(branch)+'：'+safe(found.join('、'))+'</span>';
+        });
+        groupCards.push('<div class="data-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合成员：'+safe(members.join('、'))+'</p><div class="annual-relations">'+sources.join('')+'</div><p class="muted">三个地支均在本命、当前大运或当前流年实际出现；这里只提示组合成员齐备，不判断合化或吉凶。</p></div>');
+      });
     });
-    return '<h3 class="subhead">干支关系</h3><p class="muted">查看四柱之间的合、冲、刑、害及三合、三会等传统关系。不同流派对部分规则的取法可能不同，本页仅展示命中关系，不单独据此断吉凶。</p><div class="data-grid">'+(cards.length?cards.join(''):'<div class="empty">当前四柱之间未命中已收录的两两关系。</div>')+(groups.length?'<h3 class="subhead" style="grid-column:1/-1;margin-top:10px">三支组合</h3>'+groups.join(''):'')+'</div><div class="customer-note"><span class="note-mark">金</span><div><strong>排盘说明</strong><p>命盘依据所填写的出生时间、时区与可选经度计算。若出生时间不确定，或接近节气、换日交界，建议结合可靠历书进一步核对。</p></div></div>';
+    const layerStatus=[
+      '<span class="chip">本命 '+participants.filter(p=>p.layer==='本命').length+' 柱</span>',
+      '<span class="chip">'+(currentLuck?'当前大运已纳入':'当前大运未纳入')+'</span>',
+      '<span class="chip">'+(currentYearProfile?'当前流年 '+currentYearProfile.ganzhi:'当前流年不可用')+'</span>'
+    ].join('');
+    return '<h3 class="subhead">本命 · 大运 · 流年关系</h3><p class="muted">以本命实际存在的柱、引擎当前生效的大运柱，以及按北京时间立春确定的当前流年柱组成关系对照。未知时辰、未起运或无法确认的对象不会被补造。以下只列引擎识别的两两关系；三合、三会需三个不同成员都实际出现，不代表合化或吉凶。</p><div class="data-card"><div class="annual-relations">'+layerStatus+'</div>'+(currentYearError?'<p class="muted">流年暂不可参与：'+safe(currentYearError)+'</p>':'')+'</div><div class="data-grid">'+(cards.length?cards.join(''):'<div class="empty">当前参与对象之间未命中已收录的两两干支关系。</div>')+(groupCards.length?'<h3 class="subhead" style="grid-column:1/-1;margin-top:10px">完整三支组合提示</h3>'+groupCards.join(''):'')+'</div><div class="customer-note"><span class="note-mark">金</span><div><strong>关系说明</strong><p>两两关系按引擎规则逐对检查，并保留双方层级和柱位。三合、三会仅按成员是否齐全提示，不等同于合化成立。不同传统流派对部分规则的取法可能不同，本页不据此单独断吉凶。</p></div></div>';
   }
   function renderShensha() {
     const engine=window.BaziEngine||{};
