@@ -398,7 +398,7 @@
     const selectedLuck=getSelectedLuckPillar();
     const selector=renderTimelineSelectors({luck:true});
     const selectedLuckSummary=selectedLuck?'<div class="data-card selected-time-context"><h3>当前关系对照大运：第'+safe(selectedLuck.index)+'步 · '+safe(selectedLuck.ganzhi)+'</h3><p>时间范围：'+safe(selectedLuck.yearLabel||'年份未返回')+' · 虚岁 '+safe(selectedLuck.startAgeSui??'—')+'–'+safe(selectedLuck.endAgeSui??'—')+'</p><p>天干十神：'+safe(selectedLuck.stemTenGod&&selectedLuck.stemTenGod.god||'—')+'　地支十神：'+safe(selectedLuck.branchTenGod&&selectedLuck.branchTenGod.god||'—')+'</p><p>藏干：'+safe(Array.isArray(selectedLuck.hideGan)?selectedLuck.hideGan.join('、'):'—')+'　十二长生：'+safe(selectedLuck.stage||'—')+'</p><p class="muted">该大运将与本命及所选流年共同参与关系对照。</p></div>':'<div class="data-card selected-time-context"><h3>当前关系对照大运：未指定</h3><p class="muted">选择一部大运后，才会把它加入关系对照；本命和所选流年仍可单独参与。</p></div>';
-    const cards=items.map(p=>'<div class="luck-item '+(p.isCurrent?'current ':'')+(selectedLuck&&Number(selectedLuck.index)===Number(p.index)?'selected':'')+'"><div class="data-card"><h3><span class="relation-icon" aria-hidden="true">⌁</span>'+safe(p.ganzhi||'—')+(p.isCurrent?' · 当前':'')+(selectedLuck&&Number(selectedLuck.index)===Number(p.index)?' · 关系已选':'')+'</h3><p>第'+safe(p.index)+'步 · '+safe(p.yearLabel||'年份未知')+'</p><p>虚岁 '+safe(p.startAgeSui??'—')+'–'+safe(p.endAgeSui??'—')+'</p><p><span class="chip">天干 '+safe(p.stemTenGod&&p.stemTenGod.god||'—')+'</span></p><p><span class="chip">地支 '+safe(p.branchTenGod&&p.branchTenGod.god||'—')+'</span></p><p>藏干：'+safe(Array.isArray(p.hideGan)?p.hideGan.join('、'):'—')+'</p><p>十二长生：'+safe(p.stage||'—')+'</p></div></div>').join('');
+    const cards=items.map(p=>{const picked=!!selectedLuck&&Number(selectedLuck.index)===Number(p.index);return '<button type="button" class="luck-item timeline-pick '+(p.isCurrent?'current ':'')+(picked?'selected':'')+'" data-pick-luck-index="'+safe(p.index)+'" aria-pressed="'+String(picked)+'" aria-label="选择第'+safe(p.index)+'步大运 '+safe(p.ganzhi||'')+'"><span class="data-card"><h3><span class="relation-icon" aria-hidden="true">⌁</span>'+safe(p.ganzhi||'—')+(p.isCurrent?' · 当前':'')+(picked?' · 关系已选':'')+'</h3><p>第'+safe(p.index)+'步 · '+safe(p.yearLabel||'年份未知')+'</p><p>虚岁 '+safe(p.startAgeSui??'—')+'–'+safe(p.endAgeSui??'—')+'</p><p><span class="chip">天干 '+safe(p.stemTenGod&&p.stemTenGod.god||'—')+'</span></p><p><span class="chip">地支 '+safe(p.branchTenGod&&p.branchTenGod.god||'—')+'</span></p><p>藏干：'+safe(Array.isArray(p.hideGan)?p.hideGan.join('、'):'—')+'</p><p>十二长生：'+safe(p.stage||'—')+'</p></span></button>';}).join('');
     const unknown=lastBirth.unknownTime&&lastLuck.unknownTime;
     let unknownNote='';
     if(unknown){
@@ -440,7 +440,7 @@
       const jie=profile.lichun&&profile.lichun.text||'立春日期未返回';
       const currentMark=y===currentYear?'<span class="chip">当前流年</span>':'';
       const selectedMark=y===Number(selectedAnnualYear==null?currentYear:selectedAnnualYear)?'<span class="chip">关系已选</span>':'';
-      cards.push('<div class="data-card annual-card '+(selectedMark?'annual-selected':'')+'"><div class="luck-card-top"><h3>'+safe(profile.year)+' · '+safe(profile.ganzhi)+'</h3><span class="chip">'+safe(profile.zodiacCn||profile.branch)+'</span>'+currentMark+selectedMark+'</div><div class="annual-meta"><span>流年天干十神</span><strong>'+safe(god)+'</strong><span>五行</span><strong>'+safe(profile.stemElement)+' / '+safe(profile.branchElement)+'</strong><span>纳音</span><strong>'+safe(profile.nayin||'—')+'</strong><span>立春交界</span><strong>'+safe(jie)+'</strong></div><p>与本命干支的直接关系：</p><div class="annual-relations">'+(relations.join('')||'<span class="muted">未命中引擎定义的两两关系</span>')+'</div></div>');
+      const isPicked=y===Number(selectedAnnualYear==null?currentYear:selectedAnnualYear);cards.push('<button type="button" class="data-card annual-card timeline-pick '+(isPicked?'annual-selected':'')+'" data-pick-annual-year="'+safe(y)+'" aria-pressed="'+String(isPicked)+'" aria-label="选择流年 '+safe(profile.year)+' '+safe(profile.ganzhi)+'"><span class="luck-card-top"><h3>'+safe(profile.year)+' · '+safe(profile.ganzhi)+'</h3><span class="chip">'+safe(profile.zodiacCn||profile.branch)+'</span>'+currentMark+selectedMark+'</span><span class="annual-meta"><span>流年天干十神</span><strong>'+safe(god)+'</strong><span>五行</span><strong>'+safe(profile.stemElement)+' / '+safe(profile.branchElement)+'</strong><span>纳音</span><strong>'+safe(profile.nayin||'—')+'</strong><span>立春交界</span><strong>'+safe(jie)+'</strong></span><span class="annual-relations"><span class="annual-relations-label">与本命干支的直接关系：</span>'+(relations.join('')||'<span class="muted">未命中引擎定义的两两关系</span>')+'</span></button>');
     }
     let monthRows=[];
     try{
@@ -479,6 +479,27 @@
     content.querySelectorAll('[data-select-luck]').forEach(el=>el.addEventListener('change',()=>{selectedLuckIndex=el.value===''?null:Number(el.value);renderTab();}));
     content.querySelectorAll('[data-select-annual]').forEach(el=>el.addEventListener('change',()=>{selectedAnnualYear=Number(el.value);renderTab();}));
   }
+  // 时间轴卡片使用按钮语义；父容器事件委托在重绘后仍然有效。
+  content.addEventListener('click',event=>{
+    const target=event.target;
+    if(!target||typeof target.closest!=='function') return;
+    const luckButton=target.closest('[data-pick-luck-index]');
+    if(luckButton&&content.contains(luckButton)){
+      const index=Number(luckButton.dataset.pickLuckIndex);
+      if(Number.isFinite(index)&&Array.isArray(lastLuck?.pillars)&&lastLuck.pillars.some(p=>Number(p.index)===index)){
+        selectedLuckIndex=index;renderTab();
+      }
+      return;
+    }
+    const annualButton=target.closest('[data-pick-annual-year]');
+    if(annualButton&&content.contains(annualButton)){
+      const year=Number(annualButton.dataset.pickAnnualYear);
+      const current=getCurrentAnnualInfo().year;
+      if(Number.isInteger(year)&&current!=null&&year>=current&&year<current+6){
+        selectedAnnualYear=year;renderTab();
+      }
+    }
+  });
   function compute(event) {
     event.preventDefault(); hideError();
     if (!window.BaziEngine || typeof window.BaziEngine.computeBazi !== 'function') {
