@@ -715,3 +715,7 @@
 @media(max-width:760px){.relation-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.relation-category-grid{grid-template-columns:1fr}}
 @media(max-width:380px){.relation-overview-grid{grid-template-columns:1fr}.relation-overview-item{min-height:44px}}
 @media(prefers-reduced-motion:reduce){.relation-category{scroll-behavior:auto}}
+
+
+/* P2 第六批：关系解释与规则依据 */
+.relation-explanation{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}.relation-explanation p{margin:0;color:var(--muted,#777);font-size:.88rem;line-height:1.6}.relation-explanation small,.relation-evidence{display:block;color:var(--muted,#888);font-size:.76rem;line-height:1.5;overflow-wrap:anywhere}.relation-result-items{display:grid;gap:10px}
