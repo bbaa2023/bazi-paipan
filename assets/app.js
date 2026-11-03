@@ -318,7 +318,43 @@
       }catch(e){console.warn('日柱旬空读取失败：',e);}
     }
 
-    return '<h3 class="subhead">藏干、十神与十二长生</h3><p class="muted">十二长生以日干为参照；以下为四柱相关的补充资料。</p><div class="data-grid">'+unknownNote+cards+dayCard+branchCards.join('')+kongWangCard+'</div><p class="muted">地支关系资料不代表命盘已构成相应组合；旬空按日柱统一计算。排盘资料在当前浏览器本地生成。</p>';
+    // 十神 × 宫位规则矩阵：调用引擎 tenGodPillarProfile，按本命日主取对应行。
+    // 日柱为日主本身，不套用年/月/时柱位矩阵；表为规则参考，不对本命柱位下断语。
+    function renderTenGodMatrix() {
+      const engine=window.BaziEngine||{};
+      if(typeof engine.tenGodPillarProfile!=='function'||!Array.isArray(engine.TEN_GOD_ORDER)||!Array.isArray(engine.PILLAR_POS)) return '';
+      const dayGan=lastChart?.meta?.dayMaster||lastChart?.pillars?.day?.ganzhi?.charAt(0);
+      if(!dayGan) return '';
+      const presentGods=new Set();
+      try{
+        const ps=lastChart?.pillars||{};
+        for(const k of ['year','month','day','time']){
+          const p=ps[k]; if(!p) continue;
+          if(p.shiShenGan) presentGods.add(p.shiShenGan);
+          if(Array.isArray(p.hideGan)) p.hideGan.forEach(g=>{if(typeof engine.tenGodOf==='function'){const god=engine.tenGodOf(dayGan,g);if(god) presentGods.add(god);}});
+        }
+      }catch(_){}
+      const posDefs=engine.PILLAR_POS;
+      const cards=engine.TEN_GOD_ORDER.map(god=>{
+        let groupCn='';
+        let posRows='';
+        posDefs.forEach((pd,pi)=>{
+          let p2=null; try{p2=engine.tenGodPillarProfile(god,pd.id);}catch(_){}
+          if(!p2||!Array.isArray(p2.rows)) return;
+          if(pi===0) groupCn=p2.groupCn||'';
+          const row=p2.rows.find(r=>r.dayGan===dayGan);
+          if(!row) return;
+          const el=['木','火','土','金','水'].includes(row.ganElement)?row.ganElement:'土';
+          posRows+='<div class="tg-row"><span class="tg-pos">'+safe(pd.palaceCn||pd.cn||'—')+'</span><b class="tg-gan el-'+el+'">'+safe(row.gan)+'</b><small class="tg-attr">'+safe(row.ganElement||'—')+' · '+safe(row.ganPolarity||'—')+'</small><em class="tg-rel">'+safe(row.relation||'—')+'</em></div>';
+        });
+        if(!posRows) return null;
+        return '<div class="data-card tg-card'+(presentGods.has(god)?' tg-present':'')+'"><h3>'+safe(god)+(groupCn?'<span class="chip">'+safe(groupCn)+'</span>':'')+(presentGods.has(god)?'<span class="chip tg-now">本命现</span>':'')+'</h3><div class="tg-rows">'+posRows+'</div></div>';
+      }).filter(Boolean);
+      if(!cards.length) return '';
+      return '<details class="ten-god-matrix"><summary><span>十神 × 宫位资料矩阵</span><small>规则参考 · 以本命日主对照</small></summary><p class="muted">本表为引擎十神柱位规则查询矩阵：同一十神落在年、月、时柱的传统宫位含义对照，以本命日主'+safe(dayGan)+'为参照取对应天干。日柱为日主本身，不套用此矩阵。「本命现」表示该十神在当前命盘天干或藏干中实际出现。此表是规则资料，不是对本命柱位的直接断语。</p><div class="tg-grid">'+cards.join('')+'</div></details>';
+    }
+
+    return '<h3 class="subhead">藏干、十神与十二长生</h3><p class="muted">十二长生以日干为参照；以下为四柱相关的补充资料。</p><div class="data-grid">'+unknownNote+cards+dayCard+branchCards.join('')+kongWangCard+'</div>'+renderTenGodMatrix()+'<p class="muted">地支关系资料不代表命盘已构成相应组合；旬空按日柱统一计算。排盘资料在当前浏览器本地生成。</p>';
   }
   function renderRelations() {
     const engine=window.BaziEngine||{};
@@ -517,23 +553,37 @@
     try{
       if(selectedProfile&&Array.isArray(selectedProfile.months)) monthRows=selectedProfile.months.map(item=>'<div class="annual-month-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span>第'+safe(item.ordinal)+'节月 · '+safe(item.jie||'—')+'</span><strong>'+safe(item.ganzhi||'—')+'</strong><small>'+safe(item.month)+'月建</small></div>');
     }catch(_){}
+    // 太岁关系：读取所选流年 yearProfile().relations，列出犯太岁生肖并与本命柱支比对。
+    // 值/冲/刑/害/破五类为传统规则命中，仅作资料展示与本命柱位对应，不单独判定吉凶。
+    const taiSuiSection=(()=>{
+      if(!selectedProfile||!Array.isArray(selectedProfile.relations)) return '';
+      const kindCn={'zhi':'值太岁','chong':'冲太岁','xing':'刑太岁','hai':'害太岁','po':'破太岁'};
+      const yearBranch=selectedProfile.branch||'—';
+      const yearAnimal=selectedProfile.zodiacCn||yearBranch;
+      const offenders=selectedProfile.relations.filter(r=>Array.isArray(r.kinds)&&r.kinds.length);
+      const natalBranchLabels=natal.filter(p=>p.gz&&p.gz[1]).map(p=>({branch:p.gz[1],label:p.label}));
+      const offenderCards=offenders.map(r=>{
+        const kindLabels=r.kinds.map(k=>'<span class="chip">'+safe(kindCn[k]||k)+'</span>').join('');
+        const hit=natalBranchLabels.filter(x=>x.branch===r.branch);
+        const hitNote=hit.length
+          ? '<p class="tai-sui-hit">本命命中：'+hit.map(x=>'<span class="chip">'+safe(x.label)+'（'+safe(x.branch)+'）</span>').join('')+'</p>'
+          : '<p class="muted">本命现有柱支未直接对应此生肖。</p>';
+        return '<div class="data-card tai-sui-card"><div class="luck-card-top"><h3><span class="relation-icon" aria-hidden="true">☯</span>'+safe(r.animalCn||r.branch||'—')+'</h3><span class="chip">'+safe(r.branch||'—')+'</span></div><div class="tai-sui-kinds">'+kindLabels+'</div>'+hitNote+'</div>';
+      });
+      return '<section class="tai-sui-panel"><div class="module-heading"><span class="kicker">太岁与生肖</span><span>犯太岁关系 · 与本命柱位比对</span></div>'
+        +'<div class="data-card tai-sui-head"><h3>流年太岁：'+safe(yearBranch)+' · '+safe(yearAnimal)+'</h3><p class="muted">太岁即流年地支所在方位；生肖与流年地支的关系按值、冲、刑、害、破五类规则整理。这里仅列出规则命中与命盘柱支对应情况，不据此单独判定吉凶或应事。</p></div>'
+        +(offenderCards.length?'<div class="tai-sui-grid">'+offenderCards.join('')+'</div>':'<p class="muted">当前资料未返回犯太岁关系。</p>')
+        +'</section>';
+    })();
     let selectedGod='—';
     if(selectedProfile){try{selectedGod=engine.tenGodOf(dayGan,selectedProfile.stem)||'—';}catch(_){}}
     const selectedAnnualSummary=selectedProfile?'<div class="data-card selected-time-context"><h3>当前关系对照流年：'+safe(selectedProfile.year)+' · '+safe(selectedProfile.ganzhi)+'</h3><p>天干十神：'+safe(selectedGod)+'　五行：'+safe(selectedProfile.stemElement)+' / '+safe(selectedProfile.branchElement)+'</p><p>纳音：'+safe(selectedProfile.nayin||'—')+'　生肖：'+safe(selectedProfile.zodiacCn||selectedProfile.branch||'—')+'</p><p>立春资料：'+safe(selectedProfile.lichun&&selectedProfile.lichun.text||'未返回')+'</p><p class="muted">该流年将与本命及所选大运共同参与关系对照。</p></div>':'<div class="data-card selected-time-context"><h3>所选流年资料暂不可用</h3><p class="muted">该年份的资料暂不完整，因此暂不加入关系对照。</p></div>';
     const timeText=beijingNow.year+'-'+String(beijingNow.month).padStart(2,'0')+'-'+String(beijingNow.day).padStart(2,'0')+' '+String(beijingNow.hour).padStart(2,'0')+':'+String(beijingNow.minute).padStart(2,'0');
     const annualSelector=renderTimelineSelectors({annual:true,annualYears:Array.from({length:6},(_,i)=>currentYear+i)});
-    return '<h3 class="subhead">当前流年与未来五年</h3>'+annualSelector+selectedAnnualSummary+'<p class="muted">查询时刻：北京时间 '+safe(timeText)+'。当前干支年按立春时间判断；立春前仍归上一干支年。当前流年起点：'+safe(currentYear)+' 年。流年天干十神以本命日主为参照；关系区域仅列出本命与流年之间符合条件的干支关系，不代表完整吉凶结论。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">暂时没有可显示的流年资料。</div>')+'</div>'+(monthRows.length?'<h3 class="subhead" style="margin-top:20px">所选流年 '+safe(activeYear)+' 的十二节月资料</h3><p class="muted">以下为所选流年的节月干支与节令名称。当前资料未提供十二个交节的精确时刻，因此不标记当前节月，也不把节月序号当作公历月份边界。</p><div class="annual-month-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'+monthRows.join('')+'</div>':'');
-  }
-  function togglePresentationMode() {
-    const enabled = document.body.classList.toggle('presentation-mode');
-    const button = document.getElementById('presentation-toggle');
-    if (button) {
-      button.textContent = enabled ? '退出直播展示' : '直播展示模式';
-      button.setAttribute('aria-pressed', String(enabled));
-    }
+    return '<h3 class="subhead">当前流年与未来五年</h3>'+annualSelector+selectedAnnualSummary+'<p class="muted">查询时刻：北京时间 '+safe(timeText)+'。当前干支年按立春时间判断；立春前仍归上一干支年。当前流年起点：'+safe(currentYear)+' 年。流年天干十神以本命日主为参照；关系区域仅列出本命与流年之间符合条件的干支关系，不代表完整吉凶结论。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">暂时没有可显示的流年资料。</div>')+'</div>'+taiSuiSection+(monthRows.length?'<h3 class="subhead" style="margin-top:20px">所选流年 '+safe(activeYear)+' 的十二节月资料</h3><p class="muted">以下为所选流年的节月干支与节令名称。当前资料未提供十二个交节的精确时刻，因此不标记当前节月，也不把节月序号当作公历月份边界。</p><div class="annual-month-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'+monthRows.join('')+'</div>':'');
   }
     function renderSidePanels() {
-    // [直播简洁布局] 五行总览保留在主命盘下方；大运与流年只在下方标签中按需展开。
+    // 五行总览保留在主命盘下方；大运与流年只在下方标签中按需展开。
     const overview = $('#overview-panel');
     if (overview) {
       // 每次排盘都彻底清空旧节点，再写入当前版本的五行扶抑分析。
@@ -667,15 +717,11 @@
       selectedAnnualYear=annualInfo.year;
       drawPillars(chart);
       results.hidden=false; activeTab='details'; renderSidePanels(); renderTab();
-      const presentationButton=document.getElementById('presentation-toggle');
-      if(presentationButton) presentationButton.hidden=true;
       results.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
     } catch (e) {
       console.error(e); showError('排盘失败：'+(e && e.message ? e.message : '未知错误')+'。请检查出生信息是否正确；如果问题持续，请联系维护者。');
     }
   }
-  const presentationButton=document.getElementById('presentation-toggle');
-  if(presentationButton){presentationButton.hidden=true;presentationButton.removeEventListener('click',togglePresentationMode);}
   form.addEventListener('submit',compute);
   document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{activeTab=b.dataset.tab;renderTab();}));
   if (!window.BaziEngine) {
