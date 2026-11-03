@@ -737,7 +737,10 @@
       showError('排盘功能暂时无法启动，请刷新页面后重试；如果仍无法使用，请联系维护者。'); return;
     }
     const fd=new FormData(form);
-    const year=Number(fd.get('year')),month=Number(fd.get('month')),day=Number(fd.get('day'));
+    // 出生日期使用 <input type="date">，值为 YYYY-MM-DD；空/格式非法直接拦截，不猜测补全。
+    const birthdateRaw=String(fd.get('birthdate')||'').trim();
+    const bdMatch=/^(\d{4})-(\d{2})-(\d{2})$/.exec(birthdateRaw);
+    const year=bdMatch?Number(bdMatch[1]):NaN,month=bdMatch?Number(bdMatch[2]):NaN,day=bdMatch?Number(bdMatch[3]):NaN;
     const hourRaw=fd.get('hour'),hour=hourRaw===''?null:Number(hourRaw),minute=Number(fd.get('minute'));
     const longitudeRaw=fd.get('longitude'),genderRaw=fd.get('gender'),tzOffsetHours=Number(fd.get('tzOffsetHours'));
     const birth={year,month,day,hour,minute,longitude:longitudeRaw===''?null:Number(longitudeRaw),tzOffsetHours,unknownTime:hour===null,sect:Number(fd.get('sect'))};
@@ -779,6 +782,22 @@
     }
   }
   form.addEventListener('submit',compute);
+  // 出生城市快捷选择：选中即自动填好出生地经度与 UTC 时区偏移（仍可手动微调）。
+  const citySelect=form.querySelector('[name="city"]');
+  if(citySelect){
+    citySelect.addEventListener('change',()=>{
+      const val=String(citySelect.value||'');
+      if(!val) return;
+      const parts=val.split('|');
+      if(parts.length<3) return;
+      const lng=Number(parts[1]),tz=Number(parts[2]);
+      const lngInput=form.querySelector('[name="longitude"]');
+      const tzInput=form.querySelector('[name="tzOffsetHours"]');
+      if(lngInput&&Number.isFinite(lng)) lngInput.value=lng;
+      if(tzInput&&Number.isFinite(tz)) tzInput.value=tz;
+      hideError();
+    });
+  }
   document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{activeTab=b.dataset.tab;renderTab();}));
   if (!window.BaziEngine) {
     window.addEventListener('load',()=>{if(!window.BaziEngine)showError('排盘功能暂时无法启动，请刷新页面后重试；如果仍无法使用，请联系维护者。');});
