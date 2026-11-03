@@ -676,3 +676,22 @@
 @media(prefers-reduced-motion:reduce){.timeline-pick,.timeline-pick .data-card{transition:none}}
 
 @media(max-width:680px){.annual-card.timeline-pick{padding:13px}}
+
+
+/* P2 第四批：关系结果对象定位与来源层级 */
+.relation-result{border-left:3px solid #b98b45}
+.relation-result-heading{display:flex;align-items:center;gap:8px;margin-bottom:10px;color:#735b32}
+.relation-participants{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.relation-connector{color:var(--muted);font-size:12px}
+.relation-locator{display:inline-flex;align-items:center;gap:5px;min-height:38px;padding:7px 11px;border:1px solid #d9c59e;border-radius:9px;background:#fbf7ee;color:#55452e;font:600 13px/1.5 inherit;text-align:left;cursor:pointer;touch-action:manipulation}
+.relation-locator:hover{border-color:#a8874e;background:#f3e8d1;color:#60491f}
+.relation-locator:focus-visible{outline:3px solid #a8874e;outline-offset:2px}
+.relation-result-items{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.relation-group-members{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:12px 0}
+.relation-group-member{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;padding:9px;border:1px solid #e8ddc9;border-radius:10px;background:#fffdf8}
+.relation-group-member>strong{color:#735b32;font-size:17px}
+.relation-group-member .relation-locator{max-width:100%;overflow-wrap:anywhere}
+.relation-target-focus{outline:3px solid #b98b45!important;outline-offset:4px!important;box-shadow:0 0 0 7px #b98b4520!important;scroll-margin-top:90px;animation:relation-target-pulse 1.4s ease-out}
+@keyframes relation-target-pulse{0%{box-shadow:0 0 0 10px #b98b4540}100%{box-shadow:0 0 0 7px #b98b4520}}
+@media(max-width:680px){.relation-group-members{grid-template-columns:1fr}.relation-locator{min-height:44px}.relation-participants{align-items:stretch}.relation-participants .relation-locator{max-width:100%}}
+@media(prefers-reduced-motion:reduce){.relation-target-focus{animation:none}}
