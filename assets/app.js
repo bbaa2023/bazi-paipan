@@ -319,33 +319,60 @@
   }
   function renderAnnual() {
     const engine=window.BaziEngine||{};
-    if(typeof engine.yearProfile!=='function'||typeof engine.tenGodOf!=='function') return '<div class="empty">当前本地引擎未公开流年分析所需接口。</div>';
+    if(typeof engine.yearProfile!=='function'||typeof engine.tenGodOf!=='function'||typeof engine.lichunOf!=='function') return '<div class="empty">当前本地引擎未公开流年分析所需接口。</div>';
     const dayGan=lastChart.meta&&lastChart.meta.dayMaster||lastChart.pillars&&lastChart.pillars.day&&lastChart.pillars.day.ganzhi&&lastChart.pillars.day.ganzhi.charAt(0);
     if(!dayGan) return '<div class="empty">命盘日主不可用，暂时无法生成流年对照。</div>';
-    const natal=[['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']].map(([key,label])=>{
-      const p=lastChart.pillars&&lastChart.pillars[key];
-      return p&&p.ganzhi?{label,gz:p.ganzhi}:null;
-    }).filter(Boolean);
-    const startYear=new Date().getFullYear();
+    let beijingNow=null;
+    try{
+      const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+      const values=Object.fromEntries(parts.filter(x=>x.type!=='literal').map(x=>[x.type,Number(x.value)]));
+      beijingNow={year:values.year,month:values.month,day:values.day,hour:values.hour,minute:values.minute};
+    }catch(_){}
+    if(!beijingNow||![beijingNow.year,beijingNow.month,beijingNow.day,beijingNow.hour,beijingNow.minute].every(Number.isFinite)) return '<div class="empty">无法取得可靠的北京时间，暂时不能确定当前流年。请使用支持时区格式化的现代浏览器。</div>';
+    let currentYear=beijingNow.year,currentLichun=null;
+    try{currentLichun=engine.lichunOf(currentYear);}catch(_){}
+    if(!currentLichun) return '<div class="empty">本地引擎没有当前年份的立春资料，无法确定当前干支年。</div>';
+    const beforeLichun=beijingNow.month<currentLichun.month||
+      (beijingNow.month===currentLichun.month&&beijingNow.day<currentLichun.day)||
+      (beijingNow.month===currentLichun.month&&beijingNow.day===currentLichun.day&&beijingNow.hour<currentLichun.hour)||
+      (beijingNow.month===currentLichun.month&&beijingNow.day===currentLichun.day&&beijingNow.hour===currentLichun.hour&&beijingNow.minute<currentLichun.minute);
+    if(beforeLichun) currentYear-=1;
+    if(typeof engine.zodiacIndexFromDateTime==='function'){
+      try{
+        const branchIndex=engine.zodiacIndexFromDateTime(beijingNow.year,beijingNow.month,beijingNow.day,beijingNow.hour,beijingNow.minute);
+        if(branchIndex==null) return '<div class="empty">引擎无法识别当前北京时间对应的流年生肖。</div>';
+        if(Array.isArray(engine.BRANCHES)&&engine.BRANCHES[branchIndex]&&engine.yearGanzhi){
+          const expectedBranch=engine.yearGanzhi(currentYear).charAt(1);
+          if(engine.BRANCHES[branchIndex]!==expectedBranch) return '<div class="empty">流年接口交叉核对不一致，已暂停展示，避免给出错误年份。</div>';
+        }
+      }catch(_){return '<div class="empty">流年时间边界核对失败，已暂停展示。</div>';}
+    }
+    const natal=[['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']]
+      .filter(([key])=>key!=='time'||!(lastBirth&&lastBirth.unknownTime))
+      .map(([key,label])=>{const p=lastChart.pillars&&lastChart.pillars[key];return p&&p.ganzhi?{label,gz:p.ganzhi}:null;}).filter(Boolean);
     const cards=[];
-    for(let y=startYear;y<startYear+6;y++){
-      let profile;
-      try{profile=engine.yearProfile(y);}catch(_){profile=null;}
+    for(let y=currentYear;y<currentYear+6;y++){
+      let profile;try{profile=engine.yearProfile(y);}catch(_){profile=null;}
       if(!profile) continue;
-      let god='—';
-      try{god=engine.tenGodOf(dayGan,profile.stem)||'—';}catch(_){}
+      let god='—';try{god=engine.tenGodOf(dayGan,profile.stem)||'—';}catch(_){}
       const relations=[];
       natal.forEach(p=>{
-        let sr=[],br=[];
-        try{sr=engine.stemRelation(p.gz[0],profile.stem)||[];}catch(_){}
+        let sr=[],br=[];try{sr=engine.stemRelation(p.gz[0],profile.stem)||[];}catch(_){}
         try{br=engine.branchRelations(p.gz[1],profile.branch)||[];}catch(_){}
         const all=sr.map(x=>'天干'+x.type).concat(br.map(x=>'地支'+x.type+(x.kind?'（'+x.kind+'）':'')));
         if(all.length) relations.push('<span class="chip">'+safe(p.label)+'：'+safe(all.join('、'))+'</span>');
       });
       const jie=profile.lichun&&profile.lichun.text||'立春日期未返回';
-      cards.push('<div class="data-card annual-card"><div class="luck-card-top"><h3>'+safe(profile.year)+' · '+safe(profile.ganzhi)+'</h3><span class="chip">'+safe(profile.zodiacCn||profile.branch)+'</span></div><div class="annual-meta"><span>流年天干十神</span><strong>'+safe(god)+'</strong><span>五行</span><strong>'+safe(profile.stemElement)+' / '+safe(profile.branchElement)+'</strong><span>纳音</span><strong>'+safe(profile.nayin||'—')+'</strong><span>立春交界</span><strong>'+safe(jie)+'</strong></div><p>与本命干支的直接关系：</p><div class="annual-relations">'+(relations.join('')||'<span class="muted">未命中引擎定义的两两关系</span>')+'</div></div>');
+      const currentMark=y===currentYear?'<span class="chip">当前流年</span>':'';
+      cards.push('<div class="data-card annual-card"><div class="luck-card-top"><h3>'+safe(profile.year)+' · '+safe(profile.ganzhi)+'</h3><span class="chip">'+safe(profile.zodiacCn||profile.branch)+'</span>'+currentMark+'</div><div class="annual-meta"><span>流年天干十神</span><strong>'+safe(god)+'</strong><span>五行</span><strong>'+safe(profile.stemElement)+' / '+safe(profile.branchElement)+'</strong><span>纳音</span><strong>'+safe(profile.nayin||'—')+'</strong><span>立春交界</span><strong>'+safe(jie)+'</strong></div><p>与本命干支的直接关系：</p><div class="annual-relations">'+(relations.join('')||'<span class="muted">未命中引擎定义的两两关系</span>')+'</div></div>');
     }
-    return '<h3 class="subhead">未来六个公历年份的流年干支</h3><p class="muted">使用本地引擎的年柱资料，列出流年干支、流年天干对日主的十神、五行、纳音、立春交界，以及与本命四柱命中的直接干支关系。此页是传统历法与规则对照，不是完整的流年吉凶解读；立春前后换年需要结合具体出生/查询时刻判断。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">本地引擎没有返回流年资料。</div>')+'</div>';
+    let monthRows=[];
+    try{
+      const activeProfile=engine.yearProfile(currentYear);
+      if(activeProfile&&Array.isArray(activeProfile.months)) monthRows=activeProfile.months.map(item=>'<div class="annual-month-row"><span>第'+safe(item.ordinal)+'节月 · '+safe(item.jie||'—')+'</span><strong>'+safe(item.ganzhi||'—')+'</strong><small>'+safe(item.month)+'月建</small></div>');
+    }catch(_){}
+    const timeText=beijingNow.year+'-'+String(beijingNow.month).padStart(2,'0')+'-'+String(beijingNow.day).padStart(2,'0')+' '+String(beijingNow.hour).padStart(2,'0')+':'+String(beijingNow.minute).padStart(2,'0');
+    return '<h3 class="subhead">当前流年与未来五年</h3><p class="muted">查询时刻：北京时间 '+safe(timeText)+'。当前干支年按本地引擎立春表判断；立春前仍归上一干支年。当前流年起点：'+safe(currentYear)+' 年。流年天干十神以本命日主为参照，关系只列出引擎定义的直接两两关系，不代表完整吉凶结论。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">本地引擎没有返回流年资料。</div>')+'</div>'+(monthRows.length?'<h3 class="subhead" style="margin-top:20px">当前干支年的十二节月资料</h3><p class="muted">以下为节月干支与节令名称。引擎没有提供十二个交节的精确时刻，因此不标记当前节月，也不把节月序号当作公历月份边界。</p><div class="annual-month-grid">'+monthRows.join('')+'</div>':'');
   }
   function togglePresentationMode() {
     const enabled = document.body.classList.toggle('presentation-mode');
