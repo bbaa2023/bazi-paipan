@@ -284,3 +284,127 @@
 本轮已完成以上接口的源码签名、关键分支、返回字段和页面调用行为静态核查，并将结果记录在本文件。当前最值得先处理的不是增加新菜单，而是统一“查询时刻/立春边界”“未知时辰”“大运 today 时区”和“神煞位置结构”四类数据边界。
 
 本轮仍未修改页面、CSS、引擎算法或部署文件；未进行真实浏览器交互、移动端测试、独立历书准确性核验或 VPS1 部署。本文记录的是源码事实与待验证风险，不代表这些边界已经通过运行测试。
+
+
+## 10. ChartContext 建议结构与页面字段映射（设计稿，尚未写入运行代码）
+
+### 10.1 设计目标
+
+ChartContext 是一次排盘成功后生成的只读页面上下文。它不取代引擎原始返回、不新增排盘算法，也不是服务端 API。它的任务是让本命、扶抑、大运、流年和各详情模块读取同一份输入与结果，避免每个模块自行猜测口径。
+
+建议采用以下结构（示意契约，不是已实现 JSON）：
+
+```js
+{
+  schemaVersion: "1.0",
+  engine: {
+    name: "BaZiEngine",
+    version: "v0.15.1",
+    calendarEngine: "lunar-javascript",
+    calendarEngineVersion: "由 chart.meta.engineVersion 原样保留"
+  },
+  birthInput: {
+    year, month, day, hour, minute,
+    unknownTime,
+    gender,
+    longitude,
+    tzOffsetHours,
+    tzCentralMeridianInput,
+    sect
+  },
+  calculationMeta: {
+    absoluteInstantBeijing,
+    trueSolarTime,
+    trueSolarOffsetMinutes,
+    dstApplied,
+    tzOffsetHoursApplied,
+    tzCentralMeridianApplied,
+    sect,
+    sectLabel
+  },
+  options: {
+    luckMethod: "traditional",
+    luckFrame: "civil",
+    luckToday: "显式传入的日期及口径"
+  },
+  raw: {
+    chart: "computeBazi 原始返回",
+    favorable: "computeFavorableElement 原始返回",
+    luck: "computeLuckPillars 原始返回"
+  },
+  profiles: {
+    dayPillar: "dayPillarProfile 返回",
+    branches: "按柱位保存 branchProfile 返回",
+    kongWang: "kongWangOfDayGz 返回",
+    twelveStages: "按明确参照天干生成的长生结果"
+  },
+  annual: {
+    queryInstant,
+    queryTimezone,
+    queryInstantBeijing,
+    gregorianYear,
+    currentGanzhiYear,
+    yearProfile,
+    monthPillars
+  },
+  provenance: {}
+}
+```
+
+字段要求：
+- birthInput 保存用户实际输入；tzCentralMeridianInput 即使为空也要保留，不能用引擎推导值覆盖用户输入。
+- calculationMeta 保存引擎最终采用值；实际中央经线以 chart.meta.tzCentralMeridian 为准。
+- engine.version 应读取公开常量 BaziEngine.ENGINE_VERSION；不能从文件头注释推断。
+- luckMethod、luckFrame、luckToday 必须显式记录。当前页面默认 traditional/civil，但未来不能只靠默认值维持历史报告可复现性。
+- raw 下的三个对象必须保留原样；profiles 和 annual 是额外资料，不得覆盖 raw。
+- 未知时辰时 birthInput.unknownTime=true、birthInput.hour=null、raw.chart.pillars.time=null；所有 profiles 和关系生成器必须跳过 time。
+- annual 必须记录查询时刻与时区，并先转换为北京时间后再使用以北京时间为口径的立春表。
+- provenance 只记录字段来源，不把解释文案伪装成引擎原始字段。
+
+### 10.2 当前页面主要展示字段来源
+
+| 页面区域 | 展示内容 | 建议来源路径/计算方式 | 来源类型 |
+|---|---|---|---|
+| 四柱主卡片 | 干支 | raw.chart.pillars.{year,month,day,time}.ganzhi | 引擎直出 |
+| 四柱主卡片 | 天干十神 | pillar.shiShenGan；缺失时 tenGodOf(dayMaster, stem) | 引擎直出/引擎函数 |
+| 四柱主卡片 | 藏干 | pillar.hideGan | 引擎直出 |
+| 四柱主卡片 | 藏干十神 | tenGodOf(dayMaster, hiddenGan) | 引擎函数 |
+| 四柱主卡片 | 纳音 | pillar.naYin | 引擎直出 |
+| 四柱主卡片 | 阴阳五行标签 | STEMS/BRANCHES 与对应属性常量映射 | 引擎常量格式化 |
+| 四柱主卡片 | 墓库角标 | 当前前端按辰戌丑未判断 | 前端展示规则；需明确标注，不冒充独立接口结果 |
+| 四柱主卡片 | 神煞落柱 | shenshaScan 的 hits，按结构化位置归位 | 引擎函数 + 前端归位 |
+| 五行分布 | 三种统计口径 | raw.chart.fiveElements.* | 引擎直出 |
+| 扶抑摘要 | 旺衰、用神、不利五行 | raw.favorable.score / fuYang | 引擎直出 |
+| 扶抑摘要 | 帮扶/克泄耗展示比例 | 从选定的五行统计口径与日主十神阵营推导 | 前端派生；不得冒充引擎 score.ratio |
+| 扶抑摘要 | 根气提示 | 当前前端只检查藏干元素 | 前端简化派生；未完成完整根气规则前应保持“提示”定位 |
+| 调候 | 调候规则 | raw.favorable.tiaoHou | 引擎直出；需说明春秋无季节级简则 |
+| 详情 | 藏干、十神、纳音 | raw.chart.pillars + tenGodOf | 引擎直出/引擎函数 |
+| 详情 | 十二长生 | twelveStage(dayMaster, branch) | 引擎函数；明确“以日干为参照” |
+| 十二长生页 | 各柱天干坐支 | twelveStage(pillarStem, pillarBranch) | 引擎函数；与详情页参照口径不同 |
+| 干支关系 | 两两关系 | stemRelation / branchRelations | 引擎函数；只代表规则命中，不代表合化 |
+| 干支关系 | 三合、三会 | BRANCH_TRINE / BRANCH_MEETING + 成员检查 | 前端组合检查 |
+| 神煞 | 神煞命中与起法 | shenshaScan 的 key/cn/where/anchor | 引擎函数；where 目前是描述文本 |
+| 大运 | 起运、大运干支、十神、藏干、长生、当前标记 | raw.luck.start / pillars / current | 引擎直出 |
+| 大运 | 未知时辰起运范围 | raw.luck.unknownTime.low/high | 引擎直出；页面应同时展示中午参考说明 |
+| 流年 | 年干支、纳音、生肖、太岁关系、立春 | yearProfile(gregorianYear) | 引擎函数；公历年份资料，不自动等于当前流年 |
+| 流年 | 当前干支年 | zodiacIndexFromDateTime(北京时间查询时刻) + yearGanzhi | 引擎函数；调用端负责时区转换 |
+| 流年 | 十二节月 | yearMonthPillars(year) 或 yearProfile.months | 引擎函数；当前页面未展示 |
+
+### 10.3 数据生成顺序
+
+1. 校验并冻结 birthInput。
+2. 调用 computeBazi，成功后保存 raw.chart。
+3. 读取 ENGINE_VERSION，并从 chart.meta 保存历算、时区、真太阳时和换日口径。
+4. 调用 computeFavorableElement，保存 raw.favorable；若失败，保留 chart 并将 favorable 标记为 unavailable，不伪造默认结果。
+5. 若性别有效，调用 computeLuckPillars，显式传入 method、frame、today，保存 raw.luck；若失败，不影响本命排盘。
+6. 基于 raw.chart 生成 dayPillar、branches、kongWang 等 profiles；未知时辰不生成 time profile。
+7. 只有在用户打开流年模块或明确选择查询时刻时，生成 annual；先将查询时刻转换到北京时间，再调用立春相关接口。
+8. 各 UI 模块只读取 ChartContext，不再自行重新排盘或偷偷改变计算口径。
+
+### 10.4 当前阶段不做的事
+
+- 不把 ChartContext 暴露为公网 API。
+- 不上传出生资料到 VPS2、云模型或第三方。
+- 不引入账号、会员、支付、订单或 AI 服务。
+- 不把合盘、择日、姓名、八宅、六十四卦混进单人命盘上下文；未来按独立领域模块接入。
+- 不在本轮为了减少重复计算而重写 computeFavorableElement 或 computeLuckPillars。
