@@ -616,6 +616,17 @@
   });
   function compute(event) {
     event.preventDefault(); hideError();
+    // 新提交先清理旧命盘，避免新输入无效或计算失败时仍展示上一张命盘。
+    lastBirth=null; lastChart=null; lastLuck=null; lastFavorable=null;
+    selectedLuckIndex=null; selectedAnnualYear=null; activeTab='overview';
+    results.hidden=true;
+    pillarsBox.replaceChildren();
+    pillarsBox.classList.remove('three-pillars');
+    content.replaceChildren();
+    const overviewPanel=$('#overview-panel');
+    if(overviewPanel) overviewPanel.replaceChildren();
+    const dayMasterLabel=$('#day-master');
+    if(dayMasterLabel) dayMasterLabel.textContent='日主 —';
     if (!window.BaziEngine || typeof window.BaziEngine.computeBazi !== 'function') {
       showError('排盘功能暂时无法启动，请刷新页面后重试；如果仍无法使用，请联系维护者。'); return;
     }
