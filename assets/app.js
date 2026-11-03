@@ -54,7 +54,7 @@
     const items=Array.isArray(lastLuck?.pillars)?lastLuck.pillars:[];
     const luckSelect=options.luck?'<label class="timeline-select-label">参与关系的大运<select data-select-luck><option value="">不指定大运</option>'+items.map(p=>'<option value="'+safe(p.index)+'" '+(Number(p.index)===Number(selectedLuckIndex)?'selected':'')+'>第'+safe(p.index)+'步 · '+safe(p.ganzhi)+'（'+safe(p.yearLabel||'年份未知')+'）</option>').join('')+'</select></label>':'';
     const annualYears=Array.isArray(options.annualYears)?options.annualYears:[];
-    const annualSelect=options.annual?'<label class="timeline-select-label">参与关系的流年<select data-select-annual>'+annualYears.map(y=>{
+    const annualSelect=options.annual&&annualYears.length?'<label class="timeline-select-label">参与关系的流年<select data-select-annual>'+annualYears.map(y=>{
       let profile=null;try{profile=engine.yearProfile(y);}catch(_){}
       return '<option value="'+safe(y)+'" '+(Number(y)===Number(selectedAnnualYear)?'selected':'')+'>'+safe(y)+' · '+safe(profile?.ganzhi||'干支资料不可用')+'</option>';
     }).join('')+'</select></label>':'';
