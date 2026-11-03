@@ -719,3 +719,11 @@
 
 /* P2 第六批：关系解释与规则依据 */
 .relation-explanation{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}.relation-explanation p{margin:0;color:var(--muted,#777);font-size:.88rem;line-height:1.6}.relation-explanation small,.relation-evidence{display:block;color:var(--muted,#888);font-size:.76rem;line-height:1.5;overflow-wrap:anywhere}.relation-result-items{display:grid;gap:10px}
+
+/* 独立知识库入口：保持轻量，不影响排盘表单与命盘布局 */
+.topbar-tools{display:flex;align-items:center;gap:14px;min-width:0}
+.knowledge-link{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid #dfd1b7;border-radius:999px;background:#f8f1e3;color:#805c22;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:background .15s,border-color .15s}
+.knowledge-link:hover{border-color:#c4a56a;background:#f3e7d0}
+.knowledge-link span{font-size:11px;opacity:.7}
+@media(max-width:680px){.topbar-tools{gap:8px}.knowledge-link{padding:5px 8px;font-size:10px}.privacy{font-size:9px}.privacy i{margin-right:4px}}
+@media(max-width:360px){.topbar{gap:7px}.brand{gap:5px}.brand-mark{width:29px;height:29px;flex-basis:29px}.brand b{font-size:9px}.brand small{font-size:9px}.topbar-tools{gap:5px}.knowledge-link{padding:4px 6px;font-size:9px}.privacy{font-size:8px}}
