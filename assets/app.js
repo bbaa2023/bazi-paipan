@@ -205,19 +205,70 @@
     }).join('')+'</div>';
   }
   function renderDetails() {
-    const ps = lastChart.pillars || {};
-    const dayGan = lastChart.meta?.dayMaster || ps.day?.ganzhi?.charAt(0);
-    const labels = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
-    const cards = labels.map(([key,label])=>{
+    const engine=window.BaziEngine||{};
+    const ps=lastChart.pillars||{};
+    const dayGan=lastChart.meta?.dayMaster||ps.day?.ganzhi?.charAt(0);
+    const labels=[['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
+    const cards=labels.filter(([key])=>key!=='time'||!lastBirth?.unknownTime).map(([key,label])=>{
       const p=ps[key]||{};
       const branch=String(p.ganzhi||'').charAt(1);
       let stage='—';
-      if (branch && dayGan && window.BaziEngine && typeof window.BaziEngine.twelveStage==='function') {
-        try { const result=window.BaziEngine.twelveStage(dayGan,branch); stage=result?.stage||'—'; } catch (_) {}
+      if(branch&&dayGan&&typeof engine.twelveStage==='function'){
+        try{const result=engine.twelveStage(dayGan,branch);stage=result?.stage||'—';}catch(_){}
       }
-      return '<div class="data-card"><h3>'+label+' · '+safe(p.ganzhi||'—')+'</h3><p>天干十神：'+safe(p.shiShenGan||'—')+'</p><p>藏干：'+(Array.isArray(p.hideGan)?p.hideGan.map(x=>{let god='';try{if(dayGan&&window.BaziEngine&&typeof window.BaziEngine.tenGodOf==='function')god=window.BaziEngine.tenGodOf(dayGan,x)||'';}catch(_){}return '<span class="chip '+elementClass(x)+'">'+safe(x)+(god?' · '+safe(god):'')+'</span>';}).join(''):'—')+'</p><p>纳音：'+safe(p.naYin||'—')+'</p><p>十二长生：<span class="chip '+elementClass(dayGan||'')+'">'+safe(stage)+'</span></p></div>';
+      return '<div class="data-card"><h3>'+label+' · '+safe(p.ganzhi||'—')+'</h3><p>天干十神：'+safe(p.shiShenGan||'—')+'</p><p>藏干：'+(Array.isArray(p.hideGan)?p.hideGan.map(x=>{let god='';try{if(dayGan&&typeof engine.tenGodOf==='function')god=engine.tenGodOf(dayGan,x)||'';}catch(_){}return '<span class="chip '+elementClass(x)+'">'+safe(x)+(god?' · '+safe(god):'')+'</span>';}).join(''):'—')+'</p><p>纳音：'+safe(p.naYin||'—')+'</p><p>十二长生（以日干为参照）：<span class="chip '+elementClass(dayGan||'')+'">'+safe(stage)+'</span></p></div>';
     }).join('');
-    return '<h3 class="subhead">藏干、十神与十二长生</h3><p class="muted">十二长生以日干为参照，按本地引擎公开函数计算。</p><div class="data-grid">'+cards+'</div><p class="muted">仅展示引擎实际返回或通过引擎公开函数计算的数据；未支持的项目不会用固定文案伪造。</p>';
+    const unknownNote=lastBirth?.unknownTime?'<div class="empty">出生时辰未知：本页不生成时柱，也不会把中午参考时刻当作真实时柱。</div>':'';
+
+    let dayCard='';
+    const dayGz=ps.day?.ganzhi;
+    if(dayGz&&typeof engine.dayPillarProfile==='function'){
+      try{
+        const d=engine.dayPillarProfile(dayGz);
+        if(d){
+          const hidden=Array.isArray(d.hidden)?d.hidden.map(x=>'<span class="chip">'+safe(x.gan)+' · '+safe(x.god||'—')+'（'+safe(x.posCn)+'）</span>').join(''):'—';
+          dayCard='<div class="data-card"><h3>日柱剖面 · '+safe(d.gz)+'</h3><p>日干坐支：'+safe(d.seatCn||'—')+'</p><p>日柱纳音：'+safe(d.nayin||'—')+' · 配对：'+safe(d.nayinPartner||'—')+'</p><p>日干坐支长生：'+safe(d.stage||'—')+'</p><p>日柱藏干十神：'+(hidden||'—')+'</p><p class="muted">坐支关系是五行生克分类，不直接等同婚姻或吉凶判断。</p></div>';
+        }
+      }catch(e){console.warn('日柱剖面读取失败：',e);}
+    }
+
+    const branchCards=[];
+    if(typeof engine.branchProfile==='function'){
+      labels.filter(([key])=>key!=='time'||!lastBirth?.unknownTime).forEach(([key,label])=>{
+        const p=ps[key];
+        const branch=p?.ganzhi?.charAt(1);
+        if(!branch)return;
+        try{
+          const b=engine.branchProfile(branch);
+          if(!b)return;
+          const hidden=Array.isArray(b.hidden)?b.hidden.map(x=>'<span class="chip">'+safe(x.gan)+'（'+safe(x.posCn)+'）</span>').join(''):'—';
+          const rules=[
+            b.sixHe?.branch?'六合 '+b.sixHe.branch:'',
+            b.clash?.branch?'六冲 '+b.clash.branch:'',
+            b.harm?.branch?'六害 '+b.harm.branch:'',
+            b.trine?.members?.length?'三合组 '+b.trine.members.join('、'):'',
+            b.meeting?.members?.length?'三会组 '+b.meeting.members.join('、'):''
+          ].filter(Boolean);
+          branchCards.push('<div class="data-card"><h3>'+label+'地支 · '+safe(branch)+'</h3><p>五行 / 阴阳：'+safe(b.element||'—')+' / '+safe(b.polarity||'—')+'</p><p>生肖 / 方位：'+safe(b.animalCn||'—')+' / '+safe(b.dirCn||'—')+'</p><p>时辰范围：'+safe(b.hour?.text||'—')+' · 节令：'+safe(b.jie||'—')+' · '+safe(b.season||'—')+'</p><p>藏干：'+(hidden||'—')+'</p><p>地支规则资料：'+(rules.length?rules.map(x=>'<span class="chip">'+safe(x)+'</span>').join(''):'—')+'</p><p class="muted">以上合冲刑害与三合三会为该地支的规则资料；是否在命盘中实际构成，仍需结合参与地支判断。</p></div>');
+        }catch(e){console.warn('地支剖面读取失败：',e);}
+      });
+    }
+
+    let kongWangCard='';
+    if(dayGz&&typeof engine.kongWangOfDayGz==='function'){
+      try{
+        const kw=engine.kongWangOfDayGz(dayGz);
+        if(kw&&Array.isArray(kw.voids)){
+          const matched=labels.filter(([key])=>key!=='time'||!lastBirth?.unknownTime).map(([key,label])=>{
+            const branch=ps[key]?.ganzhi?.charAt(1);
+            return branch&&kw.voids.includes(branch)?label+'（'+branch+'）':null;
+          }).filter(Boolean);
+          kongWangCard='<div class="data-card"><h3>日柱旬空</h3><p>旬首：'+safe(kw.xunStart||'—')+'</p><p>旬空地支：'+kw.voids.map(safe).join('、')+'</p><p>本命命中：'+(matched.length?matched.map(safe).join('、'):'本命已知柱未见旬空地支')+'</p><p class="muted">旬空以日柱所在旬计算；未知时辰不参与命中判断。</p></div>';
+        }
+      }catch(e){console.warn('日柱旬空读取失败：',e);}
+    }
+
+    return '<h3 class="subhead">藏干、十神与十二长生</h3><p class="muted">十二长生以日干为参照；以下剖面资料来自本地引擎公开接口。</p><div class="data-grid">'+unknownNote+cards+dayCard+branchCards.join('')+kongWangCard+'</div><p class="muted">地支关系资料不代表命盘已构成相应组合；旬空按日柱统一计算。所有资料均在当前浏览器本地生成。</p>';
   }
   function renderRelations() {
     const labels = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
