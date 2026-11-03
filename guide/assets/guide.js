@@ -105,7 +105,7 @@
         ['本站口径','本站的年、月柱按北京时间绝对时刻和节气边界处理；日、时柱按本地真太阳时（提供经度时）或输入时间处理。详细边界以排盘页面和准确性测试文档为准。']
       ],
       note:'时间规则属于排盘计算口径，不同工具可能采用不同的子时换日、真太阳时和节气精度设置。比较结果时应先确认双方口径。',
-      sources:[['《渊海子平》目录中的节候、节气及起运相关篇目','https://nkg.best/knowledge/classics/yuan-hai-zi-ping'],['本站排盘规则与数据契约','../docs/ENGINE_DATA_CONTRACT.md']]
+      sources:[['《渊海子平》目录中的节候、节气及起运相关篇目','https://nkg.best/knowledge/classics/yuan-hai-zi-ping'],['本站排盘规则说明','./category.html?topic=rules']]
     },
     'shensha-index': {
       title:'神煞资料索引',category:'shensha',categoryName:'神煞资料',summary:'神煞是传统命理中按特定干支条件查取的一类辅助标记。',
@@ -125,16 +125,33 @@
     const status = document.getElementById('search-status');
     const empty = document.getElementById('no-results');
     const cards = [...categoryGrid.querySelectorAll('.guide-category')];
+    const results = document.getElementById('guide-search-results');
     input?.addEventListener('input', () => {
       const q = input.value.trim().toLocaleLowerCase();
       let shown = 0;
       cards.forEach(card => {
-        const match = !q || card.textContent.toLocaleLowerCase().includes(q);
+        const key = new URL(card.href).searchParams.get('topic') || '';
+        const category = categories[key];
+        const topicText = category ? category.topics.map(([id,name,desc]) => {
+          const article = articles[id];
+          return name + ' ' + desc + ' ' + (article ? article.title + ' ' + article.summary : '');
+        }).join(' ') : '';
+        const haystack = (card.textContent + ' ' + (category?.description || '') + ' ' + topicText).toLocaleLowerCase();
+        const match = !q || haystack.includes(q);
         card.hidden = !match;
         if (match) shown++;
       });
-      empty.hidden = shown !== 0;
-      status.textContent = q ? '找到 ' + shown + ' 个相关分类' : '输入关键词，查找相关分类与主题';
+      const matches = q ? Object.entries(articles).filter(([,article]) =>
+        (article.title + ' ' + article.summary + ' ' + article.categoryName + ' ' + article.sections.map(section=>section.join(' ')).join(' ')).toLocaleLowerCase().includes(q)
+      ) : [];
+      if (results) {
+        results.innerHTML = matches.slice(0,8).map(([id,article]) =>
+          '<a class="search-result" href="./article.html?id='+encodeURIComponent(id)+'"><b>'+escapeHtml(article.title)+'</b><span>'+escapeHtml(article.categoryName+' · '+article.summary)+'</span></a>'
+        ).join('');
+        results.hidden = matches.length === 0;
+      }
+      empty.hidden = shown !== 0 || matches.length !== 0;
+      status.textContent = q ? '匹配到 ' + matches.length + ' 篇条目，涉及 ' + shown + ' 个分类' : '输入关键词，查找相关分类与主题';
     });
     document.addEventListener('keydown', event => {
       if (event.key === '/' && !['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)) {
