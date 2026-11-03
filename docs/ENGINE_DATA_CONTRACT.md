@@ -682,3 +682,13 @@ P1 第一批应接入：
 - 总览计数等于各分类内有命中关系的对象对数量；无命中关系的对象对不计数、不生成空关系卡片。
 - 三合/三会组合独立计数，不计入两两关系数量；仅按当前参与对象实际地支成员是否齐备展示。
 - 总览入口只导航到已有非空分类；零项分类禁用。分类跳转不改变当前所选大运、流年或命盘数据。
+
+
+## 20. P2 第六批：干支关系解释的数据依据（2026-11-03）
+
+- stemRelation(s1,s2) 返回数组项字段：type、typeEn；天干五合另有 element。当前引擎实现检查 STEM_COMBINE、STEM_COMBINE_ELEMENT 与 STEM_CLASH。
+- branchRelations(b1,b2) 返回数组项字段：type、typeEn；视关系类型可能包含 element/elementEn 或 kind/kindEn。实现使用地支六合、六冲、六害、刑组、自刑及三合规则表。
+- 半三合由两个不同成员同时属于同一 BRANCH_TRINE 组合触发；引擎英文类型标记为 half trine (contested)。页面不得将半三合表述为完整三合。
+- 完整三合、三会使用 BRANCH_TRINE、BRANCH_MEETING 的 branches 数组检查三个不同成员；element 和 dirCn 只作规则表资料展示。
+- 上述字段和规则表是当前 vendor 的实际代码依据，不是古籍引文；页面不得将其冒称《渊海子平》原文。
+- 解释层不得自行推导合化、吉凶、应事或强弱；没有可靠字段时退回客观规则名称。
