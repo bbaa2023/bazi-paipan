@@ -342,17 +342,34 @@
     if(selectedYearProfile&&selectedYearProfile.ganzhi){
       participants.push({id:'annual-selected',layer:'所选流年',label:'流年 '+selectedYearProfile.year,gz:selectedYearProfile.ganzhi,year:activeAnnualYear});
     }
-    const cards=[];
+    const relationBuckets=[
+      {id:'natal-internal',label:'本命内部关系',description:'四柱之间的两两关系',items:[]},
+      {id:'natal-luck',label:'本命与大运关系',description:'本命四柱与当前所选大运的关系',items:[]},
+      {id:'natal-annual',label:'本命与流年关系',description:'本命四柱与当前所选流年的关系',items:[]},
+      {id:'luck-annual',label:'大运与流年关系',description:'所选大运与所选流年之间的关系',items:[]}
+    ];
+    const bucketFor=(a,b)=>{
+      const natalA=a.id.startsWith('natal-'),natalB=b.id.startsWith('natal-');
+      const luckA=a.id==='luck-selected',luckB=b.id==='luck-selected';
+      const annualA=a.id==='annual-selected',annualB=b.id==='annual-selected';
+      if(natalA&&natalB)return relationBuckets[0];
+      if((natalA&&luckB)||(natalB&&luckA))return relationBuckets[1];
+      if((natalA&&annualB)||(natalB&&annualA))return relationBuckets[2];
+      if((luckA&&annualB)||(luckB&&annualA))return relationBuckets[3];
+      return null;
+    };
     for(let i=0;i<participants.length;i++) for(let j=i+1;j<participants.length;j++){
       const a=participants[i],b=participants[j];
       let sr=[],br=[];
       try{if(typeof engine.stemRelation==='function')sr=engine.stemRelation(a.gz[0],b.gz[0])||[];}catch(_){}
       try{if(typeof engine.branchRelations==='function')br=engine.branchRelations(a.gz[1],b.gz[1])||[];}catch(_){}
       const items=sr.map(x=>'天干 '+x.type+(x.element?' · '+x.element:'')).concat(br.map(x=>'地支 '+x.type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:'')));
-      if(items.length){
-        cards.push('<div class="data-card relation-result"><div class="relation-result-heading"><span class="relation-icon" aria-hidden="true">⟷</span><strong>命中关系</strong></div><div class="relation-participants">'+locateButton(a)+'<span class="relation-connector">与</span>'+locateButton(b)+'</div><div class="relation-result-items">'+items.map(x=>'<span class="chip">'+safe(x)+'</span>').join('')+'</div></div>');
+      const bucket=bucketFor(a,b);
+      if(items.length&&bucket){
+        bucket.items.push('<div class="data-card relation-result"><div class="relation-result-heading"><span class="relation-icon" aria-hidden="true">⟷</span><strong>命中关系</strong></div><div class="relation-participants">'+locateButton(a)+'<span class="relation-connector">与</span>'+locateButton(b)+'</div><div class="relation-result-items">'+items.map(x=>'<span class="chip">'+safe(x)+'</span>').join('')+'</div></div>');
       }
     }
+    const pairCount=relationBuckets.reduce((sum,b)=>sum+b.items.length,0);
     function locateButton(p){let attrs='';if(p.id.startsWith('natal-'))attrs=' data-locate-kind="natal" data-locate-key="'+safe(p.key)+'"';else if(p.id==='luck-selected')attrs=' data-locate-kind="luck" data-locate-value="'+safe(p.index)+'"';else if(p.id==='annual-selected')attrs=' data-locate-kind="annual" data-locate-value="'+safe(p.year)+'"';return '<button type="button" class="relation-locator"'+attrs+'>'+safe(p.layer)+' · '+safe(p.label)+' '+safe(p.gz)+'<span aria-hidden="true"> ↗</span></button>';}
     const branches=participants.map(p=>({branch:p.gz[1],participant:p}));
     const groupCards=[];
@@ -374,7 +391,16 @@
       '<span class="chip">'+(selectedYearProfile?'已选流年 '+selectedYearProfile.ganzhi:'流年不可用')+'</span>'
     ].join('');
     const selectorYears=annualInfo.year==null?[]:Array.from({length:6},(_,i)=>annualInfo.year+i);
-    return '<h3 class="subhead">本命 · 大运 · 流年关系</h3><p class="muted">本命四柱固定不变；通过下方选择器切换参与关系对照的大运与流年。默认定位当前大运和当前流年。未知时辰、未起运或无法确认的对象不会被补造；关系命中不代表合化或吉凶。</p>'+renderTimelineSelectors({luck:true,annual:true,annualYears:selectorYears})+'<div class="data-card"><div class="annual-relations">'+layerStatus+'</div>'+(currentYearError?'<p class="muted">当前流年基准暂不可用：'+safe(currentYearError)+'</p>':'')+'</div><div class="data-grid">'+(cards.length?cards.join(''):'<div class="empty">当前参与对象之间未命中已收录的两两干支关系。</div>')+(groupCards.length?'<h3 class="subhead" style="grid-column:1/-1;margin-top:10px">完整三支组合提示</h3>'+groupCards.join(''):'')+'</div><div class="customer-note"><span class="note-mark">金</span><div><strong>关系说明</strong><p>两两关系按引擎规则逐对检查，并保留双方层级和柱位。三合、三会仅按成员是否齐全提示，不等同于合化成立。不同传统流派对部分规则的取法可能不同，本页不据此单独断吉凶。</p></div></div>';
+    const relationSections=relationBuckets.filter(b=>b.items.length).map(b=>'<section class="relation-category" id="relation-'+b.id+'"><div class="relation-category-heading"><div><h4>'+safe(b.label)+'</h4><p class="muted">'+safe(b.description)+'</p></div><span class="relation-count">'+b.items.length+' 项</span></div><div class="relation-category-grid">'+b.items.join('')+'</div></section>').join('');
+    const overview=[
+      {id:'natal-internal',label:'本命内部',count:relationBuckets[0].items.length},
+      {id:'natal-luck',label:'本命 × 大运',count:relationBuckets[1].items.length},
+      {id:'natal-annual',label:'本命 × 流年',count:relationBuckets[2].items.length},
+      {id:'luck-annual',label:'大运 × 流年',count:relationBuckets[3].items.length},
+      {id:'triads',label:'三合 / 三会',count:groupCards.length}
+    ];
+    const overviewHtml=overview.map(x=>'<button type="button" class="relation-overview-item" data-relation-jump="'+x.id+'" '+(x.count?'':'disabled')+'><span>'+safe(x.label)+'</span><strong>'+x.count+'</strong></button>').join('');
+    return '<h3 class="subhead">本命 · 大运 · 流年关系</h3><p class="muted">本命四柱固定不变；通过下方选择器切换参与关系对照的大运与流年。默认定位当前大运和当前流年。未知时辰、未起运或无法确认的对象不会被补造；关系命中不代表合化或吉凶。</p>'+renderTimelineSelectors({luck:true,annual:true,annualYears:selectorYears})+'<div class="data-card"><div class="annual-relations">'+layerStatus+'</div>'+(currentYearError?'<p class="muted">当前流年基准暂不可用：'+safe(currentYearError)+'</p>':'')+'</div><div class="relation-overview"><div class="relation-overview-title"><strong>关系总览</strong><span class="muted">共 '+pairCount+' 项两两关系 · '+groupCards.length+' 组三支组合</span></div><div class="relation-overview-grid">'+overviewHtml+'</div></div>'+(relationSections||'<div class="empty">当前参与对象之间未命中已收录的两两干支关系。</div>')+(groupCards.length?'<section class="relation-category" id="relation-triads"><div class="relation-category-heading"><div><h4>三合 / 三会组合</h4><p class="muted">按实际出现的三个成员分组展示来源</p></div><span class="relation-count">'+groupCards.length+' 组</span></div><div class="relation-category-grid">'+groupCards.join('')+'</div></section>':'')+'<div class="customer-note"><span class="note-mark">金</span><div><strong>关系说明</strong><p>两两关系按引擎规则逐对检查，并保留双方层级和柱位。三合、三会仅按成员是否齐全提示，不等同于合化成立。不同传统流派对部分规则的取法可能不同，本页不据此单独断吉凶。</p></div></div>';
   }
   function renderShensha() {
     const engine=window.BaziEngine||{};
@@ -497,6 +523,12 @@
       const year=Number(annualButton.dataset.pickAnnualYear);
       const current=getCurrentAnnualInfo().year;
       if(Number.isInteger(year)&&current!=null&&year>=current&&year<current+6){selectedAnnualYear=year;renderTab();}
+      return;
+    }
+    const relationJump=target.closest('[data-relation-jump]');
+    if(relationJump&&content.contains(relationJump)&&!relationJump.disabled){
+      const section=content.querySelector('#relation-'+relationJump.dataset.relationJump);
+      if(section)section.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
       return;
     }
     const locator=target.closest('[data-locate-kind]');
