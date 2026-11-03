@@ -513,7 +513,7 @@ ChartContext 是一次排盘成功后生成的只读页面上下文。它不取�
 
 ## 13. 第二批接口与当前页面的接入状态
 
-本轮重新检查 assets/app.js（SHA e991d112e89efcab216a82d093900ac20e773852），按页面对 BaziEngine 对象的直接调用统计：
+本轮重新检查 assets/app.js（SHA e991d112e89efcab216a82d093900ac20e773852），按页面对引擎对象的直接调用统计（包括局部变量 engine）：
 
 | 引擎接口 | 当前页面直接调用次数 | 当前状态 |
 |---|---:|---|
@@ -524,7 +524,7 @@ ChartContext 是一次排盘成功后生成的只读页面上下文。它不取�
 | kongWangOfDayGz | 0 | 已导出，未接入 |
 | yearMonthPillars | 0 | 已导出，未接入 |
 | zodiacIndexFromDateTime | 0 | 已导出，未接入 |
-| yearProfile | 0 | 页面流年区域未接入（当前版本直接调用计数为 0，旧映射文档中的调用结论需按最新源码复核） |
+| yearProfile | 1（通过局部变量 engine 调用） | 已接入流年卡片；但只按公历当前年列六年，尚未用立春时刻确定当前干支年，也未展示 months |
 | computeFavorableElement | 1 | 已接入 |
 | computeLuckPillars | 1 | 已接入 |
 
