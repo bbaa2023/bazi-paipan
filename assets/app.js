@@ -521,6 +521,22 @@
     }
   }
   function renderTab() {
+    const tabGuides = {
+      details: {text:'这里查看四柱中的藏干与十神资料；十神以日主为参照，可结合各柱位置对照。',links:[['十神资料','ten-gods'],['藏干资料','hidden-stems']]},
+      relations: {text:'这里汇总本命、所选大运与所选流年之间的干支关系；点击关系来源可返回对应柱位或时间轴。',links:[['干支关系说明','relations']]},
+      shensha: {text:'这里列出本地引擎规则命中的神煞及所在柱位；不同流派的起法与名称差异请查看资料说明。',links:[['神煞资料','shensha']]},
+      luck: {text:'这里查看起运信息和各步大运；选择某一步后，可与本命及所选流年进行关系对照。',links:[['大运与起运','luck'],['排盘时间规则','rules']]},
+      annual: {text:'这里查看当前干支年及后续流年；选择年份后，可同步查看该年的节月资料和关系对照。',links:[['流年与节月','luck'],['立春换年规则','rules']]},
+      twelve: {text:'这里查看十二长生在本命各柱上的对应资料；也可在大运详情中对照所选大运。',links:[['十二长生资料','twelve-stages']]}
+    };
+    const guide = tabGuides[activeTab];
+    const guideBox = $('#tab-guide');
+    if (guideBox) {
+      guideBox.innerHTML = guide
+        ? '<span class="tab-guide-text">'+guide.text+'</span><span class="tab-guide-links">'+guide.links.map(([label,topic])=>'<a href="./guide/category.html?topic='+topic+'">'+label+' <span aria-hidden="true">↗</span></a>').join('')+'</span>'
+        : '';
+      guideBox.hidden = !guide;
+    }
     document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===activeTab;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
     const renderers={details:renderDetails,relations:renderRelations,shensha:renderShensha,luck:renderLuck,annual:renderAnnual,twelve:renderTwelveStages,overview:renderOverview};
     content.innerHTML=(renderers[activeTab]||renderDetails)();
