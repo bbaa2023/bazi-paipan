@@ -522,7 +522,7 @@
   }
   function renderTab() {
     const tabGuides = {
-      details: {text:'这里查看四柱中的藏干与十神资料；十神以日主为参照，可结合各柱位置对照。',links:[['十神资料','ten-gods'],['藏干资料','hidden-stems']]},
+      details: {text:'这里查看四柱中的藏干、十神与纳音资料；十神以日主为参照，可结合各柱位置对照。',links:[['十神资料','ten-gods'],['藏干与纳音','hidden-stems']]},
       relations: {text:'这里汇总本命、所选大运与所选流年之间的干支关系；点击关系来源可返回对应柱位或时间轴。',links:[['干支关系说明','relations']]},
       shensha: {text:'这里列出符合条件的神煞名称及所在柱位；不同流派的起法与名称差异请查看资料说明。',links:[['神煞资料','shensha']]},
       luck: {text:'这里查看起运信息和各步大运；选择某一步后，可与本命及所选流年进行关系对照。',links:[['大运与起运','luck'],['排盘时间规则','rules']]},
