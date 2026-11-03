@@ -509,3 +509,42 @@ ChartContext 是一次排盘成功后生成的只读页面上下文。它不取�
 - 性别不明时禁止调用或展示“默认男性”大运结果；前端应先要求明确性别。
 - unknownTime 的 low/high 是当天时间窗口边界估算，不是统计置信区间；若 jieAmbiguous=true，月柱假设与起运节气必须特别提示。
 
+
+
+## 13. 第二批接口与当前页面的接入状态
+
+本轮重新检查 assets/app.js（SHA e991d112e89efcab216a82d093900ac20e773852），按页面对 BaziEngine 对象的直接调用统计：
+
+| 引擎接口 | 当前页面直接调用次数 | 当前状态 |
+|---|---:|---|
+| dayPillarProfile | 0 | 已导出，未接入 |
+| branchProfile | 0 | 已导出，未接入 |
+| stageProfile | 0 | 已导出，未接入 |
+| tenGodPillarProfile | 0 | 已导出，未接入 |
+| kongWangOfDayGz | 0 | 已导出，未接入 |
+| yearMonthPillars | 0 | 已导出，未接入 |
+| zodiacIndexFromDateTime | 0 | 已导出，未接入 |
+| yearProfile | 0 | 页面流年区域未接入（当前版本直接调用计数为 0，旧映射文档中的调用结论需按最新源码复核） |
+| computeFavorableElement | 1 | 已接入 |
+| computeLuckPillars | 1 | 已接入 |
+
+说明：以上统计仅表示页面中对引擎对象的直接调用；不统计引擎函数内部互相调用，也不统计页面自有辅助函数或硬编码规则。
+
+### 13.1 本命免费版接入优先级
+
+P1 第一批应接入：
+1. dayPillarProfile：补充日柱坐支关系、日柱藏干十神、日柱纳音配对等资料。
+2. branchProfile：补充地支方位、时辰范围、节令、季节、藏干位置、六合/冲/害/刑/三合/三会规则资料。
+3. kongWangOfDayGz：建立统一旬空结果，并与四柱地支比对后展示命盘中哪些柱遇旬空。
+4. yearMonthPillars、zodiacIndexFromDateTime、yearGanzhi：完善当前干支年及十二节月资料；先统一查询时刻和北京时间转换。
+5. stageProfile、tenGodPillarProfile：作为规则资料库或辅助说明，不应全部塞进命盘首页。用户需要理解某个十神/长生时，再在对应详情中按需展示。
+
+### 13.2 不应误用的字段
+
+- branchProfile.trine / meeting 是某个地支所属组合规则，不是当前命盘已经构成该局。
+- branchProfile.sixHe / clash / harm 是规则映射，不是当前命盘已经发生关系。
+- dayPillarProfile.seat 是五行生克关系标签，不是婚姻宫吉凶结论。
+- stageProfile 是全局规则矩阵，不是本命每柱的长生结果。
+- tenGodPillarProfile 是十神与柱位映射表，不是用户命盘当前十神结果。
+- kongWangOfDayGz 的 voids 是日柱旬空地支；必须与命盘柱支比对后才形成哪柱遇旬空的展示结果。
+- yearMonthPillars 返回节月资料，不含精确节气时刻；不能单独用于精确日期范围筛选。
