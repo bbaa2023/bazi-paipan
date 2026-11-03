@@ -363,10 +363,27 @@
       let sr=[],br=[];
       try{if(typeof engine.stemRelation==='function')sr=engine.stemRelation(a.gz[0],b.gz[0])||[];}catch(_){}
       try{if(typeof engine.branchRelations==='function')br=engine.branchRelations(a.gz[1],b.gz[1])||[];}catch(_){}
-      const items=sr.map(x=>'天干 '+x.type+(x.element?' · '+x.element:'')).concat(br.map(x=>'地支 '+x.type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:'')));
+      const describeRelation=(x,layer)=>{
+        const type=String(x.type||'');
+        const element=x.element?'；引擎对应五行：'+x.element:'';
+        const kind=x.kind?'；引擎细分类型：'+x.kind:'';
+        const descriptions={
+          '天干五合':'引擎天干五合规则表将这两个天干列为配对关系'+element+'。这只表示五合规则命中，不代表已经合化。',
+          '天干相冲':'引擎天干相冲规则表将这两个天干列为相冲配对。这里只记录规则命中，不推断事件或吉凶。',
+          '六合':'引擎地支六合规则表将这两个地支列为配对关系'+element+'。这里只表示六合规则命中，不代表已经合化。',
+          '六冲':'引擎地支六冲规则表将这两个地支列为相冲配对。这里只记录规则命中，不单独推断吉凶。',
+          '六害':'引擎地支六害规则表将这两个地支列为相害配对。这里只记录规则命中，不单独推断吉凶。',
+          '相刑':'引擎刑组规则表将这两个地支归入同一刑组'+kind+'。这里只说明规则归组，不扩展为现实事件判断。',
+          '自刑':'引擎自刑规则表收录该地支；此项表示同一地支触发自刑规则，不单独推断吉凶。',
+          '半三合':'引擎三合组中同时包含这两个不同地支，故标记为半三合'+element+'。引擎注记该规则存在争议；不等于三支齐全或合化成立。'
+        };
+        const source=layer==='天干'?'规则依据：本地引擎 stemRelation() / 天干规则表。':'规则依据：本地引擎 branchRelations() / 地支规则表。';
+        return {label:layer+' '+type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:''),description:descriptions[type]||'引擎返回该关系类型；当前没有更细的可核验解释，因此仅展示规则名称。',source};
+      };
+      const items=sr.map(x=>describeRelation(x,'天干')).concat(br.map(x=>describeRelation(x,'地支')));
       const bucket=bucketFor(a,b);
       if(items.length&&bucket){
-        bucket.items.push('<div class="data-card relation-result"><div class="relation-result-heading"><span class="relation-icon" aria-hidden="true">⟷</span><strong>命中关系</strong></div><div class="relation-participants">'+locateButton(a)+'<span class="relation-connector">与</span>'+locateButton(b)+'</div><div class="relation-result-items">'+items.map(x=>'<span class="chip">'+safe(x)+'</span>').join('')+'</div></div>');
+        bucket.items.push('<div class="data-card relation-result"><div class="relation-result-heading"><span class="relation-icon" aria-hidden="true">⟷</span><strong>命中关系</strong></div><div class="relation-participants">'+locateButton(a)+'<span class="relation-connector">与</span>'+locateButton(b)+'</div><div class="relation-result-items">'+items.map(x=>'<div class="relation-explanation"><span class="chip">'+safe(x.label)+'</span><p>'+safe(x.description)+'</p><small>'+safe(x.source)+'</small></div>').join('')+'</div></div>');
       }
     }
     const pairCount=relationBuckets.reduce((sum,b)=>sum+b.items.length,0);
@@ -400,7 +417,7 @@
       {id:'triads',label:'三合 / 三会',count:groupCards.length}
     ];
     const overviewHtml=overview.map(x=>'<button type="button" class="relation-overview-item" data-relation-jump="'+x.id+'" '+(x.count?'':'disabled')+'><span>'+safe(x.label)+'</span><strong>'+x.count+'</strong></button>').join('');
-    return '<h3 class="subhead">本命 · 大运 · 流年关系</h3><p class="muted">本命四柱固定不变；通过下方选择器切换参与关系对照的大运与流年。默认定位当前大运和当前流年。未知时辰、未起运或无法确认的对象不会被补造；关系命中不代表合化或吉凶。</p>'+renderTimelineSelectors({luck:true,annual:true,annualYears:selectorYears})+'<div class="data-card"><div class="annual-relations">'+layerStatus+'</div>'+(currentYearError?'<p class="muted">当前流年基准暂不可用：'+safe(currentYearError)+'</p>':'')+'</div><div class="relation-overview"><div class="relation-overview-title"><strong>关系总览</strong><span class="muted">共 '+pairCount+' 项两两关系 · '+groupCards.length+' 组三支组合</span></div><div class="relation-overview-grid">'+overviewHtml+'</div></div>'+(relationSections||'<div class="empty">当前参与对象之间未命中已收录的两两干支关系。</div>')+(groupCards.length?'<section class="relation-category" id="relation-triads"><div class="relation-category-heading"><div><h4>三合 / 三会组合</h4><p class="muted">按实际出现的三个成员分组展示来源</p></div><span class="relation-count">'+groupCards.length+' 组</span></div><div class="relation-category-grid">'+groupCards.join('')+'</div></section>':'')+'<div class="customer-note"><span class="note-mark">金</span><div><strong>关系说明</strong><p>两两关系按引擎规则逐对检查，并保留双方层级和柱位。三合、三会仅按成员是否齐全提示，不等同于合化成立。不同传统流派对部分规则的取法可能不同，本页不据此单独断吉凶。</p></div></div>';
+    return '<h3 class="subhead">本命 · 大运 · 流年关系</h3><p class="muted">本命四柱固定不变；通过下方选择器切换参与关系对照的大运与流年。默认定位当前大运和当前流年。未知时辰、未起运或无法确认的对象不会被补造；关系命中不代表合化或吉凶。</p>'+renderTimelineSelectors({luck:true,annual:true,annualYears:selectorYears})+'<div class="data-card"><div class="annual-relations">'+layerStatus+'</div>'+(currentYearError?'<p class="muted">当前流年基准暂不可用：'+safe(currentYearError)+'</p>':'')+'</div><div class="relation-overview"><div class="relation-overview-title"><strong>关系总览</strong><span class="muted">共 '+pairCount+' 项两两关系 · '+groupCards.length+' 组三支组合</span></div><div class="relation-overview-grid">'+overviewHtml+'</div></div>'+(relationSections||'<div class="empty">当前参与对象之间未命中已收录的两两干支关系。</div>')+(groupCards.length?'<section class="relation-category" id="relation-triads"><div class="relation-category-heading"><div><h4>三合 / 三会组合</h4><p class="muted">按实际出现的三个成员分组展示来源</p></div><span class="relation-count">'+groupCards.length+' 组</span></div><div class="relation-category-grid">'+groupCards.join('')+'</div></section>':'')+'<div class="customer-note"><span class="note-mark">金</span><div><strong>关系说明与依据</strong><p>两两关系说明直接依据本站随附的本地排盘引擎规则函数和规则表，页面只解释“引擎为何标记为该类型”，不添加吉凶断语。三合、三会依据引擎组合表核对三个不同成员是否齐备；成员齐备不等于合化成立。</p><p>本页没有把这些说明标注为《渊海子平》原文或逐条古籍引文。若未来加入古籍解释，将另列书名、篇目/版本及原文依据，并与引擎规则说明分开。</p></div></div>';
   }
   function renderShensha() {
     const engine=window.BaziEngine||{};
