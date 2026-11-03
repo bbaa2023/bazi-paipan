@@ -438,6 +438,26 @@
     const cards=hits.map(hit=>'<div class="data-card shensha-card"><div class="luck-card-top"><h3><span class="relation-icon" aria-hidden="true">✧</span>'+safe(hit.cn||hit.key||'未命名神煞')+'</h3><span class="chip">'+safe(hit.where||'命中位置未返回')+'</span></div><p>查法提示：'+safe(hit.anchor||'按传统干支条件查取')+'</p><p class="muted">此处仅列出符合条件的神煞名称与所在柱位，不单独据此判定吉凶。</p></div>').join('');
     return '<h3 class="subhead">神煞扫描</h3><p class="muted">本页按传统神煞规则整理四柱中的相关标记。不同典籍与流派对部分神煞的起法和名称存在差异，结果仅供查询参考，不单独作为吉凶结论。</p><div class="shensha-summary"><span>四柱已扫描</span><strong>'+gz.filter(Boolean).length+' / 4</strong><span>命中规则</span><strong>'+hits.length+'</strong></div><div class="data-grid">'+(cards||'<div class="empty">当前四柱没有显示符合条件的神煞标记。</div>')+'</div>';
   }
+  function getBasicLuckTrend(p) {
+    const unknown = (lastBirth && lastBirth.unknownTime) || (lastFavorable && lastFavorable.unknownTime);
+    if (unknown) return {grade:'暂不判断',tone:'unknown',reason:'出生时辰未知，当前为三柱参考；免费版不提供趋势分级。'};
+    if (!p || !lastFavorable || !lastFavorable.score || !lastFavorable.fuYang) return {grade:'暂不判断',tone:'unknown',reason:'基础扶抑参考或大运五行资料不完整，暂不生成趋势提示。'};
+    const verdict=lastFavorable.score.verdict;
+    if (verdict!=='strong' && verdict!=='weak') return {grade:'暂不判断',tone:'unknown',reason:'现有简化扶抑参考未给出明确方向，暂不生成有利或谨慎等级。'};
+    const favorable=new Set((lastFavorable.fuYang.favorable||[]).map(x=>x&&x.element).filter(Boolean));
+    const unfavorable=new Set((lastFavorable.fuYang.unfavorable||[]).map(x=>x&&x.element).filter(Boolean));
+    const stemElement=p.element||elementFor[p.stem];
+    const branchElement=p.branchElement||elementFor[p.branch];
+    const valid=['木','火','土','金','水'];
+    if (!valid.includes(stemElement) || !valid.includes(branchElement)) return {grade:'暂不判断',tone:'unknown',reason:'大运天干或地支五行资料不完整，暂不生成趋势提示。'};
+    const direction=element=>{const isFav=favorable.has(element),isUnfav=unfavorable.has(element);if(isFav===isUnfav)return 'none';return isFav?'favorable':'cautious';};
+    const stemDirection=direction(stemElement),branchDirection=direction(branchElement);
+    const stemText='天干'+p.stem+'（'+stemElement+'）';
+    const branchText='地支'+p.branch+'（主气'+branchElement+'）';
+    if(stemDirection==='favorable'&&branchDirection==='favorable') return {grade:'基础偏有利',tone:'favorable',reason:stemText+'与'+branchText+'均对应简化扶抑参考的扶助方向。'};
+    if(stemDirection==='cautious'&&branchDirection==='cautious') return {grade:'基础偏谨慎',tone:'cautious',reason:stemText+'与'+branchText+'均对应简化扶抑参考的制泄方向。'};
+    return {grade:'因素交错',tone:'mixed',reason:stemText+'与'+branchText+'对应方向不一致，或只有一方有明确方向，因此不作单向判断。'};
+  }
   function renderLuck() {
     if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能计算大运。</div>';
     if (!lastLuck) return '<div class="empty">当前暂时无法显示大运资料，请重新排盘或稍后再试。</div>';
@@ -447,7 +467,9 @@
     const selectedLuck=getSelectedLuckPillar();
     const selector=renderTimelineSelectors({luck:true});
     const selectedLuckSummary=selectedLuck?'<div class="data-card selected-time-context"><h3>当前关系对照大运：第'+safe(selectedLuck.index)+'步 · '+safe(selectedLuck.ganzhi)+'</h3><p>时间范围：'+safe(selectedLuck.yearLabel||'年份未返回')+' · 虚岁 '+safe(selectedLuck.startAgeSui??'—')+'–'+safe(selectedLuck.endAgeSui??'—')+'</p><p>天干十神：'+safe(selectedLuck.stemTenGod&&selectedLuck.stemTenGod.god||'—')+'　地支十神：'+safe(selectedLuck.branchTenGod&&selectedLuck.branchTenGod.god||'—')+'</p><p>藏干：'+safe(Array.isArray(selectedLuck.hideGan)?selectedLuck.hideGan.join('、'):'—')+'　十二长生：'+safe(selectedLuck.stage||'—')+'</p><p class="muted">该大运将与本命及所选流年共同参与关系对照。</p></div>':'<div class="data-card selected-time-context"><h3>当前关系对照大运：未指定</h3><p class="muted">选择一部大运后，才会把它加入关系对照；本命和所选流年仍可单独参与。</p></div>';
-    const cards=items.map(p=>{const picked=!!selectedLuck&&Number(selectedLuck.index)===Number(p.index);return '<button type="button" class="luck-item timeline-pick '+(p.isCurrent?'current ':'')+(picked?'selected':'')+'" data-pick-luck-index="'+safe(p.index)+'" aria-pressed="'+String(picked)+'" aria-label="选择第'+safe(p.index)+'步大运 '+safe(p.ganzhi||'')+'"><div class="data-card"><h3><span class="relation-icon" aria-hidden="true">⌁</span>'+safe(p.ganzhi||'—')+(p.isCurrent?' · 当前':'')+(picked?' · 关系已选':'')+'</h3><p>第'+safe(p.index)+'步 · '+safe(p.yearLabel||'年份未知')+'</p><p>虚岁 '+safe(p.startAgeSui??'—')+'–'+safe(p.endAgeSui??'—')+'</p><p><span class="chip">天干 '+safe(p.stemTenGod&&p.stemTenGod.god||'—')+'</span></p><p><span class="chip">地支 '+safe(p.branchTenGod&&p.branchTenGod.god||'—')+'</span></p><p>藏干：'+safe(Array.isArray(p.hideGan)?p.hideGan.join('、'):'—')+'</p><p>十二长生：'+safe(p.stage||'—')+'</p></div></button>';}).join('');
+    const selectedTrend=selectedLuck?getBasicLuckTrend(selectedLuck):null;
+    const selectedTrendCard=selectedTrend?'<div class="data-card luck-trend-card"><div class="luck-trend-heading"><h3>基础大运趋势</h3><span class="luck-trend-label '+selectedTrend.tone+'">'+safe(selectedTrend.grade)+'</span></div><p>'+safe(selectedTrend.reason)+'</p><p class="muted">仅依据本站简化扶抑参考与大运天干、地支主气五行生成；不包含月令、格局、调候、通关及刑冲合会的综合分析。</p></div>':'';
+    const cards=items.map(p=>{const picked=!!selectedLuck&&Number(selectedLuck.index)===Number(p.index);const trend=getBasicLuckTrend(p);const trendChip='<span class="luck-trend-mini '+trend.tone+'">'+safe(trend.grade)+'</span>';return '<button type="button" class="luck-item timeline-pick '+(p.isCurrent?'current ':'')+(picked?'selected':'')+'" data-pick-luck-index="'+safe(p.index)+'" aria-pressed="'+String(picked)+'" aria-label="选择第'+safe(p.index)+'步大运 '+safe(p.ganzhi||'')+'"><div class="data-card"><h3><span class="relation-icon" aria-hidden="true">⌁</span>'+safe(p.ganzhi||'—')+(p.isCurrent?' · 当前':'')+(picked?' · 关系已选':'')+'</h3><p class="luck-trend-mini-line">'+trendChip+'</p><p>第'+safe(p.index)+'步 · '+safe(p.yearLabel||'年份未知')+'</p><p>虚岁 '+safe(p.startAgeSui??'—')+'–'+safe(p.endAgeSui??'—')+'</p><p><span class="chip">天干 '+safe(p.stemTenGod&&p.stemTenGod.god||'—')+'</span></p><p><span class="chip">地支 '+safe(p.branchTenGod&&p.branchTenGod.god||'—')+'</span></p><p>藏干：'+safe(Array.isArray(p.hideGan)?p.hideGan.join('、'):'—')+'</p><p>十二长生：'+safe(p.stage||'—')+'</p></div></button>';}).join('');
     const unknown=lastBirth.unknownTime&&lastLuck.unknownTime;
     let unknownNote='';
     if(unknown){
@@ -456,7 +478,7 @@
       unknownNote='<div class="data-card"><h3>未知时辰：起运范围提示</h3><p>上方起运日期与年龄按中午参考时刻计算，不应视为精确结果。</p><p>按当天时辰范围估算：较早端约 '+fmt(lo)+'；较晚端约 '+fmt(hi)+'。</p><p>节气是否跨界：'+(unknown.jieAmbiguous?'当天不同时间可能对应不同节气，年/月柱及起运依据需重点复核。':'当前扫描范围未发现前后节气名称变化，但起运时间仍可能随出生时刻变化。')+'</p><p class="muted">要缩小范围，请补充出生时辰；若出生时刻接近立春或节气交界，建议按准确时刻重新排盘。</p></div>';
     }
     const todayNote=lastLuck.today?'<p class="muted">当前大运判断日期：北京时间 '+safe(lastLuck.today)+'（按日期判断当前大运步，不使用当天具体时分）。</p>':'';
-    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">起运日期和年龄会因出生时间及采用的起运方法不同而有所差异。</p></div>'+unknownNote+'</div>'+todayNote+selector+selectedLuckSummary+'<h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="luck-timeline">'+(cards||'<div class="empty">暂时没有可显示的大运序列。</div>')+'</div>';
+    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">起运日期和年龄会因出生时间及采用的起运方法不同而有所差异。</p></div>'+unknownNote+'</div>'+todayNote+selector+selectedLuckSummary+selectedTrendCard+'<h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="luck-timeline">'+(cards||'<div class="empty">暂时没有可显示的大运序列。</div>')+'</div>';
   }
   function renderAnnual() {
     const engine=window.BaziEngine||{};
