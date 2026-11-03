@@ -777,66 +777,80 @@
 .tg-pos{grid-column:1/-1;color:#8a7657;font-size:11px}
 .tg-gan{color:#34455a;font-size:16px;font-weight:750}
 .tg-attr{color:#7a8490;font-size:10px;text-align:right}
+.tg-rel{grid-column:1/-1;color:#526071;font-size:11px;overflow-wrap:anywhere}
+@media(max-width:680px){.tg-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.tg-row{padding:5px 7px}}
 
-/* 工具集子页面（tools.html）：六类独立小工具 */
-.tools-tabs{display:flex;gap:8px;flex-wrap:wrap;overflow:auto;padding:8px 2px 12px;border-bottom:1px solid #dfd3bd;scrollbar-width:thin}
-.tools-tabs .tab{padding:9px 13px;border-radius:9px;font-size:14px}
-.tools-content{padding:18px 4px 6px;color:#29384b}
-.tools-intro{display:flex;align-items:flex-start;gap:14px;margin:14px 0 4px;padding:15px 17px;border:1px solid #e5d9c4;border-radius:12px;background:#fbf8f0}
-.tools-intro-icon{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;border:1px solid #d8c49b;border-radius:50%;background:#f3e7ce;color:#946b2d;font-size:20px}
-.tools-intro h3{margin:0;color:#2b3c51;font-size:17px}
-.tools-intro p{margin:4px 0 0}
-.tools-fieldset{margin:0 0 12px;padding:12px 14px;border:1px solid #e2d7c4;border-radius:11px}
-.tools-fieldset legend{color:#8d6528;font-size:13px;font-weight:750}
-.tools-person-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
-.tools-person-grid label{display:flex;flex-direction:column;gap:5px;color:#526071;font-size:12px;font-weight:650}
-.tools-person-grid input,.tools-person-grid select{appearance:none;-webkit-appearance:none;width:100%;min-width:0;height:40px;padding:0 11px;border:1px solid var(--gold);border-radius:9px;background:#fffdf8;color:var(--text);font-size:13px;outline:none}
+/* 吉凶简化归向：按《渊海子平》合冲刑害基础规则，仅作娱乐参考，延续宣纸金色体系 */
+.omen{font-weight:800;border-radius:999px;padding:3px 8px;line-height:1.5}
+.omen-good{background:#e6f1e7;color:#2c6b3f;border:1px solid #bfd9c4}
+.omen-flat{background:#f1ede4;color:#6a685e;border:1px solid #ddd5c2}
+.omen-bad{background:#fbe9e4;color:#a93a2b;border:1px solid #ecc4b8}
+.annual-omen{margin-top:8px}
+.omen-card{overflow:hidden;border-left:3px solid #b98b45}
+.omen-card h3{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 8px}
+.omen-card h3 strong{color:#805c22;font-size:17px}
+.omen-card.omen-good{border-left-color:#3f8a55}
+.omen-card.omen-flat{border-left-color:#b8a97e}
+.omen-card.omen-bad{border-left-color:#c0563f}
+.omen-card p{margin:5px 0;font-size:13px;line-height:1.75}
+.footer-entertainment{font-size:11px;color:#8a8577;text-align:center;letter-spacing:.02em}
+@media(max-width:680px){.omen-card h3 strong{font-size:15px}.omen-card p{font-size:12px}}
+
+/* ============ 八字工具集页面（tools.html）============ */
+.tools-tabs{margin-top:4px}
+.tools-content{min-height:120px;padding:18px 2px;color:#29384b}
+.tools-intro{display:flex;align-items:flex-start;gap:13px;margin-bottom:16px;padding:15px 17px;border:1px solid #e1d0ac;border-radius:13px;background:#f7f0e2}
+.tools-intro-icon{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border:1px solid #c8a66b;border-radius:50%;background:#f3e7ce;color:#946b2d;font:19px serif}
+.tools-intro h3{margin:0;color:#2b3c51;font:600 18px "Noto Serif SC","Songti SC",serif}
+.tools-intro p{margin:6px 0 0;font-size:12px;line-height:1.7}
+.tools-fieldset{border:1px solid #e2d7c4;border-radius:12px;margin:0 0 14px;padding:12px 14px;background:#fffdf8}
+.tools-fieldset legend{padding:0 8px;color:#805c22;font-size:12px;font-weight:750}
+.tools-person-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tools-person-grid label{display:flex;flex-direction:column;gap:6px;min-width:0;color:#526071;font-size:12px;font-weight:650}
+.tools-person-grid input,.tools-person-grid select{appearance:none;-webkit-appearance:none;width:100%;min-width:0;height:42px;padding:0 11px;border:1px solid var(--gold);border-radius:10px;background-color:#fffdf8;color:var(--text);font-size:13px;outline:none}
+.tools-person-grid select{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23b98b45' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center}
 .tools-person-grid input:focus,.tools-person-grid select:focus{border-color:#a9782e;box-shadow:0 0 0 3px #b98b452b}
-.tools-submit-row{margin-top:6px;text-align:right}
-.tools-result{margin-top:14px}
-.tools-summary{margin:10px 0 12px;padding:13px 15px;border:1px solid #e5d9c4;border-radius:11px;background:#fffdf8}
-.tools-summary h3{margin:0 0 8px;color:#735b32;font-size:16px}
-.tools-summary p{margin:5px 0;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
-.tools-table-wrap{overflow-x:auto;margin:6px 0 14px}
-.tools-table{width:100%;min-width:520px;border-collapse:collapse;font-size:13px}
-.tools-table th,.tools-table td{padding:8px 10px;border:1px solid #e6dac4;text-align:left}
-.tools-table th{background:#f5ead5;color:#735b32;font-weight:750}
-.tools-table td small{display:block;color:#8a8274;font-size:10px}
-.tools-subhead{margin:16px 0 8px;color:#2b3c51;font:600 17px "Noto Serif SC","Songti SC",serif}
+.tools-name-input input{font-size:15px}
+.tools-submit-row{margin:4px 0 6px}
+.tools-result{display:flex;flex-direction:column;gap:14px}
+.tools-summary{padding:14px 16px;border:1px solid #e2d7c4;border-radius:12px;background:#fffdf8}
+.tools-summary h3{margin:0 0 8px;color:#34455a;font-size:14px}
+.tools-summary p{margin:6px 0;font-size:13px;line-height:1.75;overflow-wrap:anywhere}
+.tools-subhead{margin:4px 0 8px;color:#2b3c51;font:600 16px "Noto Serif SC","Songti SC",serif}
+.tools-table-wrap{overflow-x:auto;border:1px solid #e2d7c4;border-radius:12px;background:#fffdf8}
+.tools-table{width:100%;border-collapse:collapse;font-size:12px}
+.tools-table th,.tools-table td{padding:8px 10px;border-bottom:1px solid #eee3d0;text-align:left;vertical-align:top}
+.tools-table th{background:#f8f2e6;color:#805c22;font-weight:750;white-space:nowrap}
+.tools-table tr:last-child td{border-bottom:0}
+.tools-table small{color:#8a8577;font-size:10px}
+.tools-table .muted{color:#8a8577;font-size:11px}
 .hex-head{display:flex;align-items:center;gap:16px}
-.hex-glyph-big{display:grid;place-items:center;flex:0 0 74px;width:74px;height:74px;border:1px solid #cdb789;border-radius:12px;background:#f7efdd;color:#8c6429;font-size:48px}
-.hex-lines{display:flex;flex-direction:column;gap:4px;margin:6px 0 14px}
-.hex-line{display:flex;align-items:center;gap:10px}
-.hex-line i{display:block;width:56px;height:10px;border-radius:2px;background:#c49a51}
-.hex-line.yin i{background:#f3d9a6}
-.hex-line span{color:#8a8274;font-size:11px}
-.najia-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin:6px 0 12px}
-.najia-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:1px solid #e5d9c4;border-radius:9px;background:#fffdf8}
-.najia-item span{color:#8a7657;font-size:10px}
+.hex-glyph-big{font-size:64px;line-height:1;color:#946b2d;text-shadow:0 2px 6px #b98b4530}
+.hex-lines{display:flex;flex-direction:column;gap:5px;max-width:260px}
+.hex-line{display:flex;align-items:center;gap:10px;color:#526071;font-size:11px}
+.hex-line i{display:block;width:150px;height:12px;background:#946b2d;border-radius:3px}
+.hex-line.yin i{background:#fff;border:2px solid #946b2d;height:8px;border-radius:3px}
+.najia-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.najia-item{display:flex;flex-direction:column;gap:3px;padding:8px 10px;border:1px solid #e2d7c4;border-radius:9px;background:#fffdf8;font-size:12px}
 .najia-item b{color:#34455a;font-size:15px}
-.najia-item em{font-style:normal;color:#8d6528;font-size:11px}
-.wedding-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:8px}
-.wedding-day .weekday{color:#8a8274;font-size:11px;font-weight:600}
-.wedding-signals{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.kua-dir .luck-card-top{align-items:flex-start}
-.tools-name-input input{height:42px;font-size:14px}
+.najia-item em{font-style:normal;color:#946b2d;font-size:11px}
+.wedding-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.wedding-day .weekday{color:#8a8577;font-size:11px;font-weight:600}
+.wedding-signals{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.kua-dir h3{font-size:13px}
 @media(max-width:680px){
- .tools-tabs .tab{padding:8px 10px;font-size:12px}
- .tools-intro{gap:10px;padding:12px}
- .tools-intro-icon{width:34px;height:34px;flex-basis:34px;font-size:17px}
- .tools-person-grid{grid-template-columns:1fr;gap:9px}
- .tools-submit-row{text-align:left}
- .tools-summary{padding:11px}
- .tools-table{min-width:440px}
- .hex-head{flex-direction:column;align-items:flex-start;gap:8px}
- .hex-glyph-big{width:60px;height:60px;flex-basis:60px;font-size:40px}
- .najia-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
- .wedding-grid{grid-template-columns:1fr}
+ .tools-content{padding:14px 1px}
+ .tools-intro{padding:12px;gap:10px}
+ .tools-intro-icon{width:32px;height:32px;flex-basis:32px;font-size:16px}
+ .tools-intro h3{font-size:16px}
+ .tools-intro p{font-size:11px}
+ .tools-person-grid{grid-template-columns:1fr;gap:10px}
+ .tools-fieldset{padding:10px;margin-bottom:12px}
+ .tools-summary{padding:11px 12px}
+ .tools-summary p{font-size:12px}
+ .tools-table{font-size:11px}
+ .tools-table th,.tools-table td{padding:6px 8px}
+ .wedding-grid{grid-template-columns:1fr;gap:8px}
+ .hex-glyph-big{font-size:50px}
+ .hex-line i{width:110px}
 }
-
-/* 工具页吉凶归向 chip：与主站 omen 体系一致 */
-.omen{font-size:11px;font-weight:800}
-.omen-good{background:#e6f2e9;border-color:#bfdec6;color:#2f7a4a}
-.omen-flat{background:#f2efdf;border-color:#ddd2b2;color:#7a6a2f}
-.omen-bad{background:#fbe9e6;border-color:#edc0b8;color:#b74436}
-.footer-entertainment{font-size:11px;color:#8b8578;line-height:1.7}
