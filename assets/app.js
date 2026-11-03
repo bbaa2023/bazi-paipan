@@ -365,25 +365,25 @@
       try{if(typeof engine.branchRelations==='function')br=engine.branchRelations(a.gz[1],b.gz[1])||[];}catch(_){}
       const describeRelation=(x,layer)=>{
         const type=String(x.type||'');
-        const element=x.element?'；引擎对应五行：'+x.element:'';
-        const kind=x.kind?'；引擎细分类型：'+x.kind:'';
+        const element=x.element?'；对应五行：'+x.element:'';
+        const kind=x.kind?'；细分类型：'+x.kind:'';
         const descriptions={
-          '天干五合':'引擎天干五合规则表将这两个天干列为配对关系'+element+'。这只表示五合规则命中，不代表已经合化。',
-          '天干相冲':'引擎天干相冲规则表将这两个天干列为相冲配对。这里只记录规则命中，不推断事件或吉凶。',
-          '六合':'引擎地支六合规则表将这两个地支列为配对关系'+element+'。这里只表示六合规则命中，不代表已经合化。',
-          '六冲':'引擎地支六冲规则表将这两个地支列为相冲配对。这里只记录规则命中，不单独推断吉凶。',
-          '六害':'引擎地支六害规则表将这两个地支列为相害配对。这里只记录规则命中，不单独推断吉凶。',
-          '相刑':'引擎刑组规则表将这两个地支归入同一刑组'+kind+'。这里只说明规则归组，不扩展为现实事件判断。',
-          '自刑':'引擎自刑规则表收录该地支；此项表示同一地支触发自刑规则，不单独推断吉凶。',
-          '半三合':'引擎三合组中同时包含这两个不同地支，故标记为半三合'+element+'。引擎注记该规则存在争议；不等于三支齐全或合化成立。'
+          '天干五合':'传统天干五合规则将这两个天干列为配对关系'+element+'。这只表示五合规则命中，不代表已经合化。',
+          '天干相冲':'传统天干相冲规则将这两个天干列为相冲配对。这里只记录规则命中，不推断事件或吉凶。',
+          '六合':'传统地支六合规则将这两个地支列为配对关系'+element+'。这里只表示六合规则命中，不代表已经合化。',
+          '六冲':'传统地支六冲规则将这两个地支列为相冲配对。这里只记录规则命中，不单独推断吉凶。',
+          '六害':'传统地支六害规则将这两个地支列为相害配对。这里只记录规则命中，不单独推断吉凶。',
+          '相刑':'传统相刑分类将这两个地支归入同一刑组'+kind+'。这里只说明规则归组，不扩展为现实事件判断。',
+          '自刑':'传统自刑规则包含该地支；此项表示同一地支触发自刑规则，不单独推断吉凶。',
+          '半三合':'按传统三合分类，这两个不同地支同属一组三合，故标记为半三合'+element+'。引擎注记该规则存在争议；不等于三支齐全或合化成立。'
         };
         const punishmentNameNote=type==='相刑'&&['恃势之刑','无恩之刑'].includes(x.kind)
-          ?' 刑名提示：本站引擎规则表注明，寅巳申与丑戌未两组在不同流派中存在名称互换；此处按引擎当前 kind 展示，具体分组以实际成员为准。'
+          ?' 刑名提示：部分典籍与流派对寅巳申、丑戌未两组刑名存在互换说法；本站按所采用的规则名称展示，具体分组以实际成员为准。'
           :'';
         const source=layer==='天干'
-          ?'规则依据：vendor/bazi-engine.web.js · stemRelation()（STEM_COMBINE / STEM_CLASH）。'
-          :'规则依据：vendor/bazi-engine.web.js · branchRelations()（地支六合、六冲、六害、刑组、自刑及半三合规则表）。';
-        return {label:layer+' '+type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:''),description:(descriptions[type]||'引擎返回该关系类型；当前没有更细的可核验解释，因此仅展示规则名称。')+punishmentNameNote,source};
+          ?'规则说明：按传统天干关系分类整理。'
+          :'规则说明：按传统地支关系分类整理；部分刑名与半合条件存在流派差异。';
+        return {label:layer+' '+type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:''),description:(descriptions[type]||'本站识别到该关系类别；目前仅展示名称，不延伸解释或吉凶判断。')+punishmentNameNote,source};
       };
       const items=sr.map(x=>describeRelation(x,'天干')).concat(br.map(x=>describeRelation(x,'地支')));
       const bucket=bucketFor(a,b);
@@ -404,7 +404,7 @@
           const found=branches.filter(x=>x.branch===branch);
           return '<div class="relation-group-member"><strong>'+safe(branch)+'</strong>'+found.map(x=>locateButton(x.participant)).join('')+'</div>';
         });
-        groupCards.push('<div class="data-card relation-group-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合成员：'+safe(members.join('、'))+'</p><div class="relation-group-members">'+sources.join('')+'</div><p class="muted">三个不同成员均在本命、所选大运或所选流年实际出现；这里只提示组合成员齐备，不判断合化或吉凶。</p><small class="relation-evidence">规则依据：本站本地引擎 '+(name==='三合'?'BRANCH_TRINE':'BRANCH_MEETING')+' 规则表；'+(g.element?'对应五行 '+safe(g.element)+'。':'')+(g.dirCn?'方位 '+safe(g.dirCn)+'。':'')+'这属于引擎规则资料，不是《渊海子平》原文引述。</small></div>');
+        groupCards.push('<div class="data-card relation-group-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合成员：'+safe(members.join('、'))+'</p><div class="relation-group-members">'+sources.join('')+'</div><p class="muted">三个不同成员均在本命、所选大运或所选流年实际出现；这里只提示组合成员齐备，不判断合化或吉凶。</p><small class="relation-evidence">规则说明：本站按传统三合、三会组合分类识别；'+(g.element?'对应五行 '+safe(g.element)+'。':'')+(g.dirCn?'方位 '+safe(g.dirCn)+'。':'')+'此处说明的是组合成员是否齐备，不作为古籍原文或合化结论。</small></div>');
       });
     });
     const layerStatus=[
@@ -595,7 +595,7 @@
   function compute(event) {
     event.preventDefault(); hideError();
     if (!window.BaziEngine || typeof window.BaziEngine.computeBazi !== 'function') {
-      showError('本地排盘引擎未加载。请确认 vendor/bazi-engine.web.js 已部署在本站，并刷新页面。此页面不会调用第三方 API 作为替代。'); return;
+      showError('排盘功能暂时无法启动，请刷新页面后重试；如果仍无法使用，请联系维护者。'); return;
     }
     const fd=new FormData(form);
     const year=Number(fd.get('year')),month=Number(fd.get('month')),day=Number(fd.get('day'));
@@ -646,6 +646,6 @@
   form.addEventListener('submit',compute);
   document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{activeTab=b.dataset.tab;renderTab();}));
   if (!window.BaziEngine) {
-    window.addEventListener('load',()=>{if(!window.BaziEngine)showError('本地排盘引擎没有加载。请先确认 vendor/bazi-engine.web.js 已存在。');});
+    window.addEventListener('load',()=>{if(!window.BaziEngine)showError('排盘功能暂时无法启动，请刷新页面后重试；如果仍无法使用，请联系维护者。');});
   }
 })();
