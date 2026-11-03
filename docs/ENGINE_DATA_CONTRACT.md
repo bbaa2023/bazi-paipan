@@ -257,7 +257,7 @@
 | 干支关系 renderRelations | 只收集存在 ganzhi 的柱 | 正确 |
 | 流年 renderAnnual | 只收集存在 ganzhi 的本命柱 | 正确 |
 | 神煞总览 renderShensha | 时柱位置传空字符串，命中位置不应出现时支 | 输入槽位正确，需用回归用例确认全部规则 |
-| 大运 computeLuckPillars | 仍生成大运结果，同时另给 unknownTime.low/high 两套边界估算；中午是参考锚点 | 页面必须明确区分参考值与确定值，不能只展示一个看似精确的起运时间 |
+| 大运 computeLuckPillars | 仍生成大运结果，同时另给 unknownTime.low/high 两套边界估算；中午是参考锚点 | 页面当前已说明上方起运按中午参考时刻，并展示 low/high 的 traditional 范围；仍需真实浏览器验收说明是否清晰可见 |
 
 补充：未知时辰的 computeLuckPillars 会以中午参考锚点构造大运序列，并额外返回当天起止窗口的 low/high 估算；若当天跨节气，jieAmbiguous 会提示边界歧义。它不是“未知时辰就完全不能算大运”，也不是“中午就是用户真实出生时刻”。
 
