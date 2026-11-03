@@ -454,8 +454,8 @@
     const stemDirection=direction(stemElement),branchDirection=direction(branchElement);
     const stemText='天干'+p.stem+'（'+stemElement+'）';
     const branchText='地支'+p.branch+'（主气'+branchElement+'）';
-    if(stemDirection==='favorable'&&branchDirection==='favorable') return {grade:'基础偏有利',tone:'favorable',reason:stemText+'与'+branchText+'均对应简化扶抑参考的扶助方向。'};
-    if(stemDirection==='cautious'&&branchDirection==='cautious') return {grade:'基础偏谨慎',tone:'cautious',reason:stemText+'与'+branchText+'均对应简化扶抑参考的制泄方向。'};
+    if(stemDirection==='favorable'&&branchDirection==='favorable') return {grade:'基础偏有利',tone:'favorable',reason:stemText+'与'+branchText+'均对应简化扶抑参考列出的有利五行方向。'};
+    if(stemDirection==='cautious'&&branchDirection==='cautious') return {grade:'基础偏谨慎',tone:'cautious',reason:stemText+'与'+branchText+'均对应简化扶抑参考列出的相对不利五行方向。'};
     return {grade:'因素交错',tone:'mixed',reason:stemText+'与'+branchText+'对应方向不一致，或只有一方有明确方向，因此不作单向判断。'};
   }
   function renderLuck() {
