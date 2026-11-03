@@ -657,3 +657,20 @@
 .selected-time-context{margin:12px 0 16px;border-left:3px solid #a8874e;background:#fbf8f0}
 .selected-time-context h3{margin-top:0;color:#735b32}
 .selected-time-context p{margin:7px 0;line-height:1.65}
+
+
+/* P2 第三批：大运/流年卡片可直接选择，保持原有金色卡片视觉 */
+.timeline-pick{appearance:none;-webkit-appearance:none;display:block;width:100%;min-width:0;margin:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.timeline-pick:focus-visible{outline:3px solid #a8874e;outline-offset:3px;border-radius:13px}
+.luck-item.timeline-pick .data-card{transition:border-color .18s ease,background .18s ease,box-shadow .18s ease}
+.luck-item.timeline-pick:hover .data-card{border-color:#b79559;background:#fbf6ea}
+.luck-item.timeline-pick.selected .data-card{border-color:#a8874e;background:#f3e8d1;box-shadow:inset 0 0 0 1px #a8874e,0 3px 12px #6c5a3b12}
+.annual-card.timeline-pick{position:relative;display:block;height:100%;transition:border-color .18s ease,background .18s ease,box-shadow .18s ease}
+.annual-card.timeline-pick:hover{border-color:#b79559;background:#fbf6ea}
+.annual-card.timeline-pick.annual-selected{outline:2px solid #a8874e;outline-offset:1px;background:#f3e8d1;box-shadow:inset 0 0 0 1px #a8874e}
+.annual-card.timeline-pick .luck-card-top,.annual-card.timeline-pick .annual-meta,.annual-card.timeline-pick .annual-relations{display:flex;text-align:left}
+.annual-card.timeline-pick .annual-meta{display:grid}
+.annual-card.timeline-pick .annual-relations{flex-wrap:wrap}
+.annual-relations-label{flex-basis:100%;color:var(--muted);font-size:12px}
+@media(max-width:680px){.timeline-pick{min-height:44px}.luck-item.timeline-pick .data-card{height:100%}}
+@media(prefers-reduced-motion:reduce){.timeline-pick,.timeline-pick .data-card{transition:none}}
