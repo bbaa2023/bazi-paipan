@@ -238,8 +238,7 @@
       ],
       note:'本分类已先整理天乙贵人、咸池桃花与驿马、将星与华盖、劫煞与亡神的查法。其他神煞仍需逐项核对起法、参照柱位和版本差异后再补充。',
       sources:[['《渊海子平》目录中的贵人、禄、驿马、华盖等相关篇目','https://nkg.best/knowledge/classics/yuan-hai-zi-ping']]
-    }
-
+    },
     'shensha-lushen': {
       title:'禄神',category:'shensha',categoryName:'神煞资料',summary:'禄神按天干对应的临官禄位查取，本站以日干为参照检查四柱地支。',
       sections:[
