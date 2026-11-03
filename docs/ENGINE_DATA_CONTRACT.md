@@ -548,3 +548,24 @@ P1 第一批应接入：
 - tenGodPillarProfile 是十神与柱位映射表，不是用户命盘当前十神结果。
 - kongWangOfDayGz 的 voids 是日柱旬空地支；必须与命盘柱支比对后才形成哪柱遇旬空的展示结果。
 - yearMonthPillars 返回节月资料，不含精确节气时刻；不能单独用于精确日期范围筛选。
+
+
+## 14. 流年查询时刻与北京时间口径（2026-11-03）
+
+### 已核实的引擎接口
+
+- `lichunOf(year)`：输入公历年份，返回该年立春的 `year/month/day/hour/minute/text/dateText`；数据表范围外返回 `null`。时间按北京时间解释。
+- `yearGanzhiIndex(year)` / `yearGanzhi(year)`：只按公历年份映射六十甲子，不判断具体时刻是否已过立春。
+- `zodiacIndexFromDateTime(year, month, day, hour, minute)`：输入年月日时分，按该年立春时刻判断属于上一年还是本年，返回地支索引；无时区参数，缺省时分为 12:00。比较精度到分钟，不能承诺秒级切换。
+- `yearMonthPillars(year)`：返回十二节月资料，每项含 `ordinal/month/ganzhi/stem/branch/stemIndex/branchIndex/jie/jieEn`；不包含十二个交节的精确时刻。
+- `yearProfile(year)`：输入公历年份，返回该年份干支资料、`lichun/nextLichun`、太岁关系以及 `months`（即十二节月资料）。它不会自行判断某个查询时刻的当前干支年。
+
+### 页面调用约束
+
+1. 页面先把实际查询瞬间转换为 `Asia/Shanghai` 的年月日时分，再调用 `zodiacIndexFromDateTime`；不得把浏览器本地墙上时间原样传入。
+2. 当前干支年以北京时间与 `lichunOf(北京时间年份)` 的年月日时分比较：立春前归上一干支年，立春当分钟及之后归本年。
+3. 用 `yearProfile(当前干支年)` 作为当前年资料，再顺序展示后续年份；不能从公历当前年份直接起列。
+4. `yearMonthPillars/yearProfile.months` 只展示十二节月干支与节令名称；没有交节时刻，不得标记当前节月或用它判断任意日期所属节月。
+5. 页面应展示本次采用的北京时间查询时刻，且将流年直接关系说明为规则对照，不扩写成完整吉凶结论。
+6. 引擎立春表只精确到分钟；若页面交叉核对失败或立春数据缺失，应停止标记当前流年并显示说明，不得猜测。
+
