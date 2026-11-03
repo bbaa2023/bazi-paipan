@@ -353,7 +353,7 @@
         cards.push('<div class="data-card relation-result"><div class="relation-result-heading"><span class="relation-icon" aria-hidden="true">⟷</span><strong>命中关系</strong></div><div class="relation-participants">'+locateButton(a)+'<span class="relation-connector">与</span>'+locateButton(b)+'</div><div class="relation-result-items">'+items.map(x=>'<span class="chip">'+safe(x)+'</span>').join('')+'</div></div>');
       }
     }
-    const locateButton=p=>{let attrs='';if(p.id.startsWith('natal-'))attrs=' data-locate-kind="natal" data-locate-key="'+safe(p.key)+'"';else if(p.id==='luck-selected')attrs=' data-locate-kind="luck" data-locate-value="'+safe(p.index)+'"';else if(p.id==='annual-selected')attrs=' data-locate-kind="annual" data-locate-value="'+safe(p.year)+'"';return '<button type="button" class="relation-locator"'+attrs+'>'+safe(p.layer)+' · '+safe(p.label)+' '+safe(p.gz)+'<span aria-hidden="true"> ↗</span></button>';};
+    function locateButton(p){let attrs='';if(p.id.startsWith('natal-'))attrs=' data-locate-kind="natal" data-locate-key="'+safe(p.key)+'"';else if(p.id==='luck-selected')attrs=' data-locate-kind="luck" data-locate-value="'+safe(p.index)+'"';else if(p.id==='annual-selected')attrs=' data-locate-kind="annual" data-locate-value="'+safe(p.year)+'"';return '<button type="button" class="relation-locator"'+attrs+'>'+safe(p.layer)+' · '+safe(p.label)+' '+safe(p.gz)+'<span aria-hidden="true"> ↗</span></button>';}
     const branches=participants.map(p=>({branch:p.gz[1],participant:p}));
     const groupCards=[];
     [['三合',engine.BRANCH_TRINE],['三会',engine.BRANCH_MEETING]].forEach(([name,defs])=>{
