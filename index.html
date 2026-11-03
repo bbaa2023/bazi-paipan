@@ -6,11 +6,11 @@
   <meta name="theme-color" content="#f3f0e8">
   <meta name="description" content="传统四柱八字排盘工具：浏览器本地计算，出生信息不发送到第三方服务。">
   <title>八字排盘｜金镇安·古法修炼研修室</title>
-  <link rel="stylesheet" href="./assets/style.css?v=20261103n">
+  <link rel="stylesheet" href="./assets/style.css?v=20261103p">
   <script defer src="https://k18.mom/script.js" data-website-id="0f61d2b9-f6a5-48ca-97be-4540844a474d"></script>
   <script defer src="./vendor/lunar.js?v=20261024e"></script>
   <script defer src="./vendor/bazi-engine.web.js?v=20261024e"></script>
-  <script defer src="./assets/app.js?v=20261103s"></script>
+  <script defer src="./assets/app.js?v=20261103u"></script>
 </head>
 <body>
   <header class="topbar">
@@ -41,7 +41,7 @@
       <div id="error" class="notice error" role="alert" hidden></div>
     </section>
     <section id="results" class="results" hidden>
-      <div class="section-heading result-title"><div><span class="kicker">命盘总览</span><h2>本命四柱</h2></div><div class="result-actions"><span id="day-master" class="day-master"></span><button id="presentation-toggle" class="presentation-toggle" type="button" aria-pressed="false" hidden>直播展示模式</button></div></div>
+      <div class="section-heading result-title"><div><span class="kicker">命盘总览</span><h2>本命四柱</h2></div><div class="result-actions"><span id="day-master" class="day-master"></span></div></div>
       <!-- [布局规范 1/6] 左侧本命与五行主面板，右侧大运/流年摘要；详情仍由现有标签模块渲染 -->
       <div class="results-layout">
         <div class="results-primary">
@@ -60,7 +60,8 @@
             <button class="tab" data-tab="annual" role="tab">流年详情</button>
              <button class="tab" data-tab="twelve" role="tab">十二长生</button>
           </div>
-          <div id="tab-guide" class="tab-guide" hidden></div>\n          <div id="tab-content" class="tab-content" aria-live="polite"></div>
+          <div id="tab-guide" class="tab-guide" hidden></div>
+          <div id="tab-content" class="tab-content" aria-live="polite"></div>
           
         </div>
       </div>
