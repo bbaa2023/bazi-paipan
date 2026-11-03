@@ -70,35 +70,18 @@
 
 知识库作为现有静态站点中的独立页面区域，首期不引入后端、数据库、框架或 Docker。
 
-建议结构：
+首期实际采用轻量静态结构：
 
 ```text
 guide/
-├── index.html
-├── assets/
-│   ├── guide.css
-│   └── guide.js
-├── basics/
-│   └── index.html
-├── stems-branches/
-│   └── index.html
-├── ten-gods/
-│   └── index.html
-├── hidden-stems/
-│   └── index.html
-├── twelve-stages/
-│   └── index.html
-├── relations/
-│   └── index.html
-├── luck/
-│   └── index.html
-├── shensha/
-│   └── index.html
-└── rules/
-    └── index.html
+├── index.html                 # 知识库首页与分类搜索
+├── category.html              # 分类页模板，通过 ?topic= 分类 ID 读取目录
+└── assets/
+    ├── guide.css              # 独立样式
+    └── guide.js               # 分类目录、搜索与页面渲染
 ```
 
-后续文章数量增加时，再按主题拆分独立文章页面。第一版优先建立可浏览的首页、分类入口和文章模板，不预先创建大量空文章。
+这种方式先减少重复页面和维护成本。后续文章数量、SEO 和独立收录需求明确后，再将重要分类与文章拆成独立目录/HTML 页面；不为了形式提前创建大量空文件。
 
 主排盘页面通过顶栏“知识库”入口进入 `./guide/`。知识库页面提供“返回排盘”入口。文章内的排盘关联链接应指向真实存在的排盘功能或页面锚点；当前排盘结果依赖用户本地输入，知识库不读取、不上传用户出生资料。
 
