@@ -24,7 +24,7 @@
     const engine=window.BaziEngine||{};
     const now=getBeijingNow();
     if(!now) return {year:null,profile:null,now:null,error:'无法取得北京时间'};
-    if(typeof engine.lichunOf!=='function'||typeof engine.yearProfile!=='function') return {year:null,profile:null,now,error:'本地引擎缺少流年接口'};
+    if(typeof engine.lichunOf!=='function'||typeof engine.yearProfile!=='function') return {year:null,profile:null,now,error:'当前流年资料暂不可用'};
     try{
       const lichun=engine.lichunOf(now.year);
       if(!lichun) throw new Error('缺少当前年份立春资料');
@@ -36,7 +36,7 @@
       if(typeof engine.zodiacIndexFromDateTime==='function'&&Array.isArray(engine.BRANCHES)){
         const bi=engine.zodiacIndexFromDateTime(now.year,now.month,now.day,now.hour,now.minute);
         const expected=typeof engine.yearGanzhi==='function'?engine.yearGanzhi(year).charAt(1):'';
-        if(bi==null||!expected||engine.BRANCHES[bi]!==expected) throw new Error('流年接口交叉核对不一致');
+        if(bi==null||!expected||engine.BRANCHES[bi]!==expected) throw new Error('当前流年资料校验未通过');
       }
       const profile=engine.yearProfile(year);
       if(!profile||!profile.ganzhi) throw new Error('引擎未返回当前流年干支');
@@ -435,7 +435,7 @@
     let hits=[];
     try { hits=engine.shenshaScan(gz)||[]; } catch(e) { console.warn('神煞扫描失败：',e); }
     if(!Array.isArray(hits)) hits=[];
-    const cards=hits.map(hit=>'<div class="data-card shensha-card"><div class="luck-card-top"><h3><span class="relation-icon" aria-hidden="true">✧</span>'+safe(hit.cn||hit.key||'未命名神煞')+'</h3><span class="chip">'+safe(hit.where||'命中位置未返回')+'</span></div><p>查法提示：'+safe(hit.anchor||'按传统干支条件查取')+'</p><p class="muted">此处仅记录本地引擎识别到的规则与落点，不单独据此判定吉凶。</p></div>').join('');
+    const cards=hits.map(hit=>'<div class="data-card shensha-card"><div class="luck-card-top"><h3><span class="relation-icon" aria-hidden="true">✧</span>'+safe(hit.cn||hit.key||'未命名神煞')+'</h3><span class="chip">'+safe(hit.where||'命中位置未返回')+'</span></div><p>查法提示：'+safe(hit.anchor||'按传统干支条件查取')+'</p><p class="muted">此处仅列出符合条件的神煞名称与所在柱位，不单独据此判定吉凶。</p></div>').join('');
     return '<h3 class="subhead">神煞扫描</h3><p class="muted">本页按传统神煞规则整理四柱中的相关标记。不同典籍与流派对部分神煞的起法和名称存在差异，结果仅供查询参考，不单独作为吉凶结论。</p><div class="shensha-summary"><span>四柱已扫描</span><strong>'+gz.filter(Boolean).length+' / 4</strong><span>命中规则</span><strong>'+hits.length+'</strong></div><div class="data-grid">'+(cards||'<div class="empty">当前四柱没有显示符合条件的神煞标记。</div>')+'</div>';
   }
   function renderLuck() {
@@ -500,7 +500,7 @@
     const selectedAnnualSummary=selectedProfile?'<div class="data-card selected-time-context"><h3>当前关系对照流年：'+safe(selectedProfile.year)+' · '+safe(selectedProfile.ganzhi)+'</h3><p>天干十神：'+safe(selectedGod)+'　五行：'+safe(selectedProfile.stemElement)+' / '+safe(selectedProfile.branchElement)+'</p><p>纳音：'+safe(selectedProfile.nayin||'—')+'　生肖：'+safe(selectedProfile.zodiacCn||selectedProfile.branch||'—')+'</p><p>立春资料：'+safe(selectedProfile.lichun&&selectedProfile.lichun.text||'未返回')+'</p><p class="muted">该流年将与本命及所选大运共同参与关系对照。</p></div>':'<div class="data-card selected-time-context"><h3>所选流年资料暂不可用</h3><p class="muted">该年份的资料暂不完整，因此暂不加入关系对照。</p></div>';
     const timeText=beijingNow.year+'-'+String(beijingNow.month).padStart(2,'0')+'-'+String(beijingNow.day).padStart(2,'0')+' '+String(beijingNow.hour).padStart(2,'0')+':'+String(beijingNow.minute).padStart(2,'0');
     const annualSelector=renderTimelineSelectors({annual:true,annualYears:Array.from({length:6},(_,i)=>currentYear+i)});
-    return '<h3 class="subhead">当前流年与未来五年</h3>'+annualSelector+selectedAnnualSummary+'<p class="muted">查询时刻：北京时间 '+safe(timeText)+'。当前干支年按本地引擎立春表判断；立春前仍归上一干支年。当前流年起点：'+safe(currentYear)+' 年。流年天干十神以本命日主为参照；关系区域仅列出本命与流年之间符合条件的干支关系，不代表完整吉凶结论。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">暂时没有可显示的流年资料。</div>')+'</div>'+(monthRows.length?'<h3 class="subhead" style="margin-top:20px">所选流年 '+safe(activeYear)+' 的十二节月资料</h3><p class="muted">以下为所选流年的节月干支与节令名称。当前资料未提供十二个交节的精确时刻，因此不标记当前节月，也不把节月序号当作公历月份边界。</p><div class="annual-month-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'+monthRows.join('')+'</div>':'');
+    return '<h3 class="subhead">当前流年与未来五年</h3>'+annualSelector+selectedAnnualSummary+'<p class="muted">查询时刻：北京时间 '+safe(timeText)+'。当前干支年按立春时间判断；立春前仍归上一干支年。当前流年起点：'+safe(currentYear)+' 年。流年天干十神以本命日主为参照；关系区域仅列出本命与流年之间符合条件的干支关系，不代表完整吉凶结论。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">暂时没有可显示的流年资料。</div>')+'</div>'+(monthRows.length?'<h3 class="subhead" style="margin-top:20px">所选流年 '+safe(activeYear)+' 的十二节月资料</h3><p class="muted">以下为所选流年的节月干支与节令名称。当前资料未提供十二个交节的精确时刻，因此不标记当前节月，也不把节月序号当作公历月份边界。</p><div class="annual-month-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'+monthRows.join('')+'</div>':'');
   }
   function togglePresentationMode() {
     const enabled = document.body.classList.toggle('presentation-mode');
@@ -524,7 +524,7 @@
     const tabGuides = {
       details: {text:'这里查看四柱中的藏干与十神资料；十神以日主为参照，可结合各柱位置对照。',links:[['十神资料','ten-gods'],['藏干资料','hidden-stems']]},
       relations: {text:'这里汇总本命、所选大运与所选流年之间的干支关系；点击关系来源可返回对应柱位或时间轴。',links:[['干支关系说明','relations']]},
-      shensha: {text:'这里列出本地引擎规则命中的神煞及所在柱位；不同流派的起法与名称差异请查看资料说明。',links:[['神煞资料','shensha']]},
+      shensha: {text:'这里列出符合条件的神煞名称及所在柱位；不同流派的起法与名称差异请查看资料说明。',links:[['神煞资料','shensha']]},
       luck: {text:'这里查看起运信息和各步大运；选择某一步后，可与本命及所选流年进行关系对照。',links:[['大运与起运','luck'],['排盘时间规则','rules']]},
       annual: {text:'这里查看当前干支年及后续流年；选择年份后，可同步查看该年的节月资料和关系对照。',links:[['流年与节月','luck'],['立春换年规则','rules']]},
       twelve: {text:'这里查看十二长生在本命各柱上的对应资料；也可在大运详情中对照所选大运。',links:[['十二长生资料','twelve-stages']]}
