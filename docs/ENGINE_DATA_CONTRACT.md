@@ -408,3 +408,104 @@ ChartContext 是一次排盘成功后生成的只读页面上下文。它不取�
 - 不引入账号、会员、支付、订单或 AI 服务。
 - 不把合盘、择日、姓名、八宅、六十四卦混进单人命盘上下文；未来按独立领域模块接入。
 - 不在本轮为了减少重复计算而重写 computeFavorableElement 或 computeLuckPillars。
+
+
+## 11. 第二批剖面接口字段级核查
+
+### 11.1 dayPillarProfile(gz)
+
+- 输入：有效六十甲子字符串，例如“甲子”；必须是长度为 2 的字符串，且天干、地支均在引擎表内，否则返回 null。
+- 返回字段：
+  - 基础：gz、stem、branch、stemIdx、branchIdx。
+  - 英文/属性：stemEn、branchEn、animalEn、stemElement、branchElement、stemPolarity。
+  - 日干坐支关系：seat、seatCn、seatEn。seat 由日干五行与地支五行的生克关系派生，属于引擎规则分类，不是吉凶结论。
+  - 藏干：hidden[]，每项含 gan、ganEn、pos、posCn、element、god、godEn、group、groupCn、groupLabel、relation；十神以该日柱天干作为日主计算。
+  - 长生：stage、stageEn、stageIndex；以该柱天干坐该柱地支计算。
+  - 纳音：nayin、nayinEn、nayinPartner、nayinPairIndex。
+- 该接口适合日柱详情卡，不应把其中“坐支关系”直接写成婚姻、性格或吉凶断语。
+
+### 11.2 branchProfile(branch)
+
+- 输入：单个有效地支字符；无效时返回 null。
+- 返回字段：
+  - 基础属性：branch、index、element、elementEn、polarity、branchEn、animalCn、animalEn、dirCn、dirEn。
+  - 时间：hour（来自 branchHourRange，包含 start/end/text）、month、jie、jieEn、season、seasonEn。
+  - 藏干：hidden[]，每项含 gan、ganEn、element、polarity、pos、posCn。
+  - 关系：sixHe（branch/branchEn/element/elementEn）、clash（branch/branchEn）、harm（branch/branchEn）。
+  - 组合：trine（element/elementEn/members/peers）、meeting（element/elementEn/dirCn/dirEn/members/peers）。
+  - 刑：punishGroups[]（kind/kindEn/members/peers）、selfPunish。
+  - 长生：stageOf[]，为十个天干分别在该地支上的 stage/stageEn/stageIndex。
+  - 甲子列表：pillars[]，列出所有地支为该支的六十甲子。
+- 注意：sixHe/clash/harm/trine/meeting 是该地支在规则表中的对应关系资料，不表示命盘中实际发生；只有将本命/大运/流年实际出现的地支集合与 members/peers 对照后，才可判定组合是否齐全。
+- 该接口不返回藏干十神，因为十神必须依赖具体命盘日主；如需十神，使用 dayPillarProfile 的 hidden 或 tenGodOf(dayMaster, gan)。
+
+### 11.3 stageProfile(index)
+
+- 输入：0–11 的整数；无效时返回 null。
+- 返回字段：index、stageCn、stageEn、rows、pillars、yangRows、yinRows。
+- rows 每项对应一个天干，含 gan、ganEn、polarity、element、branch、branchEn、animalCn、animalEn、yangDirection、startBranch、startBranchEn、stageIndex、verified。
+- pillars 列出六十甲子中落在该长生阶段的干支及 stemIdx、branchIdx。
+- 该接口是十二长生规则查询表，不是某个命盘的直接分析结果。命盘中某柱的实际长生仍应调用 twelveStage(参照天干, 地支)。
+
+### 11.4 tenGodPillarProfile(god, pos)
+
+- god 必须属于 TEN_GOD_ORDER；pos 必须匹配 PILLAR_POS 中的柱位 id，否则返回 null。
+- 返回：god、godEn、group、groupLabel、groupCn、relation、pos、posDef、rows。
+- rows 固定十项，分别枚举十个可能的日主天干；每项含 dayGan、dayGanEn、dayElement、dayPolarity、gan、ganEn、ganElement、ganPolarity、god、godEn、group、groupLabel、groupCn、relation、samePolarity。
+- posDef 是所选柱位的定义资料；接口结果是“某个十神在某柱位可能对应的干支/日主映射表”，不是当前命盘该柱的实时值。
+- 当前接口不提供 day 柱位；日柱天干是日主本身，不能把日柱十神机械地套入此矩阵。
+
+### 11.5 kongWangOfDayGz(gz)
+
+- 输入有效六十甲子日柱字符串；无效时返回 null。
+- 返回 xunStart（该旬首干支）和 voids（两个旬空地支）。
+- 这是日柱旬空的直接接口；页面如果按每柱展示空亡，必须明确语义是“本日柱旬空落在哪些地支”，不能误写成每个柱各有一套独立旬空。
+- 如需判断本命柱是否遇空亡，应将 voids 与本命年/月/日/时柱地支逐一比对；未知时辰不参与。
+
+## 12. 核心计算函数输入与返回契约补充
+
+### 12.1 computeBazi(opts)
+
+主要输入：
+- 必需：year、month、day。
+- 可选：hour、minute、longitude、tzCentralMeridian、tzOffsetHours、unknownTime、sect。
+- 默认：minute 为 0；tzOffsetHours 为 8；tzCentralMeridian 为 tzOffsetHours × 15；sect 为 1。
+- unknownTime 为真时，time 柱为 null；未知时辰且中国历史夏令时命中时，不对未知小时执行减一小时。
+- 绝对时刻年/月柱以转换后的北京时间计算；日/时柱按本地真太阳时（有经度时）或输入时间计算。
+- 返回顶层字段：input、meta、pillars、fiveElements、tenGodsEn、branchEn、stemEn。
+- input：year、month、day、hour、minute、longitude、tzOffsetHours、unknownTime、sect。注意不保存 tzCentralMeridian 原始输入。
+- meta：dayMaster、dayMasterEn、dayElement、dayPolarity、dstApplied、trueSolarOffsetMinutes、tzCentralMeridian、tzOffsetHours、trueSolarTime、absoluteInstantBeijing、engine、engineVersion、sect、sectLabel、sectLabelEn。
+- pillars：year/month/day/time；每个有效柱含 ganzhi、hideGan、shiShenGan、naYin；未知时辰 time 为 null。
+- fiveElements：stemsBranchesOnly、withHiddenHalfWeight、withHiddenFull 三套计数。
+- 重要口径：year/month 使用绝对时刻（北京时间）历法柱；day/hour 使用本地真太阳时口径。trueSolarTime 仅在输入经度且非 unknownTime 时生成。
+
+### 12.2 computeFavorableElement(opts)
+
+- 参数与 computeBazi 相同；内部重新调用 computeBazi(opts)。
+- 返回顶层字段：engineVersion、dayMaster、chart、monthBranch、monthBranchEn、season、seasonEn、unknownTime、score、fuYang、tiaoHou、synthesis、fiveElements、conventionNote。
+- score：perElement、breakdown、support、drain、total、ratio、thresholds、verdict、verdictEn、verdictCn。
+- breakdown 每项含 pos、kind、char、element、weight、monthBoosted；月柱权重乘 2，日主天干不计入扶抑分。
+- fuYang：method、favorable[]、unfavorable[]；每项含 element、elementEn、group、groupCn、groupLabel、reasonEn。
+- tiaoHou：method、applicable、element、elementEn、rule、ruleCn。春秋简则不适用；夏季简则取水，冬季简则取火。
+- synthesis：agree、noteEn；仅说明两种简则是否同向，不代表最终专业结论。
+- fiveElements 是 computeBazi 的三种五行统计原样附带。
+- 重要边界：扶抑分数是公开权重规则的计分结果；不能等同于对根气、合化、刑冲、调候、格局等全部因素综合后的权威旺衰结论。
+
+### 12.3 computeLuckPillars(opts)
+
+主要输入：
+- 继承 computeBazi 的出生时间、时区、经度、未知时辰等参数。
+- 额外：gender、count、method、frame、today。
+- gender 识别 male/female、M/F、1/0、true/false 等当前实现值；不传或无法识别为 female 的值会按 male 处理，因此调用端必须要求用户明确选择性别，不能依赖默认。
+- count 默认 10；method 仅 precise 会启用精确法，否则 traditional；frame 仅 true-solar 会启用真太阳时框架，否则 civil。
+- today 默认 UTC 日期；页面应显式传入约定日期。
+- 返回顶层：gender、genderLabel、direction、dayMaster、dayMasterEn、dayElement、monthPillar、yearPillar、chart、instant、elapsed、start、preLuck、pillars、current、frameAlt、today、sensitivity、unknownTime。
+- pillars[] 每项含 index、ganzhi、stem、branch、stemEn、branchEn、element、branchElement、stemTenGod、branchTenGod、hideGan、hideGanTenGods、stage、stageEn、stageIndex、startAgeSui、endAgeSui、startYear、endYear、yearLabel、startDate、endDate、startDateTime、endDateTime、isCurrent。
+- current 含 index、pill、today；today 同时在顶层重复。
+- unknownTime 为未知时辰时包含 windowStart、windowEnd、low、high、jieAmbiguous、monthPillarAssumedNoon；已知时辰为 null。
+- start 同时返回 traditional、precise、chosen、differenceDays 和起运日期/年龄；不能只保存 chosen 而丢弃另一种算法的对照结果。
+- instant 记录出生、节气的北京时间/所选框架时间、节气方向和时间块；frameAlt 给出另一时间框架的结果。
+- sensitivity 是参考时刻前后两小时的起运敏感性扫描；不是概率或误差置信区间。
+- 性别不明时禁止调用或展示“默认男性”大运结果；前端应先要求明确性别。
+- unknownTime 的 low/high 是当天时间窗口边界估算，不是统计置信区间；若 jieAmbiguous=true，月柱假设与起运节气必须特别提示。
+
