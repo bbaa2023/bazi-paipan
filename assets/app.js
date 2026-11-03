@@ -39,7 +39,7 @@
         if(bi==null||!expected||engine.BRANCHES[bi]!==expected) throw new Error('当前流年资料校验未通过');
       }
       const profile=engine.yearProfile(year);
-      if(!profile||!profile.ganzhi) throw new Error('引擎未返回当前流年干支');
+      if(!profile||!profile.ganzhi) throw new Error('当前流年资料暂不可用');
       return {year,profile,now,error:''};
     }catch(e){return {year:null,profile:null,now,error:e&&e.message?e.message:'当前流年不可用'};}
   }
@@ -137,7 +137,7 @@
     const data = lastChart?.fiveElements || {};
     const selected = data.withHiddenHalfWeight || data.withHiddenStems || data.stemsBranchesOnly || {};
     const entries = objectEntries(selected);
-    if (!entries.length) return '<section class="fy-final fy-final-empty">当前引擎没有返回可识别的五行统计数据。</section>';
+    if (!entries.length) return '<section class="fy-final fy-final-empty">当前命盘暂时没有可显示的五行统计资料。</section>';
 
     const keys = ['木','火','土','金','水'];
     const values = Object.fromEntries(keys.map(k => [k, Math.max(0, Number(selected[k]) || 0)]));
@@ -161,7 +161,7 @@
       '财': ke[(ki + 1) % 5],
       '官杀': ke[(ki + 4) % 5]
     };
-    if (!roles) return '<section class="fy-final fy-final-empty">引擎未返回可识别的日主五行，暂时无法建立十神关系。</section>';
+    if (!roles) return '<section class="fy-final fy-final-empty">日主五行资料暂不可用，暂时无法建立十神关系。</section>';
 
     const helpElements = [roles['印'], roles['比劫']];
     const drainElements = [roles['食伤'], roles['财'], roles['官杀']];
@@ -203,12 +203,12 @@
 
     const drainRanked = drainNames.slice().sort((a,b) => values[b] - values[a]);
     const tabooElements = drainRanked.length ? drainRanked.filter(e => values[e] === values[drainRanked[0]]) : [];
-    const useText = useElements.length ? useElements.join(' · ') : (strength === '偏弱' ? helpNames.join(' · ') : '以引擎用神结果为准');
+    const useText = useElements.length ? useElements.join(' · ') : (strength === '偏弱' ? helpNames.join(' · ') : '以当前用神参考结果为准');
     const tabooText = tabooElements.length ? tabooElements.join(' · ') : '暂无明显克泄耗五行';
-    const useRoleText = useElements.length ? useElements.map(e => relationOf(e).god).join(' · ') : (strength === '偏弱' ? '印 · 比劫（阵营参考）' : '以引擎返回为准');
+    const useRoleText = useElements.length ? useElements.map(e => relationOf(e).god).join(' · ') : (strength === '偏弱' ? '印 · 比劫（阵营参考）' : '以当前分析结果为准');
     const tabooRoleText = tabooElements.length ? tabooElements.map(e => relationOf(e).god).join(' · ') : '当前未见突出项';
 
-    let basis = '引擎暂未给出明确旺衰结论，以下阵营比例仅作五行关系参考。';
+    let basis = '目前尚无明确旺衰结论，以下阵营比例仅作五行关系参考。';
     if (strength === '偏弱') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；虽有令根，但克泄耗占'+drainPct.toFixed(1)+'%、帮扶占'+helpPct.toFixed(1)+'%，克泄耗一方更重，故综合仍偏弱。';
     else if (strength === '偏强') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；'+(deLing ? '得令且有根，帮扶基础较足' : '虽失令，但帮扶力量占'+helpPct.toFixed(1)+'%，整体支持较重')+'，故综合偏强，宜适度疏泄制衡。';
     else if (strength === '中和') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；帮扶占'+helpPct.toFixed(1)+'%，克泄耗占'+drainPct.toFixed(1)+'%，整体较为均衡。';
@@ -217,17 +217,17 @@
     let keyInsight = leadDrain
       ? '关键：'+leadDrain+'占比'+pctText(values[leadDrain])+'，对应'+relationOf(leadDrain).god+'（'+(relationOf(leadDrain).effect)+'），属于克泄耗阵营；该五行数量增加并不等于日主变强。数量 ≠ 强弱。'
       : '关键：当前未统计到明显克泄耗五行；五行数量只表示分布，不直接等同日主旺衰。';
-    if (strength === '偏弱' && leadDrain) keyInsight += ' 引擎综合判为身弱，宜优先扶身。';
+    if (strength === '偏弱' && leadDrain) keyInsight += ' 综合判断为身弱，宜优先扶身。';
     const advice = strength === '偏弱'
       ? '①补'+(useElements.length ? useElements.join('、') : '印比')+'（印生身、比劫助身）固本；②结合实际生活节奏沉淀积累；③慎叠加'+(tabooText === '暂无明显克泄耗五行' ? '克泄耗力量' : tabooText+'（'+tabooRoleText+'）')+'。'
       : strength === '偏强'
-        ? '①优先参考引擎用神方向疏泄制衡；②减少继续叠加印比帮扶；③结合完整命局与调候灵活取舍。'
+        ? '①优先参考用神方向疏泄制衡；②减少继续叠加印比帮扶；③结合完整命局与调候灵活取舍。'
         : strength === '中和'
           ? '①维持现有平衡；②结合季节调候作细节调整；③避免只按单一五行数量盲目增减。'
-          : '①先观察五行分布与十神关系；②待引擎旺衰结论明确后再定补益方向。';
+          : '①先观察五行分布与十神关系；②待旺衰结论明确后再定补益方向。';
     const climate = lastFavorable?.tiaoHou?.ruleCn || '暂无调候结果';
     const badge = (label,good) => '<span class="fy-final-badge '+(good?'good':'bad')+'">'+label+(good?' ✓':' ✗')+'</span>';
-    const elementList = arr => arr.length ? arr.map(e=>'<b class="fy-final-pill el-'+e+'">'+e+'</b>').join('') : '<span class="fy-final-muted">暂无引擎返回数据</span>';
+    const elementList = arr => arr.length ? arr.map(e=>'<b class="fy-final-pill el-'+e+'">'+e+'</b>').join('') : '<span class="fy-final-muted">暂无相关资料</span>';
 
     return '<section class="fy-final">'+
       '<header class="fy-final-heading"><div><span>五行结构 · 子平扶抑</span><h3>五行能量 · 扶抑法诊断</h3><p>子平扶抑 · 身旺宜抑，身弱宜扶</p></div></header>'+
@@ -235,7 +235,7 @@
       '<div class="fy-final-verdict"><div class="fy-final-verdict-main"><span>日主旺衰</span><strong>'+safe(strength)+'</strong></div><p>'+safe(basis)+'</p></div>'+
       '<section class="fy-final-section"><div class="fy-final-section-title">力量对比 <small>五行阵营统计值</small></div><div class="fy-final-balance-labels"><strong class="help">帮扶 '+helpPct.toFixed(1)+'%</strong><strong class="drain">克泄耗 '+drainPct.toFixed(1)+'%</strong></div><div class="fy-final-bar"><i class="help" style="width:'+helpPct.toFixed(2)+'%"></i><i class="drain" style="width:'+drainPct.toFixed(2)+'%"></i></div><div class="fy-final-composition"><span class="help">帮扶：'+safe(helpNames.join(' · ')||'无')+'（'+safe([roles['印'],roles['比劫']].filter((e,i,arr)=>arr.indexOf(e)===i).map(e=>relationOf(e).god).join(' · '))+'）</span><span class="drain">克泄耗：'+safe(drainNames.join(' · ')||'无')+'（'+safe(drainNames.map(e=>relationOf(e).god).join(' · ')||'无')+'）</span></div></section>'+
       '<section class="fy-final-section"><div class="fy-final-section-title">五行 → 十神 → 阵营 <small>按五行点数由高到低</small></div><div class="fy-final-cause">'+causeRows+'</div><p class="fy-final-insight">'+safe(keyInsight)+'</p></section>'+
-      '<div class="fy-final-gods"><article class="fy-final-god-card use"><span>用神 · 扶身参考</span><strong>'+safe(useText||'待引擎确认')+'</strong><small>'+safe(useRoleText)+' · 宜补益</small></article><article class="fy-final-god-card taboo"><span>忌神参考 · 慎叠加</span><strong>'+safe(tabooText)+'</strong><small>'+safe(tabooRoleText)+' · 宜适度控制</small></article></div>'+
+      '<div class="fy-final-gods"><article class="fy-final-god-card use"><span>用神 · 扶身参考</span><strong>'+safe(useText||'待进一步确认')+'</strong><small>'+safe(useRoleText)+' · 宜补益</small></article><article class="fy-final-god-card taboo"><span>忌神参考 · 慎叠加</span><strong>'+safe(tabooText)+'</strong><small>'+safe(tabooRoleText)+' · 宜适度控制</small></article></div>'+
       '<section class="fy-final-advice"><div><strong>行动建议</strong><p>'+safe(advice)+'</p></div><div class="fy-final-advice-meta"><small>调候参考：'+safe(climate)+'</small><footer>以上为传统流派规则推演，仅供文化研究参考，不作为人生决策依据。</footer></div></section>'+
       '</section>';
   }
@@ -243,7 +243,7 @@
     const pillars = lastChart?.pillars || {};
     const rows = [['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']]
       .filter(([key]) => key !== 'time' || !(lastBirth && lastBirth.unknownTime));
-    return '<h3 class="subhead">十二长生</h3><p class="muted">以各柱天干为参照，按本地排盘引擎计算。</p><div class="twelve-stage-grid">'+rows.map(([key,label])=>{
+    return '<h3 class="subhead">十二长生</h3><p class="muted">以各柱天干为参照，查看其与对应地支的阶段关系。</p><div class="twelve-stage-grid">'+rows.map(([key,label])=>{
       const p=pillars[key]||{};
       const gz=String(p.ganzhi||'');
       const stem=gz.charAt(0), branch=gz.charAt(1);
@@ -375,7 +375,7 @@
           '六害':'传统地支六害规则将这两个地支列为相害配对。这里只记录规则命中，不单独推断吉凶。',
           '相刑':'传统相刑分类将这两个地支归入同一刑组'+kind+'。这里只说明规则归组，不扩展为现实事件判断。',
           '自刑':'传统自刑规则包含该地支；此项表示同一地支触发自刑规则，不单独推断吉凶。',
-          '半三合':'按传统三合分类，这两个不同地支同属一组三合，故标记为半三合'+element+'。引擎注记该规则存在争议；不等于三支齐全或合化成立。'
+          '半三合':'按传统三合分类，这两个不同地支同属一组三合，故标记为半三合'+element+'。此类规则在不同流派中存在争议；不等于三支齐全或合化成立。'
         };
         const punishmentNameNote=type==='相刑'&&['恃势之刑','无恩之刑'].includes(x.kind)
           ?' 刑名提示：部分典籍与流派对寅巳申、丑戌未两组刑名存在互换说法；本站按所采用的规则名称展示，具体分组以实际成员为准。'
@@ -440,7 +440,7 @@
   }
   function renderLuck() {
     if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能计算大运。</div>';
-    if (!lastLuck) return '<div class="empty">当前引擎没有成功返回大运结果，请重新排盘或稍后再试。</div>';
+    if (!lastLuck) return '<div class="empty">当前暂时无法显示大运资料，请重新排盘或稍后再试。</div>';
     const s=lastLuck.start||{}, chosen=s.chosen||{}, pre=lastLuck.preLuck||{};
     const direction=lastLuck.direction&&typeof lastLuck.direction==='object'?(lastLuck.direction.forward?'顺排':'逆排'):(lastLuck.direction||'—');
     const items=Array.isArray(lastLuck.pillars)?lastLuck.pillars:[];
@@ -455,7 +455,7 @@
       const fmt=x=>safe(x.years??'—')+'年 '+safe(x.months??'—')+'个月 '+safe(x.days??'—')+'天';
       unknownNote='<div class="data-card"><h3>未知时辰：起运范围提示</h3><p>上方起运日期与年龄按中午参考时刻计算，不应视为精确结果。</p><p>按当天时辰范围估算：较早端约 '+fmt(lo)+'；较晚端约 '+fmt(hi)+'。</p><p>节气是否跨界：'+(unknown.jieAmbiguous?'当天不同时间可能对应不同节气，年/月柱及起运依据需重点复核。':'当前扫描范围未发现前后节气名称变化，但起运时间仍可能随出生时刻变化。')+'</p><p class="muted">要缩小范围，请补充出生时辰；若出生时刻接近立春或节气交界，建议按准确时刻重新排盘。</p></div>';
     }
-    const todayNote=lastLuck.today?'<p class="muted">当前大运判断日期：北京时间 '+safe(lastLuck.today)+'（引擎按日期判断当前大运步，不使用当天具体时分）。</p>':'';
+    const todayNote=lastLuck.today?'<p class="muted">当前大运判断日期：北京时间 '+safe(lastLuck.today)+'（按日期判断当前大运步，不使用当天具体时分）。</p>':'';
     return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">起运日期和年龄会因出生时间及采用的起运方法不同而有所差异。</p></div>'+unknownNote+'</div>'+todayNote+selector+selectedLuckSummary+'<h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="luck-timeline">'+(cards||'<div class="empty">暂时没有可显示的大运序列。</div>')+'</div>';
   }
   function renderAnnual() {
@@ -489,7 +489,7 @@
       const jie=profile.lichun&&profile.lichun.text||'立春日期未返回';
       const currentMark=y===currentYear?'<span class="chip">当前流年</span>':'';
       const selectedMark=y===Number(selectedAnnualYear==null?currentYear:selectedAnnualYear)?'<span class="chip">关系已选</span>':'';
-      const isPicked=y===Number(selectedAnnualYear==null?currentYear:selectedAnnualYear);cards.push('<button type="button" class="data-card annual-card timeline-pick '+(isPicked?'annual-selected':'')+'" data-pick-annual-year="'+safe(y)+'" aria-pressed="'+String(isPicked)+'" aria-label="选择流年 '+safe(profile.year)+' '+safe(profile.ganzhi)+'"><div class="luck-card-top"><h3>'+safe(profile.year)+' · '+safe(profile.ganzhi)+'</h3><span class="chip">'+safe(profile.zodiacCn||profile.branch)+'</span>'+currentMark+selectedMark+'</div><div class="annual-meta"><span>流年天干十神</span><strong>'+safe(god)+'</strong><span>五行</span><strong>'+safe(profile.stemElement)+' / '+safe(profile.branchElement)+'</strong><span>纳音</span><strong>'+safe(profile.nayin||'—')+'</strong><span>立春交界</span><strong>'+safe(jie)+'</strong></div><div class="annual-relations"><span class="annual-relations-label">与本命干支的直接关系：</span>'+(relations.join('')||'<span class="muted">未命中引擎定义的两两关系</span>')+'</div></button>');
+      const isPicked=y===Number(selectedAnnualYear==null?currentYear:selectedAnnualYear);cards.push('<button type="button" class="data-card annual-card timeline-pick '+(isPicked?'annual-selected':'')+'" data-pick-annual-year="'+safe(y)+'" aria-pressed="'+String(isPicked)+'" aria-label="选择流年 '+safe(profile.year)+' '+safe(profile.ganzhi)+'"><div class="luck-card-top"><h3>'+safe(profile.year)+' · '+safe(profile.ganzhi)+'</h3><span class="chip">'+safe(profile.zodiacCn||profile.branch)+'</span>'+currentMark+selectedMark+'</div><div class="annual-meta"><span>流年天干十神</span><strong>'+safe(god)+'</strong><span>五行</span><strong>'+safe(profile.stemElement)+' / '+safe(profile.branchElement)+'</strong><span>纳音</span><strong>'+safe(profile.nayin||'—')+'</strong><span>立春交界</span><strong>'+safe(jie)+'</strong></div><div class="annual-relations"><span class="annual-relations-label">与本命干支的直接关系：</span>'+(relations.join('')||'<span class="muted">未发现符合条件的两两关系</span>')+'</div></button>');
     }
     let monthRows=[];
     try{
