@@ -727,3 +727,12 @@
 .knowledge-link span{font-size:11px;opacity:.7}
 @media(max-width:680px){.topbar-tools{gap:8px}.knowledge-link{padding:5px 8px;font-size:10px}.privacy{font-size:9px}.privacy i{margin-right:4px}}
 @media(max-width:360px){.topbar{gap:7px}.brand{gap:5px}.brand-mark{width:29px;height:29px;flex-basis:29px}.brand b{font-size:9px}.brand small{font-size:9px}.topbar-tools{gap:5px}.knowledge-link{padding:4px 6px;font-size:9px}.privacy{font-size:8px}}
+
+/* 排盘标签页轻量导航：说明短、入口清晰，不与命盘数据争夺视觉空间 */
+.tab-guide{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 4px;padding:9px 12px;border:1px solid #e8decb;border-radius:9px;background:#fbf8f0;color:#687381;font-size:11px;line-height:1.65}
+.tab-guide-text{min-width:0}
+.tab-guide-links{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:0 0 auto;flex-wrap:wrap}
+.tab-guide-links a{color:#8d6528;text-decoration:none;font-weight:700;white-space:nowrap}
+.tab-guide-links a:hover{text-decoration:underline}
+.tab-guide-links a span{font-size:9px;opacity:.65}
+@media(max-width:680px){.tab-guide{align-items:flex-start;flex-direction:column;gap:5px;padding:8px 10px;font-size:10px}.tab-guide-links{justify-content:flex-start;gap:12px}}
