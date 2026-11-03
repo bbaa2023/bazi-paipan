@@ -194,3 +194,10 @@ git log -1 --oneline
 - [宝塔部署说明](docs/BAOTA_DEPLOY.md)
 - [当前功能盘点](docs/CURRENT_FEATURE_AUDIT.md)
 - [排盘准确性回归测试](docs/ACCURACY_TEST_CASES.md)
+
+
+### 知识库规划
+
+- [知识库信息架构与排盘导航规范](docs/KNOWLEDGE_BASE_INFORMATION_ARCHITECTURE.md)
+
+知识库是独立于排盘页面的静态资料区域；在页面框架实际开发前，不代表线上已经存在 `/guide/` 页面。
