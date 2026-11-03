@@ -104,7 +104,7 @@
       const gz = p.ganzhi || '';
       const stem = String(gz).charAt(0);
       const branch = String(gz).charAt(1);
-      if (!stem || !branch) return '<article class="pillar"><div class="pillar-label">'+label+'</div><div class="empty">引擎未返回此柱</div></article>';
+      if (!stem || !branch) return '<article class="pillar"><div class="pillar-label">'+label+'</div><div class="empty">暂无该柱资料</div></article>';
       const stemInfo = stemAttr(stem), branchInfo = branchAttr(branch);
       const dayClass = key === 'day' ? ' pillar-day-master' : '';
       const palace = ({year:'祖上宫',month:'父母事业宫',day:'自身',time:'子女宫'})[key] || '—';
@@ -318,7 +318,7 @@
       }catch(e){console.warn('日柱旬空读取失败：',e);}
     }
 
-    return '<h3 class="subhead">藏干、十神与十二长生</h3><p class="muted">十二长生以日干为参照；以下剖面资料来自本地引擎公开接口。</p><div class="data-grid">'+unknownNote+cards+dayCard+branchCards.join('')+kongWangCard+'</div><p class="muted">地支关系资料不代表命盘已构成相应组合；旬空按日柱统一计算。所有资料均在当前浏览器本地生成。</p>';
+    return '<h3 class="subhead">藏干、十神与十二长生</h3><p class="muted">十二长生以日干为参照；以下为四柱相关的补充资料。</p><div class="data-grid">'+unknownNote+cards+dayCard+branchCards.join('')+kongWangCard+'</div><p class="muted">地支关系资料不代表命盘已构成相应组合；旬空按日柱统一计算。排盘资料在当前浏览器本地生成。</p>';
   }
   function renderRelations() {
     const engine=window.BaziEngine||{};
@@ -422,11 +422,11 @@
       {id:'triads',label:'三合 / 三会',count:groupCards.length}
     ];
     const overviewHtml=overview.map(x=>'<button type="button" class="relation-overview-item" data-relation-jump="'+x.id+'" '+(x.count?'':'disabled')+'><span>'+safe(x.label)+'</span><strong>'+x.count+'</strong></button>').join('');
-    return '<h3 class="subhead">本命 · 大运 · 流年关系</h3><p class="muted">本命四柱固定不变；通过下方选择器切换参与关系对照的大运与流年。默认定位当前大运和当前流年。未知时辰、未起运或无法确认的对象不会被补造；关系命中不代表合化或吉凶。</p>'+renderTimelineSelectors({luck:true,annual:true,annualYears:selectorYears})+'<div class="data-card"><div class="annual-relations">'+layerStatus+'</div>'+(currentYearError?'<p class="muted">当前流年基准暂不可用：'+safe(currentYearError)+'</p>':'')+'</div><div class="relation-overview"><div class="relation-overview-title"><strong>关系总览</strong><span class="muted">共 '+pairCount+' 项两两关系 · '+groupCards.length+' 组三支组合</span></div><div class="relation-overview-grid">'+overviewHtml+'</div></div>'+(relationSections||'<div class="empty">当前参与对象之间未命中已收录的两两干支关系。</div>')+(groupCards.length?'<section class="relation-category" id="relation-triads"><div class="relation-category-heading"><div><h4>三合 / 三会组合</h4><p class="muted">按实际出现的三个成员分组展示来源</p></div><span class="relation-count">'+groupCards.length+' 组</span></div><div class="relation-category-grid">'+groupCards.join('')+'</div></section>':'')+'<div class="customer-note"><span class="note-mark">金</span><div><strong>关系说明与依据</strong><p>两两关系说明直接依据本站随附的本地排盘引擎规则函数和规则表，页面只解释“引擎为何标记为该类型”，不添加吉凶断语。三合、三会依据引擎组合表核对三个不同成员是否齐备；成员齐备不等于合化成立。</p><p>本页没有把这些说明标注为《渊海子平》原文或逐条古籍引文。若未来加入古籍解释，将另列书名、篇目/版本及原文依据，并与引擎规则说明分开。</p></div></div>';
+    return '<h3 class="subhead">本命 · 大运 · 流年关系</h3><p class="muted">本命四柱固定不变；通过下方选择器切换参与关系对照的大运与流年。默认定位当前大运和当前流年。未知时辰、未起运或无法确认的对象不会被补造；关系命中不代表合化成立，也不直接代表吉凶。</p>'+renderTimelineSelectors({luck:true,annual:true,annualYears:selectorYears})+'<div class="data-card"><div class="annual-relations">'+layerStatus+'</div>'+(currentYearError?'<p class="muted">当前流年资料暂不可用：'+safe(currentYearError)+'</p>':'')+'</div><div class="relation-overview"><div class="relation-overview-title"><strong>关系总览</strong><span class="muted">共 '+pairCount+' 项两两关系 · '+groupCards.length+' 组三支组合</span></div><div class="relation-overview-grid">'+overviewHtml+'</div></div>'+(relationSections||'<div class="empty">当前参与对象之间未命中已收录的两两干支关系。</div>')+(groupCards.length?'<section class="relation-category" id="relation-triads"><div class="relation-category-heading"><div><h4>三合 / 三会组合</h4><p class="muted">按实际出现的三个成员分组展示来源</p></div><span class="relation-count">'+groupCards.length+' 组</span></div><div class="relation-category-grid">'+groupCards.join('')+'</div></section>':'')+'<div class="customer-note"><span class="note-mark">金</span><div><strong>关系说明与依据</strong><p>两两关系按传统天干、地支分类规则识别；三合、三会则检查相应组合成员是否齐备。页面只展示符合条件的关系，不据此直接推断合化或吉凶。</p><p>本页的规则说明是对传统分类的简要整理，并非《渊海子平》原文逐字引述。古籍参考请查看本知识库对应条目的书名与篇目说明。</p></div></div>';
   }
   function renderShensha() {
     const engine=window.BaziEngine||{};
-    if(typeof engine.shenshaScan!=='function') return '<div class="empty">当前本地引擎未公开神煞扫描接口；为避免另写算法，本页暂不推算。</div>';
+    if(typeof engine.shenshaScan!=='function') return '<div class="empty">当前版本暂时无法显示神煞资料，请以其他排盘信息为准。</div>';
     const labels=[['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
     const gz=labels.map(([key])=>{
       const p=lastChart.pillars&&lastChart.pillars[key];
@@ -435,8 +435,8 @@
     let hits=[];
     try { hits=engine.shenshaScan(gz)||[]; } catch(e) { console.warn('神煞扫描失败：',e); }
     if(!Array.isArray(hits)) hits=[];
-    const cards=hits.map(hit=>'<div class="data-card shensha-card"><div class="luck-card-top"><h3><span class="relation-icon" aria-hidden="true">✧</span>'+safe(hit.cn||hit.key||'未命名神煞')+'</h3><span class="chip">'+safe(hit.where||'命中位置未返回')+'</span></div><p>起法依据：'+safe(hit.anchor||'固定柱表/引擎规则')+'</p><p class="muted">此处仅记录本地引擎识别到的规则与落点，不单独据此判定吉凶。</p></div>').join('');
-    return '<h3 class="subhead">神煞扫描</h3><p class="muted">调用仓库内排盘引擎的 shenshaScan 接口，按引擎内置规则检查四柱。涵盖日干起、年支起、月支起、三合组星、固定柱表、空亡等多类规则。神煞流派存在差异，结果用于传统规则参考，不作为单独的吉凶结论。</p><div class="shensha-summary"><span>四柱已扫描</span><strong>'+gz.filter(Boolean).length+' / 4</strong><span>命中规则</span><strong>'+hits.length+'</strong></div><div class="data-grid">'+(cards||'<div class="empty">当前四柱未命中本地引擎所定义的神煞规则，或引擎返回空结果。</div>')+'</div>';
+    const cards=hits.map(hit=>'<div class="data-card shensha-card"><div class="luck-card-top"><h3><span class="relation-icon" aria-hidden="true">✧</span>'+safe(hit.cn||hit.key||'未命名神煞')+'</h3><span class="chip">'+safe(hit.where||'命中位置未返回')+'</span></div><p>查法提示：'+safe(hit.anchor||'按传统干支条件查取')+'</p><p class="muted">此处仅记录本地引擎识别到的规则与落点，不单独据此判定吉凶。</p></div>').join('');
+    return '<h3 class="subhead">神煞扫描</h3><p class="muted">本页按传统神煞规则整理四柱中的相关标记。不同典籍与流派对部分神煞的起法和名称存在差异，结果仅供查询参考，不单独作为吉凶结论。</p><div class="shensha-summary"><span>四柱已扫描</span><strong>'+gz.filter(Boolean).length+' / 4</strong><span>命中规则</span><strong>'+hits.length+'</strong></div><div class="data-grid">'+(cards||'<div class="empty">当前四柱没有显示符合条件的神煞标记。</div>')+'</div>';
   }
   function renderLuck() {
     if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能计算大运。</div>';
@@ -456,13 +456,13 @@
       unknownNote='<div class="data-card"><h3>未知时辰：起运范围提示</h3><p>上方起运日期与年龄按中午参考时刻计算，不应视为精确结果。</p><p>按当天时辰范围估算：较早端约 '+fmt(lo)+'；较晚端约 '+fmt(hi)+'。</p><p>节气是否跨界：'+(unknown.jieAmbiguous?'当天不同时间可能对应不同节气，年/月柱及起运依据需重点复核。':'当前扫描范围未发现前后节气名称变化，但起运时间仍可能随出生时刻变化。')+'</p><p class="muted">要缩小范围，请补充出生时辰；若出生时刻接近立春或节气交界，建议按准确时刻重新排盘。</p></div>';
     }
     const todayNote=lastLuck.today?'<p class="muted">当前大运判断日期：北京时间 '+safe(lastLuck.today)+'（引擎按日期判断当前大运步，不使用当天具体时分）。</p>':'';
-    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">以上字段来自本地排盘引擎；不同起运口径可能产生差异。</p></div>'+unknownNote+'</div>'+todayNote+selector+selectedLuckSummary+'<h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="luck-timeline">'+(cards||'<div class="empty">引擎没有返回大运序列。</div>')+'</div>';
+    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">起运日期和年龄会因出生时间及采用的起运方法不同而有所差异。</p></div>'+unknownNote+'</div>'+todayNote+selector+selectedLuckSummary+'<h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="luck-timeline">'+(cards||'<div class="empty">暂时没有可显示的大运序列。</div>')+'</div>';
   }
   function renderAnnual() {
     const engine=window.BaziEngine||{};
-    if(typeof engine.yearProfile!=='function'||typeof engine.tenGodOf!=='function'||typeof engine.lichunOf!=='function') return '<div class="empty">当前本地引擎未公开流年分析所需接口。</div>';
+    if(typeof engine.yearProfile!=='function'||typeof engine.tenGodOf!=='function'||typeof engine.lichunOf!=='function') return '<div class="empty">当前版本暂时无法显示流年资料，请稍后重试。</div>';
     const dayGan=lastChart.meta&&lastChart.meta.dayMaster||lastChart.pillars&&lastChart.pillars.day&&lastChart.pillars.day.ganzhi&&lastChart.pillars.day.ganzhi.charAt(0);
-    if(!dayGan) return '<div class="empty">命盘日主不可用，暂时无法生成流年对照。</div>';
+    if(!dayGan) return '<div class="empty">命盘日主资料暂不可用，暂时无法生成流年对照。</div>';
     const annualInfo=getCurrentAnnualInfo();
     const beijingNow=annualInfo.now;
     const currentYear=annualInfo.year;
@@ -497,10 +497,10 @@
     }catch(_){}
     let selectedGod='—';
     if(selectedProfile){try{selectedGod=engine.tenGodOf(dayGan,selectedProfile.stem)||'—';}catch(_){}}
-    const selectedAnnualSummary=selectedProfile?'<div class="data-card selected-time-context"><h3>当前关系对照流年：'+safe(selectedProfile.year)+' · '+safe(selectedProfile.ganzhi)+'</h3><p>天干十神：'+safe(selectedGod)+'　五行：'+safe(selectedProfile.stemElement)+' / '+safe(selectedProfile.branchElement)+'</p><p>纳音：'+safe(selectedProfile.nayin||'—')+'　生肖：'+safe(selectedProfile.zodiacCn||selectedProfile.branch||'—')+'</p><p>立春资料：'+safe(selectedProfile.lichun&&selectedProfile.lichun.text||'未返回')+'</p><p class="muted">该流年将与本命及所选大运共同参与关系对照。</p></div>':'<div class="data-card selected-time-context"><h3>所选流年资料暂不可用</h3><p class="muted">本地引擎未返回该年份完整资料，因此不生成关系对照。</p></div>';
+    const selectedAnnualSummary=selectedProfile?'<div class="data-card selected-time-context"><h3>当前关系对照流年：'+safe(selectedProfile.year)+' · '+safe(selectedProfile.ganzhi)+'</h3><p>天干十神：'+safe(selectedGod)+'　五行：'+safe(selectedProfile.stemElement)+' / '+safe(selectedProfile.branchElement)+'</p><p>纳音：'+safe(selectedProfile.nayin||'—')+'　生肖：'+safe(selectedProfile.zodiacCn||selectedProfile.branch||'—')+'</p><p>立春资料：'+safe(selectedProfile.lichun&&selectedProfile.lichun.text||'未返回')+'</p><p class="muted">该流年将与本命及所选大运共同参与关系对照。</p></div>':'<div class="data-card selected-time-context"><h3>所选流年资料暂不可用</h3><p class="muted">该年份的资料暂不完整，因此暂不加入关系对照。</p></div>';
     const timeText=beijingNow.year+'-'+String(beijingNow.month).padStart(2,'0')+'-'+String(beijingNow.day).padStart(2,'0')+' '+String(beijingNow.hour).padStart(2,'0')+':'+String(beijingNow.minute).padStart(2,'0');
     const annualSelector=renderTimelineSelectors({annual:true,annualYears:Array.from({length:6},(_,i)=>currentYear+i)});
-    return '<h3 class="subhead">当前流年与未来五年</h3>'+annualSelector+selectedAnnualSummary+'<p class="muted">查询时刻：北京时间 '+safe(timeText)+'。当前干支年按本地引擎立春表判断；立春前仍归上一干支年。当前流年起点：'+safe(currentYear)+' 年。流年天干十神以本命日主为参照，关系只列出引擎定义的直接两两关系，不代表完整吉凶结论。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">本地引擎没有返回流年资料。</div>')+'</div>'+(monthRows.length?'<h3 class="subhead" style="margin-top:20px">所选流年 '+safe(activeYear)+' 的十二节月资料</h3><p class="muted">以下为所选流年的节月干支与节令名称。引擎没有提供十二个交节的精确时刻，因此不标记当前节月，也不把节月序号当作公历月份边界。</p><div class="annual-month-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'+monthRows.join('')+'</div>':'');
+    return '<h3 class="subhead">当前流年与未来五年</h3>'+annualSelector+selectedAnnualSummary+'<p class="muted">查询时刻：北京时间 '+safe(timeText)+'。当前干支年按本地引擎立春表判断；立春前仍归上一干支年。当前流年起点：'+safe(currentYear)+' 年。流年天干十神以本命日主为参照；关系区域仅列出本命与流年之间符合条件的干支关系，不代表完整吉凶结论。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">暂时没有可显示的流年资料。</div>')+'</div>'+(monthRows.length?'<h3 class="subhead" style="margin-top:20px">所选流年 '+safe(activeYear)+' 的十二节月资料</h3><p class="muted">以下为所选流年的节月干支与节令名称。当前资料未提供十二个交节的精确时刻，因此不标记当前节月，也不把节月序号当作公历月份边界。</p><div class="annual-month-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'+monthRows.join('')+'</div>':'');
   }
   function togglePresentationMode() {
     const enabled = document.body.classList.toggle('presentation-mode');
@@ -609,7 +609,7 @@
     }
     try {
       const chart=window.BaziEngine.computeBazi(birth);
-      if (!chart || !chart.pillars) throw new Error('引擎未返回有效命盘数据。');
+      if (!chart || !chart.pillars) throw new Error('排盘资料不完整，请检查出生信息后重试。');
       // computeBazi 返回四柱与五行；喜用/旺衰/调候由 v0.6.0 独立接口返回。
       console.log('[BaziEngine.computeBazi] 完整返回结构：', chart);
       lastFavorable = null;
@@ -638,7 +638,7 @@
       if(presentationButton) presentationButton.hidden=true;
       results.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
     } catch (e) {
-      console.error(e); showError('排盘失败：'+(e && e.message ? e.message : '未知错误')+'。请检查输入范围，或把浏览器控制台错误发给维护者。');
+      console.error(e); showError('排盘失败：'+(e && e.message ? e.message : '未知错误')+'。请检查出生信息是否正确；如果问题持续，请联系维护者。');
     }
   }
   const presentationButton=document.getElementById('presentation-toggle');
