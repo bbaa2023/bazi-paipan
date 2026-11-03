@@ -683,7 +683,7 @@
 .relation-result-heading{display:flex;align-items:center;gap:8px;margin-bottom:10px;color:#735b32}
 .relation-participants{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .relation-connector{color:var(--muted);font-size:12px}
-.relation-locator{display:inline-flex;align-items:center;gap:5px;min-height:38px;padding:7px 11px;border:1px solid #d9c59e;border-radius:9px;background:#fbf7ee;color:#55452e;font:600 13px/1.5 inherit;text-align:left;cursor:pointer;touch-action:manipulation}
+.relation-locator{display:inline-flex;align-items:center;gap:5px;min-height:38px;padding:7px 11px;border:1px solid #d9c59e;border-radius:9px;background:#fbf7ee;color:#55452e;font-family:inherit;font-size:13px;font-weight:600;line-height:1.5;text-align:left;cursor:pointer;touch-action:manipulation}
 .relation-locator:hover{border-color:#a8874e;background:#f3e8d1;color:#60491f}
 .relation-locator:focus-visible{outline:3px solid #a8874e;outline-offset:2px}
 .relation-result-items{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
