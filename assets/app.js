@@ -12,6 +12,24 @@
   const elementFor = {'甲':'木','乙':'木','寅':'木','卯':'木','丙':'火','丁':'火','巳':'火','午':'火','戊':'土','己':'土','辰':'土','戌':'土','丑':'土','未':'土','庚':'金','辛':'金','申':'金','酉':'金','壬':'水','癸':'水','子':'水','亥':'水'};
   const elementClass = (text) => 'el-' + (elementFor[text] || '土');
   const safe = (s) => String(s ?? '—').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  // 简单吉凶归向：按《渊海子平》合冲刑害的基础规则，只给三档倾向，不作具体应事断语。
+  // 合（天干五合、六合）主和顺为“吉顺”；半三合力弱为“偏吉”；冲、害、刑主不和为“多阻”；自刑偏内耗为“自阻”。
+  const relationOmen=(x)=>{
+    const type=String(x&&x.type||'');
+    const omenMap={
+      '天干五合':['good','吉顺'],
+      '天干相冲':['bad','多阻'],
+      '六合':['good','吉顺'],
+      '六冲':['bad','多阻'],
+      '六害':['bad','多阻'],
+      '相刑':['bad','多阻'],
+      '自刑':['flat','自阻'],
+      '半三合':['flat','偏吉']
+    };
+    const hit=omenMap[type];
+    if(!hit) return {tone:'flat',label:'—'};
+    return {tone:hit[0],label:hit[1]};
+  };
   function getBeijingNow() {
     try {
       const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
@@ -404,27 +422,27 @@
         const element=x.element?'；对应五行：'+x.element:'';
         const kind=x.kind?'；细分类型：'+x.kind:'';
         const descriptions={
-          '天干五合':'传统天干五合规则将这两个天干列为配对关系'+element+'。这只表示五合规则命中，不代表已经合化。',
-          '天干相冲':'传统天干相冲规则将这两个天干列为相冲配对。这里只记录规则命中，不推断事件或吉凶。',
-          '六合':'传统地支六合规则将这两个地支列为配对关系'+element+'。这里只表示六合规则命中，不代表已经合化。',
-          '六冲':'传统地支六冲规则将这两个地支列为相冲配对。这里只记录规则命中，不单独推断吉凶。',
-          '六害':'传统地支六害规则将这两个地支列为相害配对。这里只记录规则命中，不单独推断吉凶。',
-          '相刑':'传统相刑分类将这两个地支归入同一刑组'+kind+'。这里只说明规则归组，不扩展为现实事件判断。',
-          '自刑':'传统自刑规则包含该地支；此项表示同一地支触发自刑规则，不单独推断吉凶。',
-          '半三合':'按传统三合分类，这两个不同地支同属一组三合，故标记为半三合'+element+'。此类规则在不同流派中存在争议；不等于三支齐全或合化成立。'
+          '天干五合':'传统天干五合规则将这两个天干列为配对关系'+element+'。这只表示五合规则命中，不代表已经合化；按简化规则归向为和顺。',
+          '天干相冲':'传统天干相冲规则将这两个天干列为相冲配对。这里只记录规则命中，按简化规则归向为多阻，不作具体应事断语。',
+          '六合':'传统地支六合规则将这两个地支列为配对关系'+element+'。这里只表示六合规则命中，不代表已经合化；按简化规则归向为和顺。',
+          '六冲':'传统地支六冲规则将这两个地支列为相冲配对。这里只记录规则命中，按简化规则归向为多阻，不作具体应事断语。',
+          '六害':'传统地支六害规则将这两个地支列为相害配对。这里只记录规则命中，按简化规则归向为多阻，不作具体应事断语。',
+          '相刑':'传统相刑分类将这两个地支归入同一刑组'+kind+'。这里只说明规则归组，按简化规则归向为多阻，不扩展为现实事件判断。',
+          '自刑':'传统自刑规则包含该地支；此项表示同一地支触发自刑规则，按简化规则归向为自阻、宜自省，不作具体应事断语。',
+          '半三合':'按传统三合分类，这两个不同地支同属一组三合，故标记为半三合'+element+'。此类规则在不同流派中存在争议；不等于三支齐全或合化成立，归向偏吉而力弱。'
         };
         const punishmentNameNote=type==='相刑'&&['恃势之刑','无恩之刑'].includes(x.kind)
           ?' 刑名提示：部分典籍与流派对寅巳申、丑戌未两组刑名存在互换说法；本站按所采用的规则名称展示，具体分组以实际成员为准。'
           :'';
         const source=layer==='天干'
-          ?'规则说明：按传统天干关系分类整理。'
-          :'规则说明：按传统地支关系分类整理；部分刑名与半合条件存在流派差异。';
-        return {label:layer+' '+type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:''),description:(descriptions[type]||'本站识别到该关系类别；目前仅展示名称，不延伸解释或吉凶判断。')+punishmentNameNote,source};
+          ?'规则说明：按传统天干关系分类整理；吉凶归向为简化参考。'
+          :'规则说明：按传统地支关系分类整理；部分刑名与半合条件存在流派差异，吉凶归向为简化参考。';
+        return {label:layer+' '+type+(x.kind?' · '+x.kind:'')+(x.element?' · '+x.element:''),description:(descriptions[type]||'本站识别到该关系类别；目前仅展示名称与简化归向。')+punishmentNameNote,source,omen:relationOmen(x)};
       };
       const items=sr.map(x=>describeRelation(x,'天干')).concat(br.map(x=>describeRelation(x,'地支')));
       const bucket=bucketFor(a,b);
       if(items.length&&bucket){
-        bucket.items.push('<div class="data-card relation-result"><div class="relation-result-heading"><span class="relation-icon" aria-hidden="true">⟷</span><strong>命中关系</strong></div><div class="relation-participants">'+locateButton(a)+'<span class="relation-connector">与</span>'+locateButton(b)+'</div><div class="relation-result-items">'+items.map(x=>'<div class="relation-explanation"><span class="chip">'+safe(x.label)+'</span><p>'+safe(x.description)+'</p><small>'+safe(x.source)+'</small></div>').join('')+'</div></div>');
+        bucket.items.push('<div class="data-card relation-result"><div class="relation-result-heading"><span class="relation-icon" aria-hidden="true">⟷</span><strong>命中关系</strong></div><div class="relation-participants">'+locateButton(a)+'<span class="relation-connector">与</span>'+locateButton(b)+'</div><div class="relation-result-items">'+items.map(x=>'<div class="relation-explanation">'+(x.omen&&x.omen.label&&x.omen.label!=='—'?'<span class="chip omen omen-'+safe(x.omen.tone)+'">'+safe(x.omen.label)+'</span>':'')+'<span class="chip">'+safe(x.label)+'</span><p>'+safe(x.description)+'</p><small>'+safe(x.source)+'</small></div>').join('')+'</div></div>');
       }
     }
     const pairCount=relationBuckets.reduce((sum,b)=>sum+b.items.length,0);
@@ -575,12 +593,50 @@
         +(offenderCards.length?'<div class="tai-sui-grid">'+offenderCards.join('')+'</div>':'<p class="muted">当前资料未返回犯太岁关系。</p>')
         +'</section>';
     })();
+    // 流年简测·吉凶归向：按《渊海子平》合冲刑害与犯太岁的简化规则，汇总所选流年与本命的关系信号。
+    const annualOmenSection=(()=>{
+      if(!selectedProfile||!selectedProfile.ganzhi) return '';
+      const k2={zhi:'值太岁',chong:'冲太岁',xing:'刑太岁',hai:'害太岁',po:'破太岁'};
+      const taiSuiSignal={chong:'bad',xing:'bad',hai:'bad',zhi:'flat',po:'flat'};
+      let good=0,bad=0;const signals=[];
+      natal.forEach(p=>{
+        if(!p.gz) return;
+        let sr=[],br=[];try{sr=engine.stemRelation(p.gz[0],selectedProfile.stem)||[];}catch(_){}
+        try{br=engine.branchRelations(p.gz[1],selectedProfile.branch)||[];}catch(_){}
+        sr.concat(br).forEach(x=>{
+          const o=relationOmen(x);
+          if(o.tone==='good')good++;else if(o.tone==='bad')bad++;
+          if(o.label&&o.label!=='—')signals.push(o.label);
+        });
+      });
+      if(Array.isArray(selectedProfile.relations)){
+        selectedProfile.relations.forEach(r=>{
+          if(!Array.isArray(r.kinds))return;
+          r.kinds.forEach(k=>{
+            const t=taiSuiSignal[k];if(!t)return;
+            if(t==='bad')bad++;
+            signals.push(k2[k]||k);
+          });
+        });
+      }
+      if(good+bad===0) return '';
+      let tone='flat',head='平稳';
+      if(bad>good&&bad>0){tone='bad';head='多阻';}
+      else if(good>bad){tone='good';head='吉顺';}
+      const note={
+        good:'和合信号偏多，简化规则偏顺。宜顺势而为，仍以实际事态为准。',
+        flat:'和顺与阻隔信号大致相抵或信号不多，简化规则判为平稳。宜守常行事。',
+        bad:'阻隔信号偏多（多源于冲刑害或犯太岁），简化规则偏慎。宜静守审慎、不宜冒进。'
+      }[tone];
+      const unique=[...new Set(signals)].slice(0,6).join('、');
+      return '<section class="annual-omen"><div class="module-heading"><span class="kicker">流年吉凶 · 简化参考</span><span>按《渊海子平》合冲刑害与犯太岁规则归向</span></div><div class="data-card omen-card omen-'+tone+'"><h3>'+safe(selectedProfile.year)+' · '+safe(selectedProfile.ganzhi)+' 简测：<strong>'+head+'</strong></h3><p>'+(unique?'相关信号：'+safe(unique)+'。':'当前未识别到明显关系信号。')+'</p><p>'+safe(note)+'</p><p class="muted">本小节仅按合冲刑害与犯太岁的简化规则作倾向归向，非古籍逐字结论，也不构成对财运、事业、健康等具体事件的判断；仅供娱乐参考。</p></div></section>';
+    })();
     let selectedGod='—';
     if(selectedProfile){try{selectedGod=engine.tenGodOf(dayGan,selectedProfile.stem)||'—';}catch(_){}}
     const selectedAnnualSummary=selectedProfile?'<div class="data-card selected-time-context"><h3>当前关系对照流年：'+safe(selectedProfile.year)+' · '+safe(selectedProfile.ganzhi)+'</h3><p>天干十神：'+safe(selectedGod)+'　五行：'+safe(selectedProfile.stemElement)+' / '+safe(selectedProfile.branchElement)+'</p><p>纳音：'+safe(selectedProfile.nayin||'—')+'　生肖：'+safe(selectedProfile.zodiacCn||selectedProfile.branch||'—')+'</p><p>立春资料：'+safe(selectedProfile.lichun&&selectedProfile.lichun.text||'未返回')+'</p><p class="muted">该流年将与本命及所选大运共同参与关系对照。</p></div>':'<div class="data-card selected-time-context"><h3>所选流年资料暂不可用</h3><p class="muted">该年份的资料暂不完整，因此暂不加入关系对照。</p></div>';
     const timeText=beijingNow.year+'-'+String(beijingNow.month).padStart(2,'0')+'-'+String(beijingNow.day).padStart(2,'0')+' '+String(beijingNow.hour).padStart(2,'0')+':'+String(beijingNow.minute).padStart(2,'0');
     const annualSelector=renderTimelineSelectors({annual:true,annualYears:Array.from({length:6},(_,i)=>currentYear+i)});
-    return '<h3 class="subhead">当前流年与未来五年</h3>'+annualSelector+selectedAnnualSummary+'<p class="muted">查询时刻：北京时间 '+safe(timeText)+'。当前干支年按立春时间判断；立春前仍归上一干支年。当前流年起点：'+safe(currentYear)+' 年。流年天干十神以本命日主为参照；关系区域仅列出本命与流年之间符合条件的干支关系，不代表完整吉凶结论。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">暂时没有可显示的流年资料。</div>')+'</div>'+taiSuiSection+(monthRows.length?'<h3 class="subhead" style="margin-top:20px">所选流年 '+safe(activeYear)+' 的十二节月资料</h3><p class="muted">以下为所选流年的节月干支与节令名称。当前资料未提供十二个交节的精确时刻，因此不标记当前节月，也不把节月序号当作公历月份边界。</p><div class="annual-month-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'+monthRows.join('')+'</div>':'');
+    return '<h3 class="subhead">当前流年与未来五年</h3>'+annualSelector+selectedAnnualSummary+'<p class="muted">查询时刻：北京时间 '+safe(timeText)+'。当前干支年按立春时间判断；立春前仍归上一干支年。当前流年起点：'+safe(currentYear)+' 年。流年天干十神以本命日主为参照；关系区域仅列出本命与流年之间符合条件的干支关系。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">暂时没有可显示的流年资料。</div>')+'</div>'+taiSuiSection+annualOmenSection+(monthRows.length?'<h3 class="subhead" style="margin-top:20px">所选流年 '+safe(activeYear)+' 的十二节月资料</h3><p class="muted">以下为所选流年的节月干支与节令名称。当前资料未提供十二个交节的精确时刻，因此不标记当前节月，也不把节月序号当作公历月份边界。</p><div class="annual-month-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'+monthRows.join('')+'</div>':'');
   }
     function renderSidePanels() {
     // 五行总览保留在主命盘下方；大运与流年只在下方标签中按需展开。
