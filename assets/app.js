@@ -399,7 +399,7 @@
           const found=branches.filter(x=>x.branch===branch);
           return '<div class="relation-group-member"><strong>'+safe(branch)+'</strong>'+found.map(x=>locateButton(x.participant)).join('')+'</div>';
         });
-        groupCards.push('<div class="data-card relation-group-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合成员：'+safe(members.join('、'))+'</p><div class="relation-group-members">'+sources.join('')+'</div><p class="muted">三个地支均在本命、所选大运或所选流年实际出现；这里只提示组合成员齐备，不判断合化或吉凶。</p></div>');
+        groupCards.push('<div class="data-card relation-group-card"><h3>'+safe(name)+' · '+safe(g.element||'')+'</h3><p>组合成员：'+safe(members.join('、'))+'</p><div class="relation-group-members">'+sources.join('')+'</div><p class="muted">三个不同成员均在本命、所选大运或所选流年实际出现；这里只提示组合成员齐备，不判断合化或吉凶。</p><small class="relation-evidence">规则依据：本站本地引擎 '+(name==='三合'?'BRANCH_TRINE':'BRANCH_MEETING')+' 规则表；'+(g.element?'对应五行 '+safe(g.element)+'。':'')+(g.dirCn?'方位 '+safe(g.dirCn)+'。':'')+'这属于引擎规则资料，不是《渊海子平》原文引述。</small></div>');
       });
     });
     const layerStatus=[
