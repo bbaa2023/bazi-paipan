@@ -695,3 +695,23 @@
 @keyframes relation-target-pulse{0%{box-shadow:0 0 0 10px #b98b4540}100%{box-shadow:0 0 0 7px #b98b4520}}
 @media(max-width:680px){.relation-group-members{grid-template-columns:1fr}.relation-locator{min-height:44px}.relation-participants{align-items:stretch}.relation-participants .relation-locator{max-width:100%}}
 @media(prefers-reduced-motion:reduce){.relation-target-focus{animation:none}}
+
+
+/* P2 第五批：关系分类总览与快速定位 */
+.relation-overview{margin:16px 0;padding:15px;border:1px solid #e6dac4;border-radius:14px;background:linear-gradient(135deg,#fffdf8,#f8f1e5)}
+.relation-overview-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:11px}
+.relation-overview-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.relation-overview-item{display:flex;align-items:center;justify-content:space-between;gap:7px;min-width:0;min-height:48px;padding:9px 10px;border:1px solid #e5d6b9;border-radius:10px;background:#fff;color:#55452e;font:inherit;text-align:left;cursor:pointer;touch-action:manipulation}
+.relation-overview-item strong{display:inline-grid;place-items:center;min-width:25px;height:25px;padding:0 6px;border-radius:20px;background:#f3e8d1;color:#735b32;font-size:12px}
+.relation-overview-item:hover:not(:disabled){border-color:#a8874e;background:#fbf5e9}
+.relation-overview-item:focus-visible{outline:3px solid #a8874e;outline-offset:2px}
+.relation-overview-item:disabled{opacity:.45;cursor:default}
+.relation-category{margin:20px 0;scroll-margin-top:85px}
+.relation-category-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #e9dfcf}
+.relation-category-heading h4{margin:0;color:#735b32;font-size:16px}
+.relation-category-heading p{margin:4px 0 0;font-size:12px}
+.relation-count{flex:none;padding:4px 9px;border-radius:20px;background:#f3e8d1;color:#735b32;font-size:12px;font-weight:600}
+.relation-category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:760px){.relation-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.relation-category-grid{grid-template-columns:1fr}}
+@media(max-width:380px){.relation-overview-grid{grid-template-columns:1fr}.relation-overview-item{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.relation-category{scroll-behavior:auto}}
