@@ -505,13 +505,43 @@
     const branchElement=p.branchElement||elementFor[p.branch];
     const valid=['木','火','土','金','水'];
     if (!valid.includes(stemElement) || !valid.includes(branchElement)) return {grade:'暂不判断',tone:'unknown',reason:'大运天干或地支五行资料不完整，暂不生成趋势提示。'};
+    // ① 五行阵营方向（原有）：按喜用神元素判断有利/谨慎/中性
     const direction=element=>{const isFav=favorable.has(element),isUnfav=unfavorable.has(element);if(isFav===isUnfav)return 'none';return isFav?'favorable':'cautious';};
     const stemDirection=direction(stemElement),branchDirection=direction(branchElement);
     const stemText='天干'+p.stem+'（'+stemElement+'）';
     const branchText='地支'+p.branch+'（主气'+branchElement+'）';
-    if(stemDirection==='favorable'&&branchDirection==='favorable') return {grade:'基础偏有利',tone:'favorable',reason:stemText+'与'+branchText+'均对应简化扶抑参考列出的有利五行方向。'};
-    if(stemDirection==='cautious'&&branchDirection==='cautious') return {grade:'基础偏谨慎',tone:'cautious',reason:stemText+'与'+branchText+'均对应简化扶抑参考列出的相对不利五行方向。'};
-    return {grade:'因素交错',tone:'mixed',reason:stemText+'与'+branchText+'对应方向不一致，或只有一方有明确方向，因此不作单向判断。'};
+    // ② 十神层面（子平扶抑）：身弱喜印比帮身、忌财官食伤耗身；身旺喜财官食伤泄耗、忌印比助旺。
+    const helpGods=['正印','偏印','比肩','劫财'];
+    const drainGods=['正财','偏财','正官','七杀','食神','伤官'];
+    const stemGod=(p.stemTenGod&&p.stemTenGod.god)||'';
+    const branchGod=(p.branchTenGod&&p.branchTenGod.god)||'';
+    const strength=verdict==='weak'?'身弱':(verdict==='strong'?'身旺':'中和');
+    const godSignal=god=>{
+      if(!god) return 'none';
+      const isHelp=helpGods.includes(god),isDrain=drainGods.includes(god);
+      if(!isHelp&&!isDrain) return 'none';
+      const helpful=(verdict==='weak'&&isHelp)||(verdict==='strong'&&isDrain);
+      const harmful=(verdict==='weak'&&isDrain)||(verdict==='strong'&&isHelp);
+      return helpful?'favorable':(harmful?'cautious':'none');
+    };
+    const stemGodSignal=godSignal(stemGod),branchGodSignal=godSignal(branchGod);
+    const godParts=[];
+    if(stemGod) godParts.push('天干十神'+stemGod+(stemGodSignal==='favorable'?'（'+strength+'喜用）':stemGodSignal==='cautious'?'（'+strength+'忌神）':'（不参与喜忌单判）'));
+    if(branchGod) godParts.push('地支十神'+branchGod+(branchGodSignal==='favorable'?'（'+strength+'喜用）':branchGodSignal==='cautious'?'（'+strength+'忌神）':'（不参与喜忌单判）'));
+    // ③ 汇总五行方向 + 十神喜忌信号，综合定档
+    let favorableSignals=0,cautiousSignals=0;
+    [stemDirection,branchDirection].forEach(d=>{if(d==='favorable')favorableSignals++;else if(d==='cautious')cautiousSignals++;});
+    [stemGodSignal,branchGodSignal].forEach(d=>{if(d==='favorable')favorableSignals++;else if(d==='cautious')cautiousSignals++;});
+    let grade,tone;
+    if(favorableSignals>=3&&cautiousSignals===0){grade='明显偏有利';tone='favorable';}
+    else if(favorableSignals>cautiousSignals&&favorableSignals>=2){grade='基础偏有利';tone='favorable';}
+    else if(cautiousSignals>=3&&favorableSignals===0){grade='明显偏谨慎';tone='cautious';}
+    else if(cautiousSignals>favorableSignals&&cautiousSignals>=2){grade='基础偏谨慎';tone='cautious';}
+    else {grade='因素交错';tone='mixed';}
+    const directionCn=d=>d==='favorable'?'偏喜用方向':d==='cautious'?'偏忌神方向':'方向中性';
+    const detail=[stemText+'五行'+directionCn(stemDirection),branchText+'五行'+directionCn(branchDirection)].concat(godParts);
+    const helpDrainCn=strength==='身弱'?'以印比帮身为喜、财官食伤为忌':'以财官食伤泄耗为喜、印比为忌';
+    return {grade,tone,reason:'当前命局判定为'+strength+'（'+helpDrainCn+'）。综合五行方向与十神喜忌：'+detail.join('；')+'。据此给出一档倾向供传统文化参考，不作具体断语。'};
   }
   function renderLuck() {
     if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能计算大运。</div>';
@@ -523,7 +553,7 @@
     const selector=renderTimelineSelectors({luck:true});
     const selectedLuckSummary=selectedLuck?'<div class="data-card selected-time-context"><h3>当前关系对照大运：第'+safe(selectedLuck.index)+'步 · '+safe(selectedLuck.ganzhi)+'</h3><p>时间范围：'+safe(selectedLuck.yearLabel||'年份未返回')+' · 虚岁 '+safe(selectedLuck.startAgeSui??'—')+'–'+safe(selectedLuck.endAgeSui??'—')+'</p><p>天干十神：'+safe(selectedLuck.stemTenGod&&selectedLuck.stemTenGod.god||'—')+'　地支十神：'+safe(selectedLuck.branchTenGod&&selectedLuck.branchTenGod.god||'—')+'</p><p>藏干：'+safe(Array.isArray(selectedLuck.hideGan)?selectedLuck.hideGan.join('、'):'—')+'　十二长生：'+safe(selectedLuck.stage||'—')+'</p><p class="muted">该大运将与本命及所选流年共同参与关系对照。</p></div>':'<div class="data-card selected-time-context"><h3>当前关系对照大运：未指定</h3><p class="muted">选择一部大运后，才会把它加入关系对照；本命和所选流年仍可单独参与。</p></div>';
     const selectedTrend=selectedLuck?getBasicLuckTrend(selectedLuck):null;
-    const selectedTrendCard=selectedTrend?'<div class="data-card luck-trend-card"><div class="luck-trend-heading"><h3>基础大运趋势</h3><span class="luck-trend-label '+selectedTrend.tone+'">'+safe(selectedTrend.grade)+'</span></div><p>'+safe(selectedTrend.reason)+'</p><p class="muted">仅依据本站简化扶抑参考与大运天干、地支主气五行生成；不进行月令司令、格局、调候、通关及刑冲合会的综合分析；简化参考本身包含月柱权重。</p></div>':'';
+    const selectedTrendCard=selectedTrend?'<div class="data-card luck-trend-card"><div class="luck-trend-heading"><h3>基础大运趋势</h3><span class="luck-trend-label '+selectedTrend.tone+'">'+safe(selectedTrend.grade)+'</span></div><p>'+safe(selectedTrend.reason)+'</p><p class="muted">依据本站简化扶抑参考，结合大运天干、地支主气五行与该大运十神喜忌生成；未进行月令司令、格局、调候、通关及刑冲合会的综合分析。</p></div>':'';
     const cards=items.map(p=>{const picked=!!selectedLuck&&Number(selectedLuck.index)===Number(p.index);const trend=getBasicLuckTrend(p);const trendChip='<span class="luck-trend-mini '+trend.tone+'">'+safe(trend.grade)+'</span>';return '<button type="button" class="luck-item timeline-pick '+(p.isCurrent?'current ':'')+(picked?'selected':'')+'" data-pick-luck-index="'+safe(p.index)+'" aria-pressed="'+String(picked)+'" aria-label="选择第'+safe(p.index)+'步大运 '+safe(p.ganzhi||'')+'"><div class="data-card"><h3><span class="relation-icon" aria-hidden="true">⌁</span>'+safe(p.ganzhi||'—')+(p.isCurrent?' · 当前':'')+(picked?' · 关系已选':'')+'</h3><p class="luck-trend-mini-line">'+trendChip+'</p><p>第'+safe(p.index)+'步 · '+safe(p.yearLabel||'年份未知')+'</p><p>虚岁 '+safe(p.startAgeSui??'—')+'–'+safe(p.endAgeSui??'—')+'</p><p><span class="chip">天干 '+safe(p.stemTenGod&&p.stemTenGod.god||'—')+'</span></p><p><span class="chip">地支 '+safe(p.branchTenGod&&p.branchTenGod.god||'—')+'</span></p><p>藏干：'+safe(Array.isArray(p.hideGan)?p.hideGan.join('、'):'—')+'</p><p>十二长生：'+safe(p.stage||'—')+'</p></div></button>';}).join('');
     const unknown=lastBirth.unknownTime&&lastLuck.unknownTime;
     let unknownNote='';
@@ -594,7 +624,7 @@
         +(offenderCards.length?'<div class="tai-sui-grid">'+offenderCards.join('')+'</div>':'<p class="muted">当前资料未返回犯太岁关系。</p>')
         +'</section>';
     })();
-    // 流年简测·吉凶归向：按《渊海子平》合冲刑害与犯太岁的简化规则，汇总所选流年与本命的关系信号。
+    // 流年简测·吉凶归向：按《渊海子平》合冲刑害、犯太岁与大运×流年的简化规则，汇总信号。
     const annualOmenSection=(()=>{
       if(!selectedProfile||!selectedProfile.ganzhi) return '';
       const k2={zhi:'值太岁',chong:'冲太岁',xing:'刑太岁',hai:'害太岁',po:'破太岁'};
@@ -620,6 +650,21 @@
           });
         });
       }
+      // ③ 大运 × 流年关系：若已选大运，分析其与流年的天干地支两两关系，并单独检测天克地冲。
+      const luckP=getSelectedLuckPillar();
+      if(luckP&&luckP.ganzhi&&luckP.ganzhi.length>=2){
+        let srL=[],brL=[];
+        try{srL=engine.stemRelation(luckP.ganzhi[0],selectedProfile.stem)||[];}catch(_){}
+        try{brL=engine.branchRelations(luckP.ganzhi[1],selectedProfile.branch)||[];}catch(_){}
+        srL.concat(brL).forEach(x=>{
+          const o=relationOmen(x);
+          if(o.tone==='good')good++;else if(o.tone==='bad')bad++;
+          if(o.label&&o.label!=='—')signals.push(o.label+'（大运×流年）');
+        });
+        const stemClash=srL.some(x=>x.type==='天干相冲');
+        const branchClash=brL.some(x=>x.type==='六冲');
+        if(stemClash&&branchClash){bad+=2;signals.push('天克地冲（大运×流年）');}
+      }
       if(good+bad===0) return '';
       let tone='flat',head='平稳';
       if(bad>good&&bad>0){tone='bad';head='多阻';}
@@ -627,10 +672,10 @@
       const note={
         good:'和合信号偏多，简化规则偏顺。宜顺势而为，仍以实际事态为准。',
         flat:'和顺与阻隔信号大致相抵或信号不多，简化规则判为平稳。宜守常行事。',
-        bad:'阻隔信号偏多（多源于冲刑害或犯太岁），简化规则偏慎。宜静守审慎、不宜冒进。'
+        bad:'阻隔信号偏多（多源于冲刑害、犯太岁或大运×流年相冲），简化规则偏慎。宜静守审慎、不宜冒进。'
       }[tone];
       const unique=[...new Set(signals)].slice(0,6).join('、');
-      return '<section class="annual-omen"><div class="module-heading"><span class="kicker">流年吉凶 · 简化参考</span><span>按《渊海子平》合冲刑害与犯太岁规则归向</span></div><div class="data-card omen-card omen-'+tone+'"><h3>'+safe(selectedProfile.year)+' · '+safe(selectedProfile.ganzhi)+' 简测：<strong>'+head+'</strong></h3><p>'+(unique?'相关信号：'+safe(unique)+'。':'当前未识别到明显关系信号。')+'</p><p>'+safe(note)+'</p><p class="muted">本小节仅按合冲刑害与犯太岁的简化规则作倾向归向，非古籍逐字结论，也不构成对财运、事业、健康等具体事件的判断；仅供娱乐参考。</p></div></section>';
+      return '<section class="annual-omen"><div class="module-heading"><span class="kicker">流年吉凶 · 简化参考</span><span>按《渊海子平》合冲刑害、犯太岁与大运×流年规则归向</span></div><div class="data-card omen-card omen-'+tone+'"><h3>'+safe(selectedProfile.year)+' · '+safe(selectedProfile.ganzhi)+' 简测：<strong>'+head+'</strong></h3><p>'+(unique?'相关信号：'+safe(unique)+'。':'当前未识别到明显关系信号。')+'</p><p>'+safe(note)+'</p><p class="muted">本小节按合冲刑害、犯太岁，以及本命/所选大运与流年的两两干支关系作简化倾向归向；天克地冲计为较强的阻隔信号。非古籍逐字结论，也不构成对财运、事业、健康等具体事件的判断；仅供娱乐参考。</p></div></section>';
     })();
     let selectedGod='—';
     if(selectedProfile){try{selectedGod=engine.tenGodOf(dayGan,selectedProfile.stem)||'—';}catch(_){}}
