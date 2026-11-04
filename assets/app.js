@@ -201,6 +201,7 @@
       if (hidden.slice(1).some(stem => elementFor[stem] === dayElement)) residualRoot = true;
     }
     if (rootLabel === '无根' && residualRoot) rootLabel = '有余气根';
+    const deDi = rootLabel !== '无根';
 
     const favorable = Array.isArray(lastFavorable?.fuYang?.favorable) ? lastFavorable.fuYang.favorable : [];
     const useElements = [...new Set(favorable.map(item => item?.element).filter(e => keys.includes(e)))];
@@ -228,9 +229,9 @@
     const tabooRoleText = tabooElements.length ? tabooElements.map(e => relationOf(e).god).join(' · ') : '当前未见突出项';
 
     let basis = '目前尚无明确旺衰结论，以下阵营比例仅作五行关系参考。';
-    if (strength === '偏弱') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；虽有令根，但克泄耗占'+drainPct.toFixed(1)+'%、帮扶占'+helpPct.toFixed(1)+'%，克泄耗一方更重，故综合仍偏弱。';
-    else if (strength === '偏强') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；'+(deLing ? '得令且有根，帮扶基础较足' : '虽失令，但帮扶力量占'+helpPct.toFixed(1)+'%，整体支持较重')+'，故综合偏强，宜适度疏泄制衡。';
-    else if (strength === '中和') basis = (deLing ? '得令' : '失令') + '、' + rootLabel + '；帮扶占'+helpPct.toFixed(1)+'%，克泄耗占'+drainPct.toFixed(1)+'%，整体较为均衡。';
+    if (strength === '偏弱') basis = (deLing ? '得令' : '失令') + '、' + (deDi ? '得地' : '失地') + '；虽有令根，但克泄耗占'+drainPct.toFixed(1)+'%、帮扶占'+helpPct.toFixed(1)+'%，克泄耗一方更重，故综合仍偏弱。';
+    else if (strength === '偏强') basis = (deLing ? '得令' : '失令') + '、' + (deDi ? '得地' : '失地') + '；'+(deLing ? '得令且有根，帮扶基础较足' : '虽失令，但帮扶力量占'+helpPct.toFixed(1)+'%，整体支持较重')+'，故综合偏强，宜适度疏泄制衡。';
+    else if (strength === '中和') basis = (deLing ? '得令' : '失令') + '、' + (deDi ? '得地' : '失地') + '；帮扶占'+helpPct.toFixed(1)+'%，克泄耗占'+drainPct.toFixed(1)+'%，整体较为均衡。';
 
     const leadDrain = drainRanked[0] || '';
     let keyInsight = leadDrain
@@ -250,7 +251,7 @@
 
     return '<section class="fy-final">'+
       '<header class="fy-final-heading"><div><span>五行结构 · 旺衰喜忌</span><h3>日主旺衰 · 喜用神诊断</h3><p>子平扶抑 · 身弱喜印比帮身，身旺喜财官食伤泄耗</p></div></header>'+
-      '<div class="fy-final-anchor"><div class="fy-final-day"><small>日主</small><strong>'+safe(dayGan)+'</strong><em>'+safe(dayElement)+'</em></div><div class="fy-final-month"><small>月令</small><strong>'+safe(monthBranch||'—')+'</strong><em>'+safe(monthElement)+'</em></div><div class="fy-final-badges">'+badge(deLing?'得令':'失令',deLing)+badge(rootLabel,rootLabel!=='无根')+badge(helpScore>drainScore?'得势':'失势',helpScore>drainScore)+'</div></div>'+
+      '<div class="fy-final-anchor"><div class="fy-final-day"><small>日主</small><strong>'+safe(dayGan)+'</strong><em>'+safe(dayElement)+'</em></div><div class="fy-final-month"><small>月令</small><strong>'+safe(monthBranch||'—')+'</strong><em>'+safe(monthElement)+'</em></div><div class="fy-final-badges">'+badge(deLing?'得令':'失令',deLing)+badge(deDi?'得地':'失地',deDi)+badge(helpScore>drainScore?'得势':'失势',helpScore>drainScore)+'</div></div>'+
       '<div class="fy-final-verdict"><div class="fy-final-verdict-main"><span>日主旺衰</span><strong>'+safe(strength)+'</strong></div><p>'+safe(basis)+'</p></div>'+
       '<section class="fy-final-section"><div class="fy-final-section-title">力量对比 <small>五行阵营统计值</small></div><div class="fy-final-balance-labels"><strong class="help">帮扶 '+helpPct.toFixed(1)+'%</strong><strong class="drain">克泄耗 '+drainPct.toFixed(1)+'%</strong></div><div class="fy-final-bar"><i class="help" style="width:'+helpPct.toFixed(2)+'%"></i><i class="drain" style="width:'+drainPct.toFixed(2)+'%"></i></div><div class="fy-final-composition"><span class="help">帮扶：'+safe(helpNames.join(' · ')||'无')+'（'+safe([roles['印'],roles['比劫']].filter((e,i,arr)=>arr.indexOf(e)===i).map(e=>relationOf(e).god).join(' · '))+'）</span><span class="drain">克泄耗：'+safe(drainNames.join(' · ')||'无')+'（'+safe(drainNames.map(e=>relationOf(e).god).join(' · ')||'无')+'）</span></div></section>'+
       '<section class="fy-final-section"><div class="fy-final-section-title">五行 → 十神 → 阵营 <small>按五行点数由高到低</small></div><div class="fy-final-cause">'+causeRows+'</div><p class="fy-final-insight">'+safe(keyInsight)+'</p></section>'+
