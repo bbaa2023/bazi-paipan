@@ -96,8 +96,9 @@
         pillarShenshaHits = Array.isArray(scanned) ? scanned : [];
       } catch (e) { console.warn('四柱卡片神煞扫描失败：', e); }
     }
-    const elementIcon = {'木':'🌳','火':'🔥','土':'🟫','金':'⚙️','水':'💧'};
     const elementColorClass = (el) => 'el-' + (['木','火','土','金','水'].includes(el) ? el : '未知');
+    // 五行符号：由 CSS/SVG 生成统一徽章（替换早期 emoji 图标，提升质感）
+    const elementSymbol = (el) => ['木','火','土','金','水'].includes(el) ? '<i class="w5-sym w5-' + el + '" aria-hidden="true"></i>' : '<i class="w5-sym" aria-hidden="true"></i>';
     const stemAttr = (gan) => {
       const i = Array.isArray(engine.STEMS) ? engine.STEMS.indexOf(gan) : -1;
       if (i < 0) return {element:'—',polarity:'—'};
@@ -114,7 +115,7 @@
       const element = ['木','火','土','金','水'].includes(attr.element) ? attr.element : '未知';
       const label = polarity && element !== '未知' ? polarity + element : '—';
       const title = kind === '干' ? '天干' : '地支';
-      return '<span class="pillar-attr '+elementColorClass(attr.element)+'" aria-label="'+safe(title)+'属性：'+safe(label)+'"><i aria-hidden="true">'+(elementIcon[attr.element] || '◇')+'</i><b><span class="polarity polarity-'+(polarity === '阳' ? 'yang' : polarity === '阴' ? 'yin' : 'unknown')+'">'+safe(polarity || '—')+'</span><span class="attr-element">'+safe(element)+'</span></b></span>';
+      return '<span class="pillar-attr '+elementColorClass(attr.element)+'" aria-label="'+safe(title)+'属性：'+safe(label)+'">'+elementSymbol(attr.element)+'<b><span class="polarity polarity-'+(polarity === '阳' ? 'yang' : polarity === '阴' ? 'yin' : 'unknown')+'">'+safe(polarity || '—')+'</span><span class="attr-element">'+safe(element)+'</span></b></span>';
     };
     pillarsBox.classList.toggle('three-pillars', labels.length === 3);
     pillarsBox.innerHTML = labels.map(([key,label],i) => {
