@@ -953,3 +953,31 @@ body{font-family:var(--sans);background-image:
 @media(max-width:380px){
   .fy-final-element b{width:24px;height:24px;flex-basis:24px;font-size:13px}
 }
+
+/* ---- P4 视觉微调：四柱卡片纳音/神煞竖排对齐（比照问真八字），神煞一行一个避免拥挤 ---- */
+.pillar-nayin,
+.pillar-shensha{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+  flex-wrap:nowrap;
+  gap:4px;
+  width:100%;
+}
+.pillar-nayin>b{padding:0}
+.pillar-shensha-list{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+  flex-wrap:nowrap;
+  gap:4px;
+  width:100%;
+  min-width:0;
+}
+.pillar-shensha-list em{max-width:100%}
+@media(max-width:680px){
+  .pillar-nayin,.pillar-shensha{gap:3px}
+  .pillar-shensha-list{gap:3px}
+}
