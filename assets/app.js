@@ -222,9 +222,18 @@
     }).join('');
 
     const drainRanked = drainNames.slice().sort((a,b) => values[b] - values[a]);
-    const tabooElements = drainRanked.length ? drainRanked.filter(e => values[e] === values[drainRanked[0]]) : [];
+    const helpRanked = helpNames.slice().sort((a,b) => values[b] - values[a]);
+    const pickTaboo = (pool) => {
+      if (!pool.length) return [];
+      const usable = pool.filter(e => !useElements.includes(e));
+      if (!usable.length) return [];
+      const top = values[usable[0]];
+      return usable.filter(e => values[e] === top);
+    };
+    // 忌神与用神互斥，并按旺衰方向取对立阵营占比最高者：身旺忌帮扶（印比）、身弱忌克泄耗（食财官）；中和/待判断仍以克泄耗侧慎叠加参考。
+    const tabooElements = strength === '偏强' ? pickTaboo(helpRanked) : pickTaboo(drainRanked);
     const useText = useElements.length ? useElements.join(' · ') : (strength === '偏弱' ? helpNames.join(' · ') : '以当前用神参考结果为准');
-    const tabooText = tabooElements.length ? tabooElements.join(' · ') : '暂无明显克泄耗五行';
+    const tabooText = tabooElements.length ? tabooElements.join(' · ') : '暂无明显忌神';
     const useRoleText = useElements.length ? useElements.map(e => relationOf(e).god).join(' · ') : (strength === '偏弱' ? '印 · 比劫（阵营参考）' : '以当前分析结果为准');
     const tabooRoleText = tabooElements.length ? tabooElements.map(e => relationOf(e).god).join(' · ') : '当前未见突出项';
 
@@ -239,7 +248,7 @@
       : '关键：当前未统计到明显克泄耗五行；五行数量只表示分布，不直接等同日主旺衰。';
     if (strength === '偏弱' && leadDrain) keyInsight += ' 综合判断为身弱，宜优先扶身。';
     const advice = strength === '偏弱'
-      ? '①补'+(useElements.length ? useElements.join('、') : '印比')+'（印生身、比劫助身）固本；②结合实际生活节奏沉淀积累；③慎叠加'+(tabooText === '暂无明显克泄耗五行' ? '克泄耗力量' : tabooText+'（'+tabooRoleText+'）')+'。'
+      ? '①补'+(useElements.length ? useElements.join('、') : '印比')+'（印生身、比劫助身）固本；②结合实际生活节奏沉淀积累；③慎叠加'+(tabooText === '暂无明显忌神' ? '克泄耗力量' : tabooText+'（'+tabooRoleText+'）')+'。'
       : strength === '偏强'
         ? '①优先参考用神方向疏泄制衡；②减少继续叠加印比帮扶；③结合完整命局与调候灵活取舍。'
         : strength === '中和'
