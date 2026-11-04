@@ -553,7 +553,7 @@
     const selector=renderTimelineSelectors({luck:true});
     const selectedLuckSummary=selectedLuck?'<div class="data-card selected-time-context"><h3>当前关系对照大运：第'+safe(selectedLuck.index)+'步 · '+safe(selectedLuck.ganzhi)+'</h3><p>时间范围：'+safe(selectedLuck.yearLabel||'年份未返回')+' · 虚岁 '+safe(selectedLuck.startAgeSui??'—')+'–'+safe(selectedLuck.endAgeSui??'—')+'</p><p>天干十神：'+safe(selectedLuck.stemTenGod&&selectedLuck.stemTenGod.god||'—')+'　地支十神：'+safe(selectedLuck.branchTenGod&&selectedLuck.branchTenGod.god||'—')+'</p><p>藏干：'+safe(Array.isArray(selectedLuck.hideGan)?selectedLuck.hideGan.join('、'):'—')+'　十二长生：'+safe(selectedLuck.stage||'—')+'</p><p class="muted">该大运将与本命及所选流年共同参与关系对照。</p></div>':'<div class="data-card selected-time-context"><h3>当前关系对照大运：未指定</h3><p class="muted">选择一部大运后，才会把它加入关系对照；本命和所选流年仍可单独参与。</p></div>';
     const selectedTrend=selectedLuck?getBasicLuckTrend(selectedLuck):null;
-    const selectedTrendCard=selectedTrend?'<div class="data-card luck-trend-card"><div class="luck-trend-heading"><h3>基础大运趋势</h3><span class="luck-trend-label '+selectedTrend.tone+'">'+safe(selectedTrend.grade)+'</span></div><p>'+safe(selectedTrend.reason)+'</p><p class="muted">依据本站简化扶抑参考，结合大运天干、地支主气五行与该大运十神喜忌生成；未进行月令司令、格局、调候、通关及刑冲合会的综合分析。</p></div>':'';
+    const selectedTrendCard=selectedTrend?'<div class="data-card luck-trend-card"><div class="luck-trend-heading"><h3>基础大运趋势</h3><span class="luck-trend-label '+selectedTrend.tone+'">'+safe(selectedTrend.grade)+'</span></div><p>'+safe(selectedTrend.reason)+'</p><p class="muted">仅依据本站简化扶抑参考与大运天干、地支主气五行生成；不进行月令司令、格局、调候、通关及刑冲合会的综合分析；简化参考本身包含月柱权重。</p></div>':'';
     const cards=items.map(p=>{const picked=!!selectedLuck&&Number(selectedLuck.index)===Number(p.index);const trend=getBasicLuckTrend(p);const trendChip='<span class="luck-trend-mini '+trend.tone+'">'+safe(trend.grade)+'</span>';return '<button type="button" class="luck-item timeline-pick '+(p.isCurrent?'current ':'')+(picked?'selected':'')+'" data-pick-luck-index="'+safe(p.index)+'" aria-pressed="'+String(picked)+'" aria-label="选择第'+safe(p.index)+'步大运 '+safe(p.ganzhi||'')+'"><div class="data-card"><h3><span class="relation-icon" aria-hidden="true">⌁</span>'+safe(p.ganzhi||'—')+(p.isCurrent?' · 当前':'')+(picked?' · 关系已选':'')+'</h3><p class="luck-trend-mini-line">'+trendChip+'</p><p>第'+safe(p.index)+'步 · '+safe(p.yearLabel||'年份未知')+'</p><p>虚岁 '+safe(p.startAgeSui??'—')+'–'+safe(p.endAgeSui??'—')+'</p><p><span class="chip">天干 '+safe(p.stemTenGod&&p.stemTenGod.god||'—')+'</span></p><p><span class="chip">地支 '+safe(p.branchTenGod&&p.branchTenGod.god||'—')+'</span></p><p>藏干：'+safe(Array.isArray(p.hideGan)?p.hideGan.join('、'):'—')+'</p><p>十二长生：'+safe(p.stage||'—')+'</p></div></button>';}).join('');
     const unknown=lastBirth.unknownTime&&lastLuck.unknownTime;
     let unknownNote='';
@@ -624,7 +624,7 @@
         +(offenderCards.length?'<div class="tai-sui-grid">'+offenderCards.join('')+'</div>':'<p class="muted">当前资料未返回犯太岁关系。</p>')
         +'</section>';
     })();
-    // 流年简测·吉凶归向：按《渊海子平》合冲刑害、犯太岁与大运×流年的简化规则，汇总信号。
+    // 流年简测·吉凶归向：按《渊海子平》合冲刑害与犯太岁的简化规则，汇总所选流年与本命的关系信号。
     const annualOmenSection=(()=>{
       if(!selectedProfile||!selectedProfile.ganzhi) return '';
       const k2={zhi:'值太岁',chong:'冲太岁',xing:'刑太岁',hai:'害太岁',po:'破太岁'};
@@ -672,7 +672,7 @@
       const note={
         good:'和合信号偏多，简化规则偏顺。宜顺势而为，仍以实际事态为准。',
         flat:'和顺与阻隔信号大致相抵或信号不多，简化规则判为平稳。宜守常行事。',
-        bad:'阻隔信号偏多（多源于冲刑害、犯太岁或大运×流年相冲），简化规则偏慎。宜静守审慎、不宜冒进。'
+        bad:'阻隔信号偏多（多源于冲刑害或犯太岁），简化规则偏慎。宜静守审慎、不宜冒进。'
       }[tone];
       const unique=[...new Set(signals)].slice(0,6).join('、');
       return '<section class="annual-omen"><div class="module-heading"><span class="kicker">流年吉凶 · 简化参考</span><span>按《渊海子平》合冲刑害、犯太岁与大运×流年规则归向</span></div><div class="data-card omen-card omen-'+tone+'"><h3>'+safe(selectedProfile.year)+' · '+safe(selectedProfile.ganzhi)+' 简测：<strong>'+head+'</strong></h3><p>'+(unique?'相关信号：'+safe(unique)+'。':'当前未识别到明显关系信号。')+'</p><p>'+safe(note)+'</p><p class="muted">本小节按合冲刑害、犯太岁，以及本命/所选大运与流年的两两干支关系作简化倾向归向；天克地冲计为较强的阻隔信号。非古籍逐字结论，也不构成对财运、事业、健康等具体事件的判断；仅供娱乐参考。</p></div></section>';
