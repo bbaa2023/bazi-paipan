@@ -854,3 +854,102 @@
  .hex-glyph-big{font-size:50px}
  .hex-line i{width:110px}
 }
+
+/* ============================================================
+   P2 视觉升级：设计令牌 · 五行符号系统 · 质感增强（宣纸金体系）
+   借鉴成熟商用排盘工具的"专业感"设计原则，不照搬任何站点布局
+   ============================================================ */
+:root{
+  /* 宣纸质感 */
+  --paper:#f4efe6;
+  --bg:var(--paper);
+  --panel:#fffdf9;--panel2:#f6f0e4;
+  --line:#e5d9c2;--line-strong:#d8c7a0;
+  --text:#2a3340;--muted:#7b8590;
+  --gold:#a87c3c;--gold-dark:#86632a;--gold-soft:#c9a45e;
+  /* 五行 · 传统色（亮/中/深，供徽章与全局使用） */
+  --wood:#2f6f50;--wood-l:#5aa97c;--wood-d:#24573f;
+  --fire:#b03a2e;--fire-l:#e06a4f;--fire-d:#8f2f26;
+  --earth:#a8732f;--earth-l:#d09a4b;--earth-d:#8b5f22;
+  --metal:#8d9aa4;--metal-l:#c3ccd2;--metal-d:#74818b;
+  --water:#2f6e9e;--water-l:#5a9ac4;--water-d:#25587f;
+  /* 层级阴影 */
+  --shadow-1:0 1px 2px rgba(90,70,40,.05),0 4px 12px rgba(90,70,40,.07);
+  --shadow-2:0 2px 6px rgba(90,70,40,.07),0 14px 30px rgba(90,70,40,.11);
+  /* 字体 */
+  --serif:"Noto Serif SC","Songti SC","SimSun",serif;
+  --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+}
+body{font-family:var(--sans);background-image:
+  radial-gradient(ellipse at 50% -18%,#d9c7a52e,transparent 55%),
+  repeating-linear-gradient(0deg,rgba(140,120,80,.016) 0 1px,transparent 1px 3px),
+  radial-gradient(circle at 14% 6%,rgba(255,255,255,.55),transparent 40%),
+  var(--paper);background-attachment:fixed}
+@media(max-width:680px){body{background-attachment:scroll}}
+
+/* ---- 五行徽章符号系统（纯 CSS 生成，替代早期 emoji 图标） ---- */
+.w5-sym{display:inline-grid;place-items:center;width:20px;height:20px;flex:0 0 20px;border-radius:50%;font-style:normal;position:relative;color:#fff;line-height:1;vertical-align:middle}
+.w5-sym::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.36),transparent 56%)}
+.w5-sym::after{display:grid;place-items:center;position:relative;z-index:1;font:800 12px/1 var(--serif);text-shadow:0 1px 2px rgba(0,0,0,.30)}
+.w5-木{background:linear-gradient(135deg,var(--wood-l),var(--wood-d));border:1px solid #3f8059;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 1px 3px rgba(40,90,60,.42)}.w5-木::after{content:"木"}
+.w5-火{background:linear-gradient(135deg,var(--fire-l),var(--fire-d));border:1px solid #b54a39;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 1px 3px rgba(150,50,35,.42)}.w5-火::after{content:"火"}
+.w5-土{background:linear-gradient(135deg,var(--earth-l),var(--earth-d));border:1px solid #ab7d3b;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 1px 3px rgba(140,90,30,.42)}.w5-土::after{content:"土"}
+.w5-金{background:linear-gradient(135deg,var(--metal-l),var(--metal-d));border:1px solid #96a1a9;box-shadow:inset 0 0 0 1px rgba(255,255,255,.26),0 1px 3px rgba(90,100,110,.42)}.w5-金::after{content:"金"}
+.w5-水{background:linear-gradient(135deg,var(--water-l),var(--water-d));border:1px solid #357ba9;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 1px 3px rgba(30,80,120,.42)}.w5-水::after{content:"水"}
+.w5-sym:not(.w5-木):not(.w5-火):not(.w5-土):not(.w5-金):not(.w5-水){background:linear-gradient(135deg,#ccd1d6,#8d97a0);border:1px solid #9aa4ac}.w5-sym:not(.w5-木):not(.w5-火):not(.w5-土):not(.w5-金):not(.w5-水)::after{content:"·"}
+
+/* ---- Hero 质感 ---- */
+.hero{padding:22px 10px 18px}
+.hero-emblem{border-color:var(--gold-soft);box-shadow:0 0 0 5px rgba(190,160,90,.12),0 6px 18px rgba(90,70,40,.12);background:radial-gradient(circle,#fffdf8,#efe3ca)}
+.hero h1{font-family:var(--serif);letter-spacing:.1em;color:var(--text)}
+.hero h1 span{font-family:var(--serif)}
+
+/* ---- 面板 / 卡片 统一质感 ---- */
+.panel,.results,.overview-panel,.fy-final,.fy-card,.support-panel,.element-combined-card,.favorable-card,.data-card,.tools-fieldset,.tools-summary,.chart-frame{border-color:var(--line);box-shadow:var(--shadow-1)}
+.form-panel{border-color:var(--line-strong)}
+.chart-frame{border-color:#cdb789;box-shadow:var(--shadow-2),inset 0 0 0 4px rgba(190,160,90,.07)}
+.subhead{font-family:var(--serif)}
+
+/* ---- 四柱卡片 ---- */
+.pillar{box-shadow:var(--shadow-1);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.pillar:hover{transform:translateY(-2px);box-shadow:var(--shadow-2);border-color:var(--line-strong)}
+.pillar-character strong{font-family:var(--serif)}
+.pillar-day-master{box-shadow:0 0 0 3px rgba(190,150,70,.18),var(--shadow-1)}
+.pillar-attr .w5-sym{width:20px;height:20px;font-size:12px}
+
+/* ---- 主按钮 ---- */
+.primary{background:linear-gradient(135deg,#cba35f,#a87c3c);box-shadow:0 4px 14px rgba(168,124,60,.30),inset 0 1px 0 rgba(255,255,255,.38);border-color:#d7b77e}
+.primary:hover{box-shadow:0 6px 18px rgba(168,124,60,.34),inset 0 1px 0 rgba(255,255,255,.38)}
+
+/* ---- 标签页激活态 ---- */
+.tab.active{box-shadow:inset 0 2px var(--gold-soft)}
+.tab:hover{color:#8d6528}
+
+/* ---- 五行能量·扶抑面板：五行元素升级为徽章 ---- */
+.fy-final-element{display:flex;align-items:center;gap:9px}
+.fy-final-element b{display:inline-grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border-radius:50%;color:#fff;font-family:var(--serif);font-weight:800;font-size:16px;line-height:1;box-shadow:inset 0 0 0 1px rgba(255,255,255,.26),0 1px 4px rgba(0,0,0,.20)}
+.fy-final-element.el-木 b{background:linear-gradient(135deg,var(--wood-l),var(--wood-d));border:1px solid #3f8059}
+.fy-final-element.el-火 b{background:linear-gradient(135deg,var(--fire-l),var(--fire-d));border:1px solid #b54a39}
+.fy-final-element.el-土 b{background:linear-gradient(135deg,var(--earth-l),var(--earth-d));border:1px solid #ab7d3b}
+.fy-final-element.el-金 b{background:linear-gradient(135deg,var(--metal-l),var(--metal-d));border:1px solid #96a1a9}
+.fy-final-element.el-水 b{background:linear-gradient(135deg,var(--water-l),var(--water-d));border:1px solid #357ba9}
+.fy-final-element small{margin-left:auto;font-size:11px}
+
+/* ---- 命盘框架装饰 ---- */
+.chart-frame-top,.chart-frame-bottom{letter-spacing:.16em}
+.chart-seal{border-color:var(--gold-soft);background:radial-gradient(circle,#f6ead0,#e5cf9f);color:#7c5b22;box-shadow:0 0 0 3px rgba(190,160,90,.14)}
+
+/* ---- 移动端适配补充 ---- */
+@media(max-width:680px){
+  .w5-sym{width:18px;height:18px;flex-basis:18px}
+  .w5-sym::after{font-size:11px}
+  .pillar-attr .w5-sym{width:18px;height:18px;font-size:11px}
+  .fy-final-element{gap:7px}
+  .fy-final-element b{width:26px;height:26px;flex-basis:26px;font-size:14px}
+  .fy-final-element small{font-size:10px}
+  .hero{padding:16px 4px 13px}
+  .hero-emblem{box-shadow:0 0 0 4px rgba(190,160,90,.12),0 5px 14px rgba(90,70,40,.10)}
+}
+@media(max-width:380px){
+  .fy-final-element b{width:24px;height:24px;flex-basis:24px;font-size:13px}
+}
