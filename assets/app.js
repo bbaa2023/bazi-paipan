@@ -248,7 +248,7 @@
       : '关键：当前未统计到明显克泄耗五行；五行数量只表示分布，不直接等同日主旺衰。';
     if (strength === '偏弱' && leadDrain) keyInsight += ' 综合判断为身弱，宜优先扶身。';
     const advice = strength === '偏弱'
-      ? '①补'+(useElements.length ? useElements.join('、') : '印比')+'（印生身、比劫助身）固本；②结合实际生活节奏沉淀积累；③慎叠加'+(tabooText === '暂无明显忌神' ? '克泄耗力量' : tabooText+'（'+tabooRoleText+'）')+'。'
+      ? '①补'+(useElements.length ? useElements.join('、') : '印比')+'（印生身、比劫助身）固本；②结合实际生活节奏沉淀积累；③慎叠加'+(tabooText === '暂无明显克泄耗五行' ? '克泄耗力量' : tabooText+'（'+tabooRoleText+'）')+'。'
       : strength === '偏强'
         ? '①优先参考用神方向疏泄制衡；②减少继续叠加印比帮扶；③结合完整命局与调候灵活取舍。'
         : strength === '中和'
