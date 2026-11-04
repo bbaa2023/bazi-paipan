@@ -31,3 +31,10 @@ a{color:inherit}.guide-topbar{height:66px;display:flex;align-items:center;justif
 /* 首页全文检索结果 */
 .guide-search-results{max-width:620px;margin:10px auto 0;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--paper);overflow:hidden;box-shadow:var(--shadow)}
 .search-result{display:block;padding:10px 14px;border-bottom:1px solid #eee6d9;text-decoration:none}.search-result:last-child{border-bottom:0}.search-result:hover{background:#faf5ea}.search-result b,.search-result span{display:block}.search-result b{color:#805c22;font-size:12px}.search-result span{margin-top:2px;color:var(--muted);font-size:11px;line-height:1.6}
+
+/* P5：红色「返回八字排盘」按钮（知识库统一入口） */
+.back-btn{display:inline-flex;align-items:center;gap:5px;padding:8px 13px;border:1px solid #b43024;border-radius:9px;background:linear-gradient(135deg,#d8503f,#b03024);color:#fff!important;font-size:13px;font-weight:700;text-decoration:none!important;white-space:nowrap;box-shadow:0 3px 10px rgba(176,48,36,.28);transition:filter .15s,transform .15s}
+.back-btn:hover{filter:brightness(1.06)}
+.back-btn:active{transform:scale(.98)}
+@media(max-width:760px){.back-btn{padding:6px 10px;font-size:11px}}
+
