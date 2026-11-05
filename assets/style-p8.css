@@ -42,7 +42,15 @@
 }
 .ps-label { font-size: 11px; color: #8a7f63; letter-spacing: .1em; line-height: 1; }
 .ps-gz { font-size: 22px; font-weight: 700; color: #3a3428; line-height: 1.05; font-family: "Noto Serif SC", "Songti SC", "SimSun", serif; }
-.ps-day .ps-gz { color: #8a6d2f; }
+.ps-gz-c { display: inline-block; min-width: .78em; letter-spacing: 0; }
+/* 五行属性着色：木/火/土/金/水 */
+.ps-e-木 { color: #2e7d32; }
+.ps-e-火 { color: #c62828; }
+.ps-e-土 { color: #8a6d3f; }
+.ps-e-金 { color: #b08a2f; }
+.ps-e-水 { color: #1565c0; }
+.ps-e-na { color: #3a3428; }
+.ps-day .ps-gz { color: inherit; }
 .ps-god { font-size: 11px; color: #6d6250; line-height: 1; }
 
 .ps-back {
