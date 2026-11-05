@@ -1,24 +1,15 @@
-/* ===== P8 吸顶迷你四柱条 =====
-   看旺衰/格局/喜忌等分析时，四柱命盘滚出屏幕后，
-   顶部浮现一条四柱干支，常驻可对照；点击回完整命盘。 */
-.pillars-sticky {
-  position: fixed;
-  left: 0; right: 0; top: 0;
-  z-index: 60;
-  transform: translateY(-115%);
-  transition: transform .28s ease;
+/* ===== P8 四柱内嵌条 =====
+   旺衰/格局/喜忌板块（#overview-panel）顶部内嵌一条四柱干支，
+   随板块滚动对照；点击回完整命盘。命盘页不悬浮、不遮挡。 */
+.pillars-inline {
   display: flex;
   align-items: stretch;
   gap: 8px;
-  padding: 9px 12px;
-  background: rgba(243,240,232,.96);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid var(--line,#d8d2c0);
-  box-shadow: 0 4px 16px rgba(60,50,20,.16);
+  padding: 8px 2px 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px dashed var(--line,#d8d2c0);
 }
-.pillars-sticky.ps-visible { transform: translateY(0); }
-.pillars-sticky[hidden] { display: none; }
+.pillars-inline[hidden] { display: none; }
 
 .ps-pillar {
   flex: 1 1 0;
@@ -72,7 +63,7 @@
 .ps-back span:last-child { font-size: 10px; letter-spacing: .08em; }
 
 @media (max-width: 680px) {
-  .pillars-sticky { padding: 6px 8px; gap: 4px; }
+  .pillars-inline { padding: 6px 0 10px; gap: 4px; }
   .ps-pillar { padding: 4px 1px; gap: 1px; }
   .ps-gz { font-size: 17px; }
   .ps-label, .ps-god { font-size: 9px; }
