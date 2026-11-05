@@ -257,9 +257,47 @@
     const climate = lastFavorable?.tiaoHou?.ruleCn || '暂无调候结果';
     const badge = (label,good) => '<span class="fy-final-badge '+(good?'good':'bad')+'">'+label+(good?' ✓':' ✗')+'</span>';
     const elementList = arr => arr.length ? arr.map(e=>'<b class="fy-final-pill el-'+e+'">'+e+'</b>').join('') : '<span class="fy-final-muted">暂无相关资料</span>';
+    // —— 月令格局（子平取格·主流口径）：以月令本气定格，透干者为准；比劫月令入建禄/月劫，不入正八格。仅定格与透干状态，不作成格/破格推断。 ——
+    const monthHiddenList = Array.isArray(lastChart.pillars?.month?.hideGan) ? lastChart.pillars.month.hideGan : [];
+    const geJuStems = ['year','month','day','time'].map(k=>String(lastChart.pillars?.[k]?.ganzhi||'').charAt(0)).filter(Boolean);
+    const outerStems = geJuStems.filter((_,i)=> i!==2); // 透干看年/月/时三干（日干为日主，不计入取格透干）
+    const godOfStem = stem => { if(!stem || typeof (window.BaziEngine||{}).tenGodOf!=='function') return ''; try { return window.BaziEngine.tenGodOf(dayGan, stem) || ''; } catch(_) { return ''; } };
+    const geJuNameMap = {'正官':'正官格','七杀':'七杀格','正财':'正财格','偏财':'偏财格','正印':'正印格','偏印':'偏印格','食神':'食神格','伤官':'伤官格','比肩':'建禄格','劫财':'月劫格'};
+    let geJuStem = monthHiddenList[0] || String(lastChart.pillars?.month?.ganzhi||'').charAt(0) || '';
+    let geJuGod = godOfStem(geJuStem);
+    let geJuTou = '', geJuNote = '';
+    if (outerStems.includes(geJuStem)) {
+      geJuTou = '本气透干';
+    } else if (monthHiddenList.length > 1) {
+      const found = monthHiddenList.slice(1).find(s=> outerStems.includes(s));
+      if (found) {
+        const foundGod = godOfStem(found);
+        // 子平取格规范：建禄/月劫仅指月令本气为比劫；透干比劫不单独立正八格，回退以本气参考。
+        if (foundGod === '比肩' || foundGod === '劫财') {
+          geJuGod = godOfStem(monthHiddenList[0]); geJuStem = monthHiddenList[0];
+          geJuTou = '本气未透'; geJuNote = '月令本气 '+monthHiddenList[0]+'（'+geJuGod+'）未透；所透藏干 '+found+' 为比劫，子平按例不单独立正八格，暂以本气参考定格。';
+        } else {
+          geJuGod = foundGod; geJuStem = found; geJuTou = '以透干取格'; geJuNote = '月令本气 '+monthHiddenList[0]+'（'+godOfStem(monthHiddenList[0])+'）未透，取所透藏干 '+found+'（'+geJuGod+'）定格。';
+        }
+      }
+      else { geJuTou = '本气未透'; geJuNote = '月令本气 '+monthHiddenList[0]+'（'+godOfStem(monthHiddenList[0])+'）未透，暂以本气参考定格。'; }
+    }
+    const geJu = geJuNameMap[geJuGod] || (geJuGod ? geJuGod+'格' : '格局待定');
+    const geJuMeta = (label,val,sub)=> '<div class="fy-final-geju-item"><small>'+safe(label)+'</small><strong>'+safe(val)+'</strong><em>'+safe(sub||'')+'</em></div>';
+    const gejuHtml = '<div class="fy-final-geju">'+
+      '<div class="fy-final-geju-head"><span>月令格局 <small>子平取格 · 透干为准</small></span><b class="el-'+elementFor[monthBranch]+'">'+safe(geJu)+'</b></div>'+
+      '<div class="fy-final-geju-meta">'+
+        geJuMeta('月令', monthBranch||'—', monthElement) +
+        geJuMeta('定格干', geJuStem||'—', geJuGod||'—') +
+        geJuMeta('透干', geJuTou||'本气未透', '') +
+      '</div>'+
+      '<p class="fy-final-geju-note">'+safe(geJuNote || (geJuTou === '本气透干' ? '月令本气 '+monthHiddenList[0]+'（'+geJuGod+'）透于年/月/时干，格局明确。' : '以月令本气 '+monthHiddenList[0]+'（'+geJuGod+'）参考定格。'))+'</p>'+
+      '<p class="fy-final-geju-caveat">格局以月令为主、透干定格；比劫月令入建禄/月劫，不入正八格。此处仅列定格与透干状态，不作成格/破格推断，也不据此单独论吉凶。</p>'+
+      '</div>';
 
     return '<section class="fy-final">'+
       '<header class="fy-final-heading"><div><span>五行结构 · 旺衰喜忌</span><h3>日主旺衰 · 喜用神诊断</h3><p>子平扶抑 · 身弱喜印比帮身，身旺喜财官食伤泄耗</p></div></header>'+
+      gejuHtml +
       '<div class="fy-final-anchor"><div class="fy-final-day"><small>日主</small><strong>'+safe(dayGan)+'</strong><em>'+safe(dayElement)+'</em></div><div class="fy-final-month"><small>月令</small><strong>'+safe(monthBranch||'—')+'</strong><em>'+safe(monthElement)+'</em></div><div class="fy-final-badges">'+badge(deLing?'得令':'失令',deLing)+badge(deDi?'得地':'失地',deDi)+badge(helpScore>drainScore?'得势':'失势',helpScore>drainScore)+'</div></div>'+
       '<div class="fy-final-verdict"><div class="fy-final-verdict-main"><span>日主旺衰</span><strong>'+safe(strength)+'</strong></div><p>'+safe(basis)+'</p></div>'+
       '<section class="fy-final-section"><div class="fy-final-section-title">力量对比 <small>五行阵营统计值</small></div><div class="fy-final-balance-labels"><strong class="help">帮扶 '+helpPct.toFixed(1)+'%</strong><strong class="drain">克泄耗 '+drainPct.toFixed(1)+'%</strong></div><div class="fy-final-bar"><i class="help" style="width:'+helpPct.toFixed(2)+'%"></i><i class="drain" style="width:'+drainPct.toFixed(2)+'%"></i></div><div class="fy-final-composition"><span class="help">帮扶：'+safe(helpNames.join(' · ')||'无')+'（'+safe([roles['印'],roles['比劫']].filter((e,i,arr)=>arr.indexOf(e)===i).map(e=>relationOf(e).god).join(' · '))+'）</span><span class="drain">克泄耗：'+safe(drainNames.join(' · ')||'无')+'（'+safe(drainNames.map(e=>relationOf(e).god).join(' · ')||'无')+'）</span></div></section>'+
