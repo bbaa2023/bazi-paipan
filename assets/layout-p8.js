@@ -9,6 +9,12 @@
   if (!results || !frame || !sticky) return;
 
   var LABEL_MAP = { year: '年柱', month: '月柱', day: '日柱', time: '时柱' };
+  // 天干 / 地支 → 五行，用于吸顶条干支按五行着色
+  var GAN_ELEM = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  var ZHI_ELEM = {寅:'木',卯:'木',巳:'火',午:'火',辰:'土',戌:'土',丑:'土',未:'土',申:'金',酉:'金',亥:'水',子:'水'};
+  function psColor(el) {
+    return (el === '木' || el === '火' || el === '土' || el === '金' || el === '水') ? 'ps-e-' + el : 'ps-e-na';
+  }
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -23,13 +29,14 @@
     Array.prototype.forEach.call(articles, function (a) {
       var key = String(a.id || '').replace('pillar-', '');
       var chars = a.querySelectorAll('.pillar-character strong');
-      var gz = (chars[0] ? chars[0].textContent : '') + (chars[1] ? chars[1].textContent : '');
+      var stem = chars[0] ? chars[0].textContent : '';
+      var branch = chars[1] ? chars[1].textContent : '';
       var godEl = a.querySelector('.pillar-stem-god');
       var god = godEl ? godEl.textContent.trim() : '';
       var isDay = a.classList.contains('pillar-day-master');
       html += '<div class="ps-pillar' + (isDay ? ' ps-day' : '') + '" data-key="' + esc(key) + '" title="点击回到完整命盘">' +
         '<span class="ps-label">' + esc(LABEL_MAP[key] || (key + '柱')) + '</span>' +
-        '<strong class="ps-gz">' + esc(gz) + '</strong>' +
+        '<strong class="ps-gz"><span class="ps-gz-c ' + psColor(GAN_ELEM[stem]) + '">' + esc(stem) + '</span><span class="ps-gz-c ' + psColor(ZHI_ELEM[branch]) + '">' + esc(branch) + '</span></strong>' +
         '<span class="ps-god">' + esc(god || '—') + '</span></div>';
     });
     sticky.innerHTML = html +
@@ -46,9 +53,11 @@
 
   function compute() {
     if (results.hidden || sticky.hidden) { sticky.classList.remove('ps-visible'); return; }
-    var r = frame.getBoundingClientRect();
-    // 完整命盘已滚出顶部（其底部越过顶栏之下）时才吸顶，回到顶部即收起
-    var show = (typeof r.bottom === 'number') && (r.bottom < topbarHeight() + 30);
+    // 到旺衰/格局/喜忌（#overview-panel）顶部进入视口后才浮现，避免与命盘同屏显得乱
+    var ov = document.getElementById('overview-panel');
+    if (!ov) { sticky.classList.remove('ps-visible'); return; }
+    var ovTop = ov.getBoundingClientRect().top;
+    var show = (typeof ovTop === 'number') && (ovTop < topbarHeight() + 40);
     sticky.style.top = topbarHeight() + 'px';
     sticky.classList.toggle('ps-visible', show);
   }
