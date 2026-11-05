@@ -1,0 +1,77 @@
+/* ===== P8 吸顶迷你四柱条 =====
+   看旺衰/格局/喜忌等分析时，四柱命盘滚出屏幕后，
+   顶部浮现一条四柱干支，常驻可对照；点击回完整命盘。 */
+.pillars-sticky {
+  position: fixed;
+  left: 0; right: 0; top: 0;
+  z-index: 60;
+  transform: translateY(-115%);
+  transition: transform .28s ease;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 9px 12px;
+  background: rgba(243,240,232,.96);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line,#d8d2c0);
+  box-shadow: 0 4px 16px rgba(60,50,20,.16);
+}
+.pillars-sticky.ps-visible { transform: translateY(0); }
+.pillars-sticky[hidden] { display: none; }
+
+.ps-pillar {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 5px 2px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.6);
+  border: 1px solid var(--line,#d8d2c0);
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
+}
+.ps-pillar:hover { background: rgba(255,255,255,.9); }
+.ps-pillar.ps-day {
+  border-color: #cdb789;
+  background: linear-gradient(180deg, rgba(205,183,137,.26), rgba(190,160,90,.12));
+}
+.ps-label { font-size: 11px; color: #8a7f63; letter-spacing: .1em; line-height: 1; }
+.ps-gz { font-size: 22px; font-weight: 700; color: #3a3428; line-height: 1.05; font-family: "Noto Serif SC", "Songti SC", "SimSun", serif; }
+.ps-day .ps-gz { color: #8a6d2f; }
+.ps-god { font-size: 11px; color: #6d6250; line-height: 1; }
+
+.ps-back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 42px;
+  background: none;
+  border: none;
+  color: #8a6d2f;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color .2s ease;
+}
+.ps-back:hover { color: #6d4f1f; }
+.ps-back .ps-up { font-size: 18px; line-height: 1; }
+.ps-back span:last-child { font-size: 10px; letter-spacing: .08em; }
+
+@media (max-width: 680px) {
+  .pillars-sticky { padding: 6px 8px; gap: 4px; }
+  .ps-pillar { padding: 4px 1px; gap: 1px; }
+  .ps-gz { font-size: 17px; }
+  .ps-label, .ps-god { font-size: 9px; }
+  .ps-back { min-width: 34px; }
+  .ps-back .ps-up { font-size: 15px; }
+}
+@media (max-width: 360px) {
+  .ps-gz { font-size: 15px; }
+  .ps-label, .ps-god { font-size: 8px; }
+}
