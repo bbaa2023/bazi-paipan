@@ -1,0 +1,330 @@
+/* 八字排盘页：统一明亮宣纸与金色主题 */
+:root{color-scheme:light;--bg:#f3f0e8;--panel:#fffdf8;--panel2:#f8f4eb;--line:#e2d6c0;--text:#253247;--muted:#707b87;--gold:#b98b45;--gold-dark:#946b2d;--wood:#34865d;--fire:#d95442;--earth:#bd8a31;--metal:#8c969e;--water:#367db3;--radius:15px;--shadow:0 8px 24px #6c5a3b0d}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:76px}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#d9c7a52e,transparent 55%),var(--bg);color:var(--text);font:15px/1.65 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}button,input,select{font:inherit}button{touch-action:manipulation}[hidden]{display:none!important}
+.topbar{height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 max(20px,calc((100% - 1120px)/2));position:sticky;top:0;z-index:10;background:#fffdf8ed;backdrop-filter:blur(14px);border-bottom:1px solid var(--line);box-shadow:0 3px 16px #6c5a3b0b}.brand{display:flex;align-items:center;gap:10px;min-width:0;color:var(--text);text-decoration:none}.brand-mark{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;border:1px solid #c8b17f;border-radius:50%;background:radial-gradient(circle,#fffdf8,#eee3ce);color:var(--gold-dark);font:22px "Noto Serif SC","Songti SC",serif}.brand b,.brand small{display:block}.brand b{font:600 14px "Noto Serif SC","Songti SC",serif;letter-spacing:.04em}.brand small{font-size:11px;color:var(--muted)}.privacy{white-space:nowrap;color:#637080;font-size:12px}.privacy i{display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:#6eaa7b;box-shadow:0 0 0 3px #6eaa7b1a}
+.shell{width:min(100% - 32px,1080px);margin:auto}.hero{text-align:center;padding:18px 10px 16px;position:relative}.hero:before{content:"";position:absolute;top:0;left:50%;width:min(400px,90%);height:90px;transform:translateX(-50%);pointer-events:none;background:radial-gradient(ellipse,#c9b17b1b,transparent 70%)}.hero-emblem{position:relative;width:48px;height:48px;display:grid;place-items:center;margin:0 auto 5px;border:1px solid #c8b17f;border-radius:50%;background:radial-gradient(circle,#fffdf8,#eee3ce);color:var(--gold-dark);box-shadow:0 0 0 4px #c8a76b12}.hero-emblem span{font:30px/1 serif}.hero h1{position:relative;margin:3px 0;font:600 clamp(26px,4vw,34px)/1.3 "Noto Serif SC","Songti SC",serif;letter-spacing:.08em;color:var(--text)}.hero h1 span{display:inline;margin-left:8px;font:400 .48em "Noto Serif SC","Songti SC",serif;letter-spacing:.12em;color:#8b795d;white-space:nowrap}.eyebrow,.kicker{font-size:10px;letter-spacing:.16em;color:var(--gold-dark);font-weight:750}
+.panel,.results{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);color:var(--text)}.panel{padding:22px}.form-panel:before,.form-panel:after{content:"";position:absolute;width:15px;height:15px;border-color:var(--gold);pointer-events:none}.form-panel:before{top:7px;left:7px;border-top:1px solid;border-left:1px solid}.form-panel:after{right:7px;bottom:7px;border-right:1px solid;border-bottom:1px solid}
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:15px}.section-heading h2{margin:3px 0 0;font:600 21px "Noto Serif SC","Songti SC",serif;letter-spacing:.04em;color:var(--text)}.step{font-size:12px;color:var(--muted)}.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px 12px}.form-grid label{display:flex;flex-direction:column;gap:6px;min-width:0;color:#526071;font-size:12px;font-weight:650}.form-grid input,.form-grid select{appearance:none;-webkit-appearance:none;width:100%;min-width:0;height:42px;padding:0 11px;border:1px solid var(--gold);border-radius:10px;background-color:#fffdf8;color:var(--text);font-size:13px;outline:none;transition:border-color .18s,box-shadow .18s,background-color .18s}.form-grid select{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23b98b45' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center}.form-grid input::placeholder{color:#a4a09a}.form-grid input:focus,.form-grid select:focus{border-color:#a9782e;box-shadow:0 0 0 3px #b98b452b;background-color:#fffefa}.form-grid input:hover,.form-grid select:hover{border-color:#a9782e}.form-foot{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:17px}.form-foot p{max-width:670px;margin:0;color:var(--muted);font-size:11px;line-height:1.7}.primary{border:1px solid #d5b77e;border-radius:10px;background:linear-gradient(135deg,#c7a05e,#b98b45);color:#fffdf8;font-weight:750;padding:11px 22px;white-space:nowrap;cursor:pointer;box-shadow:0 4px 14px #b98b451e;transition:transform .15s,filter .15s}.primary:hover{transform:translateY(-1px);filter:brightness(1.04)}.primary:active{transform:scale(.985)}.notice{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:13px}.error{background:#fff0ed;border:1px solid #d99a8f;color:#9d3529}
+.results{margin-top:22px;padding:20px 20px 16px;scroll-margin-top:78px}.result-title{margin-bottom:15px}.result-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.day-master{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid #d9c18f;border-radius:999px;background:#f5ead5;color:#805c22;font-size:12px;font-weight:700}
+.results-layout{display:block}.results-primary{width:100%;min-width:0}.results-side{display:none}.chart-frame{position:relative;margin:0 0 18px;padding:13px;border:1px solid #cdb789;border-radius:13px;background:radial-gradient(ellipse at 50% 0%,#eee2c8,transparent 66%),#fffdf7;box-shadow:inset 0 0 0 4px #b98b4508}.chart-frame:before,.chart-frame:after{content:"";position:absolute;width:20px;height:20px;border-color:#c6a45e;pointer-events:none}.chart-frame:before{top:4px;left:4px;border-top:1px solid;border-left:1px solid}.chart-frame:after{right:4px;bottom:4px;border-right:1px solid;border-bottom:1px solid}.chart-frame-top,.chart-frame-bottom{display:flex;align-items:center;justify-content:center;gap:10px;color:#927342;font-size:10px;letter-spacing:.12em}.chart-frame-top{padding-bottom:10px;margin-bottom:11px;border-bottom:1px solid #ddcfb4}.chart-frame-bottom{padding-top:10px;margin-top:11px;border-top:1px solid #ddcfb4;color:#98866a;font-size:9px}.chart-frame-bottom i{width:3px;height:3px;background:var(--gold);transform:rotate(45deg)}.chart-seal{width:26px;height:26px;display:grid;place-items:center;border:1px solid #d3bb87;border-radius:50%;background:#f3e7ce;color:#8c6429;font-size:14px}
+.pillars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}.pillar{--el:var(--earth);position:relative;min-width:0;overflow:hidden;padding:12px 8px 13px;text-align:center;border:1px solid #e2d6c0;border-radius:12px;background:linear-gradient(180deg,#fffdf8,#f7f2e8);box-shadow:0 5px 14px #6c5a3b0b;animation:rise .35s both}.pillar:before{content:"";position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--el),transparent)}.pillar-label{color:#536174;font-size:13px;font-weight:750;letter-spacing:.05em}.pillar-god{min-height:22px;margin:4px 0 7px;color:#687587;font-size:11px;font-weight:650}.pillar-character{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80px;margin:0 auto 7px;padding:5px 0;border:1px solid #e5dac7;border-radius:7px;background:#fffdf8}.pillar-character:after{content:"";position:absolute;inset:3px;border:1px solid color-mix(in srgb,var(--el) 13%,transparent);border-radius:5px;pointer-events:none}.pillar-character small{color:#77818b;font-size:10px;line-height:1.3}.pillar-character strong{color:var(--el);font:750 clamp(29px,3vw,41px)/1.25 "Noto Serif SC","Songti SC",serif}.pillar-hidden{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:6px;color:#526071;font-size:11px;overflow-wrap:anywhere}.pillar-hidden span{color:#858b90}.pillar-hidden b{color:#34455a;font-size:12px;font-weight:700}.pillar-day-master{border:2px solid #c49a51;background:linear-gradient(180deg,#fff9e9,#f7edda);box-shadow:0 0 0 3px #b98b451b,0 8px 20px #6c5a3b12}.pillar-day-master .pillar-character{background:#fff7e4;border-color:#d8bc83}.pillar-day-master .pillar-label{color:#855e21}.pillar-icon{display:grid;place-items:center;width:21px;height:21px;margin:4px auto;border:1px solid color-mix(in srgb,var(--el) 45%,transparent);border-radius:50%;color:var(--el)}
+.module-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 5px;padding-bottom:9px;border-bottom:1px solid #dfd3bd}.module-heading>span:last-child{font-size:11px;color:#78818a}.tabs{display:flex;gap:6px;flex-wrap:wrap;overflow:auto;padding:6px 2px 0;margin-top:10px;border-bottom:1px solid #dfd3bd;scrollbar-width:thin}.tab{display:inline-flex;flex:0 0 auto;align-items:center;gap:7px;padding:8px 11px;border:1px solid #e4d8c3;border-radius:9px 9px 0 0;background:#fffdf8;color:#687381;font-size:13px;cursor:pointer}.tab:before{font-size:13px;opacity:.8}.tab[data-tab="overview"]:before{content:"◉"}.tab[data-tab="details"]:before{content:"▦"}.tab[data-tab="relations"]:before{content:"⟷"}.tab[data-tab="shensha"]:before{content:"✧"}.tab[data-tab="luck"]:before{content:"⌁"}.tab[data-tab="annual"]:before{content:"◷"}.tab:hover,.tab.active{color:#8d6528;background:#f4ead5}.tab.active{border-color:#c4a56a;box-shadow:inset 0 2px #c9a25b}.tab-content{min-height:120px;padding:18px 2px;color:#29384b}.subhead{margin:0 0 12px;color:#2b3c51;font:600 19px "Noto Serif SC","Songti SC",serif;letter-spacing:.025em}.muted{color:var(--muted);font-size:12px}
+.overview-panel{margin:14px 0 20px;padding:17px;background:#fffdf8;border:1px solid #e5d9c4;border-radius:14px}.overview-panel>.subhead{margin:0 0 12px}.element-visual{display:flex;align-items:center;gap:25px;margin:14px 0 17px;padding:18px;border:1px solid #e5d9c4;border-radius:14px;background:#fbf8f0}.element-visual-compact{justify-content:center;gap:clamp(22px,5vw,64px);padding:20px 24px;margin:0 0 15px}.element-wheel{position:relative;display:grid;place-items:center;flex:0 0 170px;width:170px;height:170px;border-radius:50%;box-shadow:0 5px 18px #6c5a3b18;border:5px solid #fffdf8}.element-wheel:after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px #ffffff50;pointer-events:none}.element-wheel-center{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:62%;height:62%;border:1px solid #e0d2b6;border-radius:50%;background:radial-gradient(circle,#fffdf8,#f2ecdf);box-shadow:inset 0 0 18px #6c5a3b16}.element-wheel-center small{color:#77818b;font-size:12px}.element-wheel-center strong{color:#956b2b;font-size:clamp(27px,3vw,36px);line-height:1.3;font-variant-numeric:tabular-nums}.element-legend{display:grid;grid-template-columns:repeat(2,minmax(100px,1fr));gap:10px 18px;flex:1}.element-legend-visual{grid-template-columns:repeat(2,minmax(125px,1fr));gap:13px 22px;max-width:560px}.legend-item{--el:var(--earth);display:flex;flex-direction:column;gap:5px;min-width:0;color:#34455a;font-size:13px}.legend-label{display:grid;grid-template-columns:10px minmax(18px,1fr) auto;align-items:center;gap:7px}.legend-item i{width:9px;height:9px;border-radius:3px;background:var(--el);box-shadow:0 0 0 2px #fff}.legend-item b{color:#253247;font-size:clamp(17px,1.6vw,22px);font-weight:750;font-variant-numeric:tabular-nums}.legend-item small{align-self:flex-end;color:#8a929b;font-size:11px}.legend-bar{width:100%;height:7px;overflow:hidden;border-radius:20px;background:#e7e2d8}.legend-bar span{display:block;width:var(--pct);height:100%;border-radius:20px;background:var(--el);transition:width .4s ease}.element-analysis{padding:15px 18px;border:1px solid #e5d9c4;border-radius:14px;background:#fffdf8}.element-analysis-title{display:flex;align-items:center;gap:9px;margin-bottom:7px}.element-analysis-title h3{margin:0;color:#2b3c51;font:600 18px "Noto Serif SC","Songti SC",serif}.analysis-mark{display:grid;place-items:center;width:27px;height:27px;border:1px solid #dfc89e;border-radius:50%;background:#f3e7d0;color:#956b2b;font-size:13px}.element-analysis p{margin:6px 0 0;color:#45566a;font-size:14px;line-height:1.85}
+.element-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}.element-card{--el:var(--earth);position:relative;min-width:0;overflow:hidden;padding:13px 11px;border:1px solid #e2d7c4;border-radius:13px;background:#fffdf8}.element-card:before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--el)}.element-name{display:flex;align-items:center;gap:6px;color:var(--el);font-size:13px}.element-name:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--el)}.element-count{margin:4px 0 8px;color:#2d4055;font-size:23px;font-weight:750;font-variant-numeric:tabular-nums}.element-count small{color:#7a8490;font-size:12px;font-weight:600}.bar{height:6px;overflow:hidden;border-radius:99px;background:#e7e2d8}.bar span{display:block;width:var(--pct);height:100%;border-radius:99px;background:linear-gradient(90deg,color-mix(in srgb,var(--el) 68%,#fff),var(--el));transition:width .5s ease}.mini-elements{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.mini-element{min-width:0;color:var(--el);font-size:12px}.mini-element span,.mini-element b{display:block}.mini-element b{margin:2px 0 5px;color:var(--text);font-size:14px}.mini-element .bar{height:4px}.data-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.data-card{--el:var(--gold);position:relative;min-width:0;padding:15px;border:1px solid #e2d7c4;border-radius:13px;background:#fffdf8}.data-card h3{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 10px;color:#34455a;font-size:14px}.data-card p{margin:6px 0;font-size:13px;overflow-wrap:anywhere}.chip{display:inline-flex;align-items:center;gap:5px;margin:3px;padding:4px 8px;border:1px solid #dfd1b7;border-radius:999px;background:#f2eadb;color:#526071;font-size:11px;line-height:1.5}.empty{padding:20px;border:1px dashed #dfd1b7;border-radius:12px;background:#f8f3e8;color:#687381;font-size:13px}.relation-icon{display:inline-grid;place-items:center;width:27px;height:27px;flex:0 0 27px;border:1px solid #dfd1b7;border-radius:9px;background:#f4ead5;color:#8c6429;font-size:13px}.shensha-summary{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 14px;padding:12px 14px;border:1px solid #e5d9c4;border-radius:12px;background:#fbf8f0}.shensha-summary span{color:var(--muted);font-size:12px}.shensha-summary strong{margin-right:12px;color:var(--gold-dark);font-size:17px}.shensha-card .luck-card-top{align-items:flex-start;gap:8px}.shensha-card .chip{white-space:normal;line-height:1.5}
+.luck-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.luck-card-top h3{margin-bottom:0}.luck-timeline{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:14px 0 0;padding-top:22px}.luck-timeline:before{content:"";position:absolute;top:9px;left:4%;right:4%;height:1px;background:linear-gradient(90deg,transparent,#b79559,#b79559,transparent)}.luck-item{position:relative;min-width:0}.luck-item:before{content:"";position:absolute;top:-17px;left:13px;width:9px;height:9px;border:2px solid #c9a66a;border-radius:50%;background:#fffdf8}.luck-item.current .data-card{border-color:#c5a264;background:#f7edda;box-shadow:inset 0 2px #c5a264}.luck-item.current:before{background:#e3c98f;box-shadow:0 0 0 4px #c9a66a25}.luck-item .data-card{height:100%;padding:12px 10px}.luck-item .data-card h3{font-size:13px}.luck-item .data-card p{font-size:11px}.annual-timeline{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}.annual-card{overflow:hidden}.annual-card:before{content:"";position:absolute;top:0;bottom:0;left:0;width:3px;background:var(--el,var(--gold))}.annual-card h3{font-size:15px}.annual-meta{display:grid;grid-template-columns:minmax(82px,auto) 1fr;gap:7px 12px;margin:12px 0 14px;font-size:12px}.annual-meta span{color:var(--muted)}.annual-meta strong{color:var(--text);font-weight:600;overflow-wrap:anywhere}.annual-relations{display:flex;flex-wrap:wrap;gap:6px}.customer-note{display:flex;align-items:flex-start;gap:13px;margin-top:20px;padding:15px 17px;border:1px solid #e1d0ac;border-radius:12px;background:#f5eddd;color:#6b5b40}.customer-note p{margin:5px 0 0;color:var(--muted);font-size:12px}.note-mark{display:grid;place-items:center;flex:0 0 30px;height:30px;border:1px solid #c8a66b;border-radius:50%;color:#946b2d;font-family:serif}
+.disclaimer{margin:0;padding:12px 15px;border:1px solid #d6bd8c;border-radius:10px;background:#f8efd9;color:#654d2b;font-size:12px;line-height:1.85;font-weight:600}.results-disclaimer{margin-top:16px}.site-footer{display:flex;flex-direction:column;gap:8px;padding:20px 4px 30px;margin-top:20px;border-top:1px solid #ded3bd;color:#7b817f;font-size:11px}.footer-disclaimer{font-size:12px}.site-footer a{color:#98702e;text-decoration:none}.site-footer a:hover{text-decoration:underline}
+.el-木{--el:var(--wood)}.el-火{--el:var(--fire)}.el-土{--el:var(--earth)}.el-金{--el:var(--metal)}.el-水{--el:var(--water)}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media(max-width:900px){.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.luck-timeline{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:24px}.luck-timeline:before{display:none}.luck-item:before{top:-10px}.annual-timeline{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.topbar{height:58px;padding:0 10px}.brand{gap:7px}.brand-mark{width:32px;height:32px;flex-basis:32px;font-size:19px}.brand b{font-size:11px;letter-spacing:0}.brand small{font-size:10px}.privacy{font-size:10px}.shell{width:calc(100% - 18px)}.hero{padding:12px 4px 11px}.hero-emblem{width:48px;height:48px;margin-bottom:4px}.hero h1{font-size:27px}.hero h1 span{font-size:.45em}.panel{padding:16px 12px;border-radius:13px}.section-heading{gap:8px;margin-bottom:13px}.section-heading h2{font-size:19px}.step{font-size:10px}.form-grid{gap:11px 8px}.form-grid label{font-size:11px}.form-grid input,.form-grid select{height:41px;padding-left:8px;font-size:12px}.form-grid select{padding-right:27px;background-position:right 7px center}.form-foot{align-items:stretch;flex-direction:column;gap:12px;margin-top:14px}.primary{width:100%}.results{padding:13px 9px 10px;margin-top:16px}.result-title{align-items:flex-start}.result-actions{gap:6px}.day-master{font-size:10px;padding:5px 8px}.chart-frame{padding:10px 6px 8px}.chart-frame-top{font-size:9px;gap:7px}.chart-frame-bottom{font-size:8px;letter-spacing:0;gap:6px}.pillars{gap:6px}.pillar{padding:9px 4px 10px;border-radius:9px}.pillar-label{font-size:10px;letter-spacing:0}.pillar-god{font-size:9px;min-height:20px}.pillar-character{min-height:59px;border-radius:6px}.pillar-character strong{font-size:clamp(25px,7vw,32px)}.pillar-hidden{font-size:9px}.pillar-hidden b{font-size:9px}.module-heading{align-items:flex-start}.module-heading>span:last-child{font-size:9px}.tabs{gap:4px}.tab{padding:8px 9px;font-size:12px;gap:5px}.tab-content{padding:15px 1px}.overview-panel{padding:12px}.element-visual{flex-direction:column;gap:15px;padding:12px}.element-visual-compact{gap:15px;padding:17px 11px}.element-wheel{width:150px;height:150px;flex-basis:150px}.element-visual-compact .element-wheel{width:170px;height:170px;flex-basis:170px}.element-wheel-center strong{font-size:25px}.element-legend{width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.element-legend-visual{max-width:none;gap:12px 13px}.legend-item b{font-size:17px}.legend-item small{font-size:10px}.element-analysis{padding:13px}.element-analysis p{font-size:13px}.element-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.element-card{padding:11px 8px;border-radius:10px}.element-count{font-size:21px}.data-grid{grid-template-columns:1fr;gap:9px}.data-card{padding:13px;border-radius:11px}.subhead{font-size:17px}.mini-elements{gap:6px}.mini-element{font-size:10px}.mini-element b{font-size:12px}.luck-timeline{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding-top:4px}.luck-item:before{display:none}.luck-item .data-card{padding:11px 9px}.luck-item .data-card h3{font-size:12px}.luck-item .data-card p{font-size:10px}.annual-timeline{grid-template-columns:1fr;gap:9px}.annual-meta{grid-template-columns:82px minmax(0,1fr);gap:6px 8px}.site-footer{padding-bottom:22px}.disclaimer{padding:11px 12px;font-size:11px}}
+@media(max-width:360px){.shell{width:calc(100% - 14px)}.brand b{font-size:10px}.privacy{font-size:9px}.hero h1{font-size:25px}.pillar-character strong{font-size:23px}.pillar-character{min-height:54px}.tab{padding:7px}.element-visual-compact{padding:14px 8px}.element-legend-visual{gap:10px 8px}.legend-label{gap:5px}.legend-item b{font-size:16px}.luck-timeline{grid-template-columns:1fr 1fr}}
+
+/* 喜用参考与四柱补充信息：延续宣纸、金色体系 */
+.favorable-card{margin:14px 0 20px;padding:17px 19px;border:1px solid #e1d0ac;border-radius:14px;background:linear-gradient(135deg,#fffdf8,#f7f0e2);box-shadow:0 5px 16px #6c5a3b0b;color:var(--text)}
+.favorable-heading{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.favorable-seal{display:grid;place-items:center;width:34px;height:34px;border:1px solid #c8a66b;border-radius:50%;background:#f3e7ce;color:#946b2d;font:17px "Noto Serif SC","Songti SC",serif}
+.favorable-heading h3{margin:0;color:#2b3c51;font:600 19px "Noto Serif SC","Songti SC",serif}
+.favorable-heading p{margin:1px 0 0;color:#85816f;font-size:11px}
+.favorable-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.favorable-item{min-width:0;padding:10px 12px;border:1px solid #e6dac4;border-radius:10px;background:#fffdf8}
+.favorable-item>span{display:block;margin-bottom:4px;color:#81745d;font-size:11px}
+.favorable-item>strong{color:#805c22;font-size:17px;font-weight:750}
+.favorable-item p{margin:0;color:#34455a;font-size:13px;line-height:1.75;overflow-wrap:anywhere}
+.favorable-wide{grid-column:1/-1}
+.favorable-footnote{display:block;margin-top:11px;color:#898477;font-size:10px;line-height:1.7}
+.pillar-label{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px}
+.tomb-badge{display:inline-flex;align-items:center;padding:1px 5px;border:1px solid #d9c18f;border-radius:5px;background:#f5ead5;color:#946b2d;font-size:9px;font-weight:650;line-height:1.5;letter-spacing:0}
+.pillar-palace{min-height:14px;margin-top:2px;color:#8a8170;font-size:9px;line-height:1.35;letter-spacing:0}
+.pillar-stage{display:block;margin-top:3px;color:#8a7657;font-size:10px;font-style:normal;line-height:1.4}
+@media(max-width:680px){
+ .favorable-card{padding:13px 12px;margin:12px 0 16px}
+ .favorable-grid{gap:7px}
+ .favorable-item{padding:9px}
+ .favorable-item>strong{font-size:15px}
+ .favorable-item p{font-size:12px}
+ .favorable-heading h3{font-size:18px}
+ .pillar-palace{font-size:8px}
+ .tomb-badge{font-size:8px;padding:1px 4px}
+ .pillar-stage{font-size:9px}
+}
+
+/* 十二长生独立标签页 */
+.tab[data-tab="twelve"]:before{content:"☯"}
+.twelve-stage-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
+.twelve-stage-card{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:16px;border:1px solid #e4d5bb;border-radius:12px;background:#fffdf8}
+.twelve-stage-card>span{color:#89714b;font-size:12px}
+.twelve-stage-gz{color:#34465b;font-size:20px;font-weight:700;letter-spacing:.08em}
+.twelve-stage-card>strong{color:#8d6528;font-size:23px;font-weight:750}
+.twelve-stage-card>small{color:#898477;font-size:10px}
+@media(max-width:680px){.twelve-stage-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.twelve-stage-card{padding:12px}.twelve-stage-card>strong{font-size:20px}}
+
+/* 五行分布与旺衰/喜用参考合并为一个主卡片 */
+.element-combined-card{overflow:hidden;border:1px solid #e1d0ac;border-radius:14px;background:#fffdf8;box-shadow:0 5px 16px #6c5a3b0b}
+.element-combined-card>.element-visual{margin:0;border:0;border-radius:0;background:#fbf7ee}
+.element-combined-card>.element-analysis{margin:0;border:0;border-top:1px solid #e6dac4;border-radius:0;box-shadow:none}
+.element-reference{margin-top:13px;padding:12px 13px;border:1px solid #e4d5bb;border-radius:10px;background:#f8f2e6}
+.element-reference-heading{margin-bottom:8px;color:#805c22;font-size:13px;font-weight:750}
+.element-reference-row{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
+.element-reference-row span,.element-reference p span{color:#81745d;font-size:11px}
+.element-reference-row strong{color:#34465b;font-size:13px}
+.element-reference p{margin:8px 0 5px;color:#34465b;font-size:12px;line-height:1.7}
+.element-reference>small{display:block;color:#898477;font-size:10px;line-height:1.6}
+.pillar-character .tomb-badge{position:relative;z-index:1;margin:5px 0 1px}
+@media(max-width:680px){.element-reference{padding:10px}.element-reference-row{gap:6px 9px}.element-reference-row strong{font-size:12px}}
+
+
+/* 四柱干支属性可视化：十神置于天干正上方，属性同时用图标与文字标注 */
+.pillar-stem-god{display:table;margin:5px auto 5px;padding:3px 10px;border:1px solid #d9c18f;border-radius:999px;background:#f5ead5;color:#805c22;font-size:11px;font-weight:750;line-height:1.5}
+.pillar-attrs{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;margin-top:4px}
+.pillar-attr{display:inline-flex;align-items:center;gap:3px;padding:2px 5px;border:1px solid color-mix(in srgb,var(--el) 35%,#e5dac7);border-radius:999px;background:color-mix(in srgb,var(--el) 8%,#fffdf8);color:var(--el);font-size:10px;line-height:1.35;white-space:nowrap}
+.pillar-attr i{font-style:normal;font-size:11px}
+.pillar-attr b{font-size:10px}
+.pillar-attr small{color:#6f7881;font-size:9px}
+.hidden-stem-list{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;width:100%;margin:2px 0 5px}
+.hidden-stem-chip{display:grid;grid-template-columns:auto auto;align-items:center;gap:1px 4px;padding:4px 6px;border:1px solid color-mix(in srgb,var(--el) 30%,#e5dac7);border-radius:8px;background:color-mix(in srgb,var(--el) 6%,#fffdf8);color:var(--text);font-size:10px;line-height:1.35}
+.hidden-stem-chip>b{color:var(--el);font-size:14px}
+.hidden-stem-chip>span{color:var(--el);font-size:9px}
+.hidden-stem-chip>em{font-style:normal;color:#596779;font-size:9px}
+.hidden-stem-chip>small{color:#947343;font-size:9px;text-align:right}
+.pillar-character .pillar-attrs{position:relative;z-index:1}
+.pillar-day-master .pillar-stem-god{background:#ead8b3;border-color:#c49a51}
+@media(max-width:680px){
+ .pillar-stem-god{font-size:9px;padding:2px 6px;margin:4px auto}
+ .pillar-attr{gap:2px;padding:2px 4px;font-size:9px}
+ .pillar-attr i{font-size:10px}
+ .pillar-attr small{font-size:8px}
+ .hidden-stem-chip{padding:3px 4px;gap:1px 3px}
+ .hidden-stem-chip>b{font-size:12px}
+ .hidden-stem-chip>span,.hidden-stem-chip>em,.hidden-stem-chip>small{font-size:8px}
+}
+
+/* 四柱卡片排版优化：属性移至干支右侧，减少重复注释，明细分区留白 */
+.pillar-character{
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(8px,1.2vw,15px);
+  min-height:76px;
+  padding:8px 6px;
+}
+.pillar-character>small{display:none}
+.pillar-character>strong{flex:0 0 auto;line-height:1.2}
+.pillar-character .pillar-attrs{display:flex;align-items:center;justify-content:flex-start;margin:0;}
+.pillar-attr{gap:4px;padding:4px 7px;font-size:11px;line-height:1.35}
+.pillar-attr i{font-size:12px}
+.pillar-attr b{font-size:11px;white-space:nowrap}
+.pillar-hidden{align-items:stretch;gap:9px;margin-top:10px;padding:9px 7px 2px;border-top:1px solid #e8dece;text-align:left}
+.pillar-hidden-group{display:flex;flex-direction:column;align-items:flex-start;gap:6px;width:100%;min-width:0}
+.pillar-hidden-title,.pillar-nayin>span{color:#8a7657;font-size:10px;font-weight:700;letter-spacing:.04em}
+.hidden-stem-list{justify-content:flex-start;gap:6px;margin:0}
+.hidden-stem-chip{min-width:0;padding:5px 7px;gap:2px 6px;border-radius:7px}
+.hidden-stem-chip>b{font-size:15px}
+.hidden-stem-chip>span,.hidden-stem-chip>em,.hidden-stem-chip>small{font-size:10px}
+.pillar-nayin{display:flex;align-items:center;gap:9px;width:100%;padding-top:7px;border-top:1px dashed #e6dac7}
+.pillar-nayin>b{color:#34455a;font-size:12px;font-weight:700}
+@media(max-width:680px){
+  .pillar-character{min-height:58px;gap:5px;padding:6px 3px}
+  .pillar-character strong{font-size:clamp(25px,6.4vw,31px)}
+  .pillar-attr{gap:2px;padding:3px 4px}
+  .pillar-attr i{font-size:10px}
+  .pillar-attr b{font-size:9px}
+  .pillar-hidden{gap:7px;margin-top:8px;padding:7px 3px 1px}
+  .pillar-hidden-title,.pillar-nayin>span{font-size:9px}
+  .hidden-stem-list{gap:4px}
+  .hidden-stem-chip{padding:4px 5px;gap:2px 4px}
+  .hidden-stem-chip>b{font-size:13px}
+  .hidden-stem-chip>span,.hidden-stem-chip>em,.hidden-stem-chip>small{font-size:8px}
+  .pillar-nayin{gap:6px;padding-top:6px}
+  .pillar-nayin>b{font-size:10px}
+}
+@media(max-width:360px){
+  .pillar-character{gap:3px}
+  .pillar-attr{padding:2px 3px}
+  .pillar-attr b{font-size:8px}
+}
+
+
+/* 藏干十神：按本气、中气、余气逐行横排，提升直播与手机阅读字号 */
+.hidden-stem-list{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;width:100%;margin:2px 0 5px}
+.hidden-stem-row{display:grid;grid-template-columns:34px minmax(64px,1fr) minmax(48px,.85fr) 38px;align-items:center;gap:8px;width:100%;min-width:0;padding:7px 9px;border:1px solid color-mix(in srgb,var(--el) 27%,#e5dac7);border-radius:8px;background:color-mix(in srgb,var(--el) 5%,#fffdf8);color:var(--text);line-height:1.35}
+.hidden-stem-gan{color:var(--el);font-size:19px;font-weight:800;text-align:center}
+.hidden-stem-attr{color:var(--el);font-size:14px;font-weight:650;white-space:nowrap}
+.hidden-stem-god{font-style:normal;color:#34455a;font-size:14px;font-weight:700;white-space:nowrap}
+.hidden-stem-pos{color:#947343;font-size:12px;font-weight:650;text-align:right;white-space:nowrap}
+@media(max-width:680px){
+ .hidden-stem-list{gap:5px}
+ .hidden-stem-row{grid-template-columns:28px minmax(48px,1fr) minmax(40px,.85fr) 32px;gap:4px;padding:6px 5px}
+ .hidden-stem-gan{font-size:16px}
+ .hidden-stem-attr,.hidden-stem-god{font-size:11px}
+ .hidden-stem-pos{font-size:10px}
+}
+
+
+/* 修正：藏干十神行不得超出四柱卡片，标题与信息字号提升 */
+.pillar-hidden,.pillar-hidden-group,.hidden-stem-list{box-sizing:border-box;min-width:0;width:100%;max-width:100%}
+.pillar-hidden-title{display:block;width:100%;font-size:16px!important;font-weight:800;line-height:1.45;color:#536174;letter-spacing:0}
+.hidden-stem-row{box-sizing:border-box;width:100%;max-width:100%;grid-template-columns:26px minmax(0,1fr) minmax(0,1fr) auto;gap:5px;padding:7px 6px;overflow:hidden}
+.hidden-stem-gan{font-size:17px;line-height:1.3}
+.hidden-stem-attr,.hidden-stem-god{font-size:15px;line-height:1.35;white-space:nowrap}
+.hidden-stem-pos{font-size:13px;line-height:1.35;white-space:nowrap}
+@media(max-width:680px){
+ .pillar-hidden-title{font-size:13px!important}
+ .hidden-stem-row{grid-template-columns:20px minmax(0,1fr) minmax(0,1fr) auto;gap:3px;padding:6px 4px}
+ .hidden-stem-gan{font-size:13px}
+ .hidden-stem-attr,.hidden-stem-god{font-size:11px}
+ .hidden-stem-pos{font-size:10px}
+}
+@media(max-width:380px){
+ .hidden-stem-row{grid-template-columns:18px minmax(0,1fr) minmax(0,1fr) auto;gap:2px;padding:5px 3px}
+ .hidden-stem-attr,.hidden-stem-god{font-size:10px}
+ .hidden-stem-pos{font-size:9px}
+}
+
+
+/* 藏干属性：顺序统一为阴阳在前、五行在后；五行文字沿用全站五行色，不使用图标 */
+.hidden-stem-attr{display:inline-flex;align-items:center;gap:2px;white-space:nowrap}
+.hidden-stem-element{font:inherit;font-weight:800}
+.hidden-stem-element.el-木{color:#39845b}
+.hidden-stem-element.el-火{color:#d95745}
+.hidden-stem-element.el-土{color:#b88732}
+.hidden-stem-element.el-金{color:#84909a}
+.hidden-stem-element.el-水{color:#3784b8}
+
+
+/* 强制覆盖藏干区域继承的五行灰色，确保五行文字本身按元素着色 */
+.hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-木{color:#39845b!important}
+.hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-火{color:#d95745!important}
+.hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-土{color:#b88732!important}
+.hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-金{color:#84909a!important}
+.hidden-stem-row .hidden-stem-attr .hidden-stem-element.el-水{color:#3784b8!important}
+
+
+/* 阴阳属性独立配色：阳为蓝色、阴为紫色；五行文字继续沿用五行专属颜色 */
+.polarity{font-weight:800;letter-spacing:.02em}
+.polarity-yang{color:#2875ad!important}
+.polarity-yin{color:#9360a8!important}
+.polarity-unknown{color:#7b8490!important}
+.pillar-attr b{display:inline-flex;align-items:center;gap:1px}
+.hidden-stem-attr{display:inline-flex;align-items:center;gap:3px}
+
+
+/* 四柱信息纵向对齐：每柱统一预留三个藏干行位，纳音与神煞保持同一基线 */
+.pillar-hidden{width:100%;min-width:0;align-items:stretch}
+.hidden-stem-list{display:flex;flex-direction:column;justify-content:flex-start;min-height:108px;gap:6px}
+.pillar-nayin{min-height:34px;box-sizing:border-box}
+.pillar-shensha{display:flex;align-items:flex-start;gap:9px;width:100%;min-height:34px;padding-top:7px;border-top:1px dashed #e6dac7;box-sizing:border-box}
+.pillar-shensha>span{flex:0 0 auto;color:#8a7657;font-size:12px;font-weight:800}
+.pillar-shensha-list{display:flex;flex-wrap:wrap;gap:5px;min-width:0}
+.pillar-shensha-list em{display:inline-flex;align-items:center;padding:3px 7px;border-radius:999px;background:#f1e5d5;color:#80552f;border:1px solid #d8bea0;font-size:12px;font-style:normal;font-weight:750;line-height:1.4}
+.pillar-shensha-list small{color:#9a8875;font-size:12px}
+@media(max-width:680px){
+ .hidden-stem-list{min-height:90px;gap:5px}
+ .pillar-nayin{min-height:30px}
+ .pillar-shensha{gap:6px;padding-top:6px}
+ .pillar-shensha>span,.pillar-shensha-list em,.pillar-shensha-list small{font-size:10px}
+}
+
+
+/* 子平扶抑面板：以帮扶/克泄耗阵营替代五行数量饼图 */
+.support-panel{overflow:hidden;padding:0;color:var(--text)}
+.support-anchor{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:19px 22px;background:linear-gradient(105deg,#f7f0e2,#fffdf8 62%);border-bottom:1px solid #e8dece}
+.support-eyebrow{display:block;margin-bottom:3px;color:#8a7657;font-size:11px;font-weight:700;letter-spacing:.08em}
+.support-anchor>div:first-child>strong{display:block;color:#26384c;font:750 25px/1.35 "Noto Serif SC","Songti SC",serif}
+.support-anchor>div:first-child>strong i{margin-left:4px;color:#98733b;font-size:17px;font-style:normal}
+.support-month{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid #e2d2b3;border-radius:10px;background:#fffdf8;color:#586577;font-size:13px}
+.support-month b{color:#805c22;font-size:14px}
+.support-month b.is-support,.support-metric strong.is-support{color:#34865d}
+.support-month b.is-drain,.support-metric strong.is-drain{color:#b94c3e}
+.support-balance{padding:19px 22px 17px}
+.support-camp-head{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.support-camp{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:1px 12px;min-width:0}
+.support-camp-name{grid-column:1/-1;font-size:17px;font-weight:800}
+.support-camp>strong{font-size:25px;font-variant-numeric:tabular-nums;line-height:1.25}
+.support-camp>strong small{font-size:12px;font-weight:500}
+.support-camp>em{font-size:17px;font-style:normal;font-weight:800;font-variant-numeric:tabular-nums}
+.support-camp>small{grid-column:1/-1;color:#858477;font-size:11px}
+.support-camp-help .support-camp-name,.support-camp-help>strong,.support-camp-help>em{color:#39845b}
+.support-camp-drain .support-camp-name,.support-camp-drain>strong,.support-camp-drain>em{color:#b95748}
+.support-balance-track{position:relative;display:flex;overflow:hidden;height:20px;margin:13px 0 8px;border:1px solid #ded5c5;border-radius:999px;background:#f3eee5;box-shadow:inset 0 1px 3px #5c4c3212}
+.support-track-help{height:100%;background:linear-gradient(90deg,#75aa7b,#39845b);transition:width .35s ease}
+.support-track-drain{height:100%;background:linear-gradient(90deg,#d58b73,#b95748);transition:width .35s ease}
+.support-balance-track>i{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fffdf8;box-shadow:0 0 0 1px #806c4c55;transform:translateX(-1px)}
+.support-balance-caption{display:flex;justify-content:space-between;gap:10px;color:#898477;font-size:10px}
+.support-three-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0 22px 19px}
+.support-metric{display:flex;align-items:center;gap:10px;min-width:0;padding:11px 12px;border:1px solid #e7ddcc;border-radius:11px;background:#fbf8f1}
+.support-metric-icon{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border:1px solid #d8c49f;border-radius:50%;background:#f4ead7;color:#916a30;font:700 16px "Noto Serif SC","Songti SC",serif}
+.support-metric>div{display:flex;flex-direction:column;min-width:0}
+.support-metric small{color:#898477;font-size:10px}
+.support-metric strong{color:#34455a;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+.support-metric em{color:#9a9284;font-size:9px;font-style:normal}
+.support-verdict{display:flex;align-items:center;gap:17px;margin:0 22px 17px;padding:13px 16px;border:1px solid #e4d5bb;border-radius:11px;background:#f8f2e6}
+.support-verdict>div{display:flex;flex-direction:column;flex:0 0 auto;gap:2px}
+.support-verdict>div>span{color:#81745d;font-size:10px}
+.support-verdict>div>strong{color:#805c22;font:800 26px/1.25 "Noto Serif SC","Songti SC",serif}
+.support-verdict p{margin:0;color:#586577;font-size:12px;line-height:1.7}
+.support-verdict-strong{border-color:#d9c18f;background:#f7edda}
+.support-verdict-weak{border-color:#d9c7b9;background:#f8eee8}
+.support-verdict-balanced{background:#f4f1e9}
+.support-gods{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 22px 16px}
+.support-god-item{min-width:0;padding:12px 14px;border:1px solid #e7ddcc;border-radius:11px;background:#fffdf8}
+.support-god-title{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:9px}
+.support-god-title>span{color:#34455a;font-size:14px;font-weight:800}
+.support-god-title>small{color:#999080;font-size:9px}
+.support-element-list{display:flex;flex-wrap:wrap;gap:7px}
+.support-element-chip{display:inline-flex;align-items:center;justify-content:center;min-width:35px;padding:5px 11px;border:1px solid currentColor;border-radius:999px;background:#fffdf8;font-size:15px;font-weight:800}
+.support-element-chip.el-木{color:#34865d;background:#34865d0c}
+.support-element-chip.el-火{color:#d95442;background:#d954420c}
+.support-element-chip.el-土{color:#bd8a31;background:#bd8a310c}
+.support-element-chip.el-金{color:#78838d;background:#8c969e18}
+.support-element-chip.el-水{color:#367db3;background:#367db30c}
+.support-no-data{color:#9b9589;font-size:12px}
+.support-climate{display:flex;align-items:flex-start;gap:10px;margin:0 22px;padding:11px 13px;border-top:1px dashed #e2d6c0;color:#5e6874}
+.support-climate>span{flex:0 0 auto;color:#8a7657;font-size:11px;font-weight:800}
+.support-climate p{margin:0;font-size:11px;line-height:1.7}
+.support-footnote{margin:12px 22px 0;padding:10px 0 14px;border-top:1px solid #eee6d8;color:#969082;font-size:10px;line-height:1.7}
+.support-panel-empty{padding:22px;color:#8c8271;font-size:13px}
+@media(max-width:680px){
+ .support-anchor{align-items:flex-start;flex-direction:column;gap:10px;padding:14px}
+ .support-anchor>div:first-child>strong{font-size:22px}
+ .support-month{width:100%;justify-content:space-between;padding:7px 10px;font-size:12px}
+ .support-balance{padding:15px 13px 13px}
+ .support-camp-head{gap:10px}
+ .support-camp-name{font-size:14px}
+ .support-camp>strong{font-size:21px}
+ .support-camp>em{font-size:14px}
+ .support-camp>small{font-size:9px}
+ .support-balance-track{height:16px;margin-top:11px}
+ .support-balance-caption{font-size:9px}
+ .support-three-metrics{gap:6px;padding:0 10px 14px}
+ .support-metric{align-items:flex-start;flex-direction:column;gap:5px;padding:9px 7px}
+ .support-metric-icon{width:27px;height:27px;flex-basis:27px;font-size:13px}
+ .support-metric strong{font-size:12px}
+ .support-metric em{font-size:8px}
+ .support-verdict{align-items:flex-start;flex-direction:column;gap:7px;margin:0 10px 13px;padding:11px 12px}
+ .support-verdict>div>strong{font-size:23px}
+ .support-verdict p{font-size:11px}
+ .support-gods{gap:7px;padding:0 10px 13px}
+ .support-god-item{padding:10px 8px}
+ .support-god-title{align-items:flex-start;flex-direction:column;gap:2px}
+ .support-god-title>span{font-size:12px}
+ .support-element-list{gap:5px}
+ .support-element-chip{min-width:30px;padding:4px 8px;font-size:13px}
+ .support-climate{gap:7px;margin:0 10px;padding:9px 2px}
+ .support-climate>span,.support-climate p{font-size:10px}
+ .support-footnote{margin:10px 10px 0;padding:9px 0 12px;font-size:9px}
+}
+@media(max-width:360px){
+ .support-camp-head{gap:7px}
+ .support-camp>strong{font-size:18px}
+ .support-balance-caption{font-size:8px}
+ .support-metric{padding:8px 5px}
+ .support-gods{grid-template-columns:1fr}
+}
+
+/* ===== 五行能量 · 扶抑法诊断面板（改造追加） ===== */
+.fy-card{overflow:hidden;border:1px solid #e1d0ac;border-radius:14px;background:#fffdf8;box-shadow:0 5px 16px #6c5a3b0b}
+.fy-anchor{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:12px 14px;background:#fffdf8;border-bottom:1px solid #e6dac4}
+.fy-k{color:#8a7a5c;font-size:13px}
+.fy-v{font-size:20px;color:#2b3c51;font-weight:700}
+.fy-v-month{color:#956b2b}
+.fy-gap{width:1px;height:18px;background:#e0d2b6}
