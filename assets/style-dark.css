@@ -1,0 +1,143 @@
+/* ===== P11 暗色皮肤（对标主站深蓝金风格） =====
+   默认暗色；切换亮色由 layout-theme.js 控制。
+   选择器前缀 html.dark，内联脚本在 head 立即加 class 避免闪烁。 */
+html.dark {
+  --bg: #0a1628;
+  --bg2: #0d1b2a;
+  --card: #111d33;
+  --card2: #152238;
+  --line: #1e3a5f;
+  --line2: #2a4a6f;
+  --text: #e0e6f0;
+  --text2: #8a9bb5;
+  --gold: #d4a843;
+  --gold2: #c9a84c;
+  --blue: #4a9eff;
+  color-scheme: dark;
+}
+
+html.dark body { background: var(--bg); color: var(--text); }
+
+/* 顶栏 */
+html.dark .topbar { background: var(--bg2); border-bottom: 1px solid var(--line); }
+html.dark .brand b { color: var(--text); }
+html.dark .brand small { color: var(--text2); }
+html.dark .brand-mark {
+  background: linear-gradient(135deg, #d4a843, #8a6d2a);
+  color: #0a1628;
+}
+html.dark .knowledge-link { color: var(--gold); }
+html.dark .privacy { color: var(--text2); }
+
+/* Hero */
+html.dark .hero h1 { color: var(--text); }
+html.dark .hero-emblem { color: var(--gold); }
+
+/* 表单面板 */
+html.dark .panel, html.dark .form-panel {
+  background: var(--card) !important;
+  border-color: var(--line) !important;
+  color: var(--text) !important;
+}
+html.dark .section-heading h2 { color: var(--text); }
+html.dark .kicker { color: var(--gold); }
+html.dark .step, html.dark .form-foot p { color: var(--text2); }
+html.dark input, html.dark select, html.dark textarea {
+  background: var(--card2) !important;
+  color: var(--text) !important;
+  border-color: var(--line) !important;
+}
+html.dark .primary {
+  background: linear-gradient(135deg, #d4a843, #b8922f) !important;
+  color: #0a1628 !important;
+}
+html.dark .notice.error {
+  background: rgba(239,83,80,.12) !important;
+  color: #ef9a9a !important;
+  border-color: rgba(239,83,80,.3) !important;
+}
+
+/* 横表 */
+html.dark .pt-table { background: var(--card) !important; border-color: var(--line) !important; }
+html.dark .pt-cell { color: var(--text) !important; border-bottom-color: var(--line) !important; }
+html.dark .pt-rowlabel { color: var(--text2) !important; border-right-color: var(--line) !important; }
+html.dark .pt-head .pt-cell {
+  background: rgba(212,168,67,.12) !important;
+  color: var(--gold) !important;
+}
+html.dark .pt-day {
+  background: linear-gradient(180deg, rgba(212,168,67,.15), rgba(212,168,67,.05)) !important;
+}
+
+/* 左侧边栏 */
+html.dark .side-nav .tab {
+  background: var(--card2) !important;
+  color: var(--text2) !important;
+  border-color: var(--line) !important;
+}
+html.dark .side-nav .tab:hover { background: rgba(212,168,67,.1) !important; }
+html.dark .side-nav .tab.active {
+  background: rgba(212,168,67,.15) !important;
+  color: var(--gold) !important;
+  border-color: var(--gold) !important;
+}
+
+/* 右侧面板 */
+html.dark .sp-card {
+  background: var(--card) !important;
+  border-color: var(--line) !important;
+  color: var(--text) !important;
+}
+html.dark .sp-card h4 { color: var(--gold); border-bottom-color: var(--line); }
+html.dark .sp-card p { color: var(--text); }
+html.dark .sp-card .muted { color: var(--text2); }
+html.dark .sp-luck-item {
+  background: rgba(212,168,67,.12) !important;
+  color: var(--text) !important;
+}
+html.dark .sp-luck-item.current {
+  background: rgba(239,83,80,.15) !important;
+  border-color: rgba(239,83,80,.4) !important;
+}
+
+/* 五行色（暗色提亮） */
+html.dark .ps-e-木 { color: #4caf50; }
+html.dark .ps-e-火 { color: #ef5350; }
+html.dark .ps-e-土 { color: #bcaaa4; }
+html.dark .ps-e-金 { color: #ffd54f; }
+html.dark .ps-e-水 { color: #42a5f5; }
+
+/* 内容区 */
+html.dark .overview-panel, html.dark .tab-content { color: var(--text); }
+html.dark .module-heading span:last-child { color: var(--text2); }
+html.dark .data-card {
+  background: var(--card2) !important;
+  border-color: var(--line) !important;
+  color: var(--text) !important;
+}
+html.dark .result-title h2 { color: var(--gold); }
+html.dark .day-master { color: var(--gold); }
+
+/* 页脚 */
+html.dark .site-footer {
+  background: var(--bg2) !important;
+  border-top: 1px solid var(--line);
+  color: var(--text2);
+}
+html.dark .disclaimer, html.dark .footer-disclaimer { color: var(--text2) !important; }
+
+/* 主题切换按钮 */
+html.dark .theme-toggle {
+  background: var(--card2) !important;
+  border-color: var(--line2) !important;
+  color: var(--gold) !important;
+}
+.theme-toggle {
+  background: none;
+  border: 1px solid #d8d2c0;
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-left: 8px;
+}
