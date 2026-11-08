@@ -1,0 +1,88 @@
+/* ===== P9 问真式四柱横表 =====
+   把竖向四柱卡片重排为横表：行=主星/天干/地支/藏干/纳音/神煞，列=年/月/日/时。
+   五行配色，日柱高亮。不改动 app.js，由 layout-p9.js 读取原卡片数据生成横表。 */
+#pillars { display: none !important; }
+.chart-frame-top, .chart-frame-bottom { display: none !important; }
+.chart-frame {
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+#pillars-table {
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.pt-table {
+  display: grid;
+  grid-template-columns: 60px repeat(4, 1fr);
+  border: 1px solid var(--line,#d8d2c0);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255,255,255,.5);
+  min-width: 480px;
+}
+.pt-row { display: contents; }
+.pt-cell {
+  padding: 7px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--line,#eae4d2);
+  font-size: 14px;
+  color: #3a3428;
+  line-height: 1.4;
+}
+.pt-rowlabel {
+  text-align: right;
+  font-size: 12px;
+  color: #8a7f63;
+  padding-right: 12px;
+  font-weight: 600;
+  border-right: 1px solid var(--line,#eae4d2);
+}
+.pt-head .pt-cell {
+  font-weight: 700;
+  color: #6d4f1f;
+  background: rgba(205,183,137,.18);
+  font-size: 15px;
+  padding: 10px 8px;
+}
+.pt-head .pt-rowlabel {
+  background: rgba(205,183,137,.18);
+}
+.pt-day {
+  background: linear-gradient(180deg, rgba(205,183,137,.22), rgba(190,160,90,.06));
+}
+.pt-gz {
+  font-size: 24px;
+  font-weight: 700;
+  font-family: "Noto Serif SC","Songti SC","SimSun",serif;
+  line-height: 1.1;
+}
+.pt-hidden {
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  margin: 0 2px;
+  line-height: 1.5;
+}
+.pt-shensha {
+  font-size: 11px;
+  color: #6d6250;
+  line-height: 1.5;
+}
+/* 五行配色（横表内） */
+.ps-e-木 { color: #2e7d32; }
+.ps-e-火 { color: #c62828; }
+.ps-e-土 { color: #8a6d3f; }
+.ps-e-金 { color: #b08a2f; }
+.ps-e-水 { color: #1565c0; }
+.ps-e-na { color: #3a3428; }
+
+@media (max-width: 680px) {
+  .pt-table { min-width: 420px; }
+  .pt-gz { font-size: 20px; }
+  .pt-cell { padding: 5px 6px; font-size: 13px; }
+  .pt-rowlabel { font-size: 11px; padding-right: 8px; }
+}
