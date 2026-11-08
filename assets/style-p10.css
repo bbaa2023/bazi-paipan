@@ -1,0 +1,126 @@
+/* ===== P10 问真式三栏布局 =====
+   左=边栏tab导航，中=横表+旺衰喜忌+tab内容，右=起运交运+大运面板。
+   移动端降级为单栏。 */
+
+.results-layout {
+  display: grid !important;
+  grid-template-columns: 140px 1fr 290px !important;
+  gap: 16px !important;
+  align-items: start !important;
+}
+
+/* 左侧边栏 */
+.side-nav {
+  position: sticky;
+  top: 16px;
+  order: 0;
+}
+.side-nav .tabs {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+}
+.side-nav .tab {
+  border-radius: 8px !important;
+  text-align: left !important;
+  padding: 9px 14px !important;
+  font-size: 13px !important;
+  border: 1px solid transparent !important;
+  background: rgba(255,255,255,.45) !important;
+  color: #6d6250 !important;
+  width: 100% !important;
+}
+.side-nav .tab:hover {
+  background: rgba(205,183,137,.15) !important;
+}
+.side-nav .tab.active {
+  background: rgba(205,183,137,.25) !important;
+  border-color: rgba(180,150,90,.35) !important;
+  color: #6d4f1f !important;
+  font-weight: 600 !important;
+}
+
+/* 中间主列 */
+.results-center {
+  order: 1;
+  min-width: 0;
+}
+
+/* 右侧信息面板 */
+.side-panel {
+  order: 2;
+  position: sticky;
+  top: 16px;
+}
+.sp-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sp-card {
+  background: rgba(255,255,255,.55);
+  border: 1px solid var(--line,#d8d2c0);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.sp-card h4 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #6d4f1f;
+  font-weight: 700;
+  border-bottom: 1px solid var(--line,#eae4d2);
+  padding-bottom: 6px;
+}
+.sp-card p {
+  margin: 3px 0;
+  font-size: 12px;
+  color: #4a4030;
+  line-height: 1.5;
+}
+.sp-card .muted { color: #8a7f63; font-size: 11px; }
+.sp-luck-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.sp-luck-item {
+  flex: 0 0 auto;
+  font-size: 12px;
+  padding: 5px 10px;
+  background: rgba(205,183,137,.15);
+  border-radius: 6px;
+  white-space: nowrap;
+  color: #4a4030;
+}
+.sp-luck-item.current {
+  background: rgba(198,40,40,.12);
+  border: 1px solid rgba(198,40,40,.3);
+}
+.sp-loading, .sp-empty {
+  font-size: 12px;
+  color: #8a7f63;
+  text-align: center;
+  padding: 20px;
+}
+
+/* 移动端：单栏，边栏变横向 */
+@media (max-width: 960px) {
+  .results-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .side-nav, .side-panel {
+    position: static;
+  }
+  .side-nav .tabs {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+  .side-nav .tab {
+    width: auto !important;
+    text-align: center !important;
+  }
+}
