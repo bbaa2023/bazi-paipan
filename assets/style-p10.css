@@ -1,10 +1,11 @@
-/* ===== P10 问真式三栏布局 =====
-   左=边栏tab导航，中=横表+旺衰喜忌+tab内容，右=起运交运+大运面板。
+/* ===== P10/P12 两栏布局 =====
+   左=边栏tab导航（窄条），主区=横表+旺衰喜忌+起运大运横条+tab内容。
+   起运交运与大运时间轴在主区内并排横条，不再独立成右侧空列。
    移动端降级为单栏。 */
 
 .results-layout {
   display: grid !important;
-  grid-template-columns: 140px 1fr 290px !important;
+  grid-template-columns: 140px 1fr !important;
   gap: 16px !important;
   align-items: start !important;
 }
@@ -49,23 +50,28 @@
   min-width: 0;
 }
 
-/* 右侧信息面板 */
+/* 起运/大运横条（主区内全宽，并排） */
 .side-panel {
-  order: 2;
-  position: sticky;
-  top: 16px;
+  order: 1;
+  width: 100%;
+  margin: 12px 0;
 }
 .sp-inner {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-direction: row;
+  gap: 12px;
+  align-items: stretch;
 }
 .sp-card {
   background: rgba(255,255,255,.55);
   border: 1px solid var(--line,#d8d2c0);
   border-radius: 12px;
   padding: 12px 14px;
+  min-width: 0;
 }
+/* 起运交运卡固定宽度，大运时间轴卡撑满剩余 */
+.sp-card:first-child { flex: 0 0 250px; }
+.sp-card:last-child { flex: 1 1 auto; }
 .sp-card h4 {
   margin: 0 0 8px;
   font-size: 13px;
@@ -107,7 +113,7 @@
   padding: 20px;
 }
 
-/* 移动端：单栏，边栏变横向 */
+/* 移动端：单栏，边栏变横向，横条堆叠 */
 @media (max-width: 960px) {
   .results-layout {
     grid-template-columns: 1fr !important;
@@ -123,4 +129,8 @@
     width: auto !important;
     text-align: center !important;
   }
+  .sp-inner {
+    flex-direction: column !important;
+  }
+  .sp-card:first-child { flex: 1 1 auto !important; }
 }
