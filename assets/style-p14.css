@@ -1,0 +1,57 @@
+/* ===== P14 五行个数比例条 =====
+   对标问真「五行个数」：五行横条 + 右侧 N个+十神；颜色走变量与既有五行色系，暗色皮肤自动跟随。 */
+
+.p14-row {
+  display: grid;
+  grid-template-columns: 34px 1fr 112px;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 2px;
+}
+
+.p14-el {
+  font-weight: 800;
+  font-size: 15px;
+  font-family: var(--serif, "Noto Serif SC", "Songti SC", "SimSun", serif);
+}
+.p14-el.el-木 { color: #34865d; }
+.p14-el.el-火 { color: #d95442; }
+.p14-el.el-土 { color: #bd8a31; }
+.p14-el.el-金 { color: #8c969e; }
+.p14-el.el-水 { color: #367db3; }
+
+.p14-track {
+  height: 14px;
+  border-radius: 99px;
+  background: var(--line2, #eee9df);
+  overflow: hidden;
+}
+.p14-fill {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  min-width: 0;
+}
+.p14-fill.el-木 { background: linear-gradient(90deg, #5fa87d, #34865d); }
+.p14-fill.el-火 { background: linear-gradient(90deg, #e18b79, #d95442); }
+.p14-fill.el-土 { background: linear-gradient(90deg, #d3a95c, #bd8a31); }
+.p14-fill.el-金 { background: linear-gradient(90deg, #a9b3ba, #8c969e); }
+.p14-fill.el-水 { background: linear-gradient(90deg, #5a9ccf, #367db3); }
+
+.p14-count {
+  font-size: 12px;
+  color: var(--text2, #706b61);
+  text-align: right;
+  white-space: nowrap;
+}
+.p14-count b {
+  color: var(--text, #3a3428);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+@media (max-width: 680px) {
+  .p14-row { grid-template-columns: 28px 1fr 96px; gap: 8px; }
+  .p14-el { font-size: 13px; }
+  .p14-count { font-size: 11px; }
+}
