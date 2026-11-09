@@ -1,0 +1,168 @@
+/* ===== P13 联动细盘 =====
+   a) 隐藏与横表重合的 P8 内嵌小条；
+   b) 顶部出生信息常驻条；
+   c) 大运/流年/流月与本命四柱同页，点击运柱上方联动。
+   颜色全部走 CSS 变量，暗色皮肤自动跟随；五行色复用 .ps-e-*。 */
+
+/* a) 重合的内嵌四柱小卡片不再展示（DOM 保留，事件不删） */
+#pillars-inline { display: none !important; }
+
+/* b) 顶部出生信息条 */
+.p13-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin: 4px 0 16px;
+  padding: 12px 16px;
+  background: var(--card, rgba(255,255,255,.55));
+  border: 1px solid var(--line, #d8d2c0);
+  border-radius: 12px;
+  font-size: 13px;
+  color: var(--text, #3a3428);
+}
+.p13-banner .p13-b-title {
+  font-weight: 700;
+  color: var(--gold, #6d4f1f);
+  font-size: 14px;
+}
+.p13-banner .p13-b-item { display: inline-flex; align-items: baseline; gap: 5px; }
+.p13-banner .p13-b-item b { font-weight: 600; }
+.p13-banner .p13-b-label { color: var(--text2, #8a7f63); font-size: 12px; }
+.p13-banner .p13-b-gender {
+  color: var(--gold, #6d4f1f);
+  border: 1px solid var(--line2, rgba(180,150,90,.35));
+  border-radius: 6px;
+  padding: 1px 8px;
+  font-size: 12px;
+}
+
+/* c) 联动细盘面板 */
+.p13-panel {
+  margin: 16px 0;
+  padding: 14px 16px;
+  background: var(--card, rgba(255,255,255,.55));
+  border: 1px solid var(--line, #d8d2c0);
+  border-radius: 12px;
+}
+.p13-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.p13-head h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold, #6d4f1f);
+}
+.p13-head .p13-hint { font-size: 12px; color: var(--text2, #8a7f63); }
+
+/* 联动横表：行标签 + 大运/流年/流月/年/月/日/时 = 7 列 */
+.p13-table-wrap { overflow-x: auto; margin-bottom: 14px; }
+.p13-table {
+  display: grid;
+  grid-template-columns: 64px repeat(7, minmax(92px, 1fr));
+  border: 1px solid var(--line, #d8d2c0);
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 720px;
+  background: var(--card, rgba(255,255,255,.5));
+}
+.p13-row { display: contents; }
+.p13-cell {
+  padding: 7px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--line, #eae4d2);
+  font-size: 13px;
+  color: var(--text, #3a3428);
+  line-height: 1.4;
+}
+.p13-rowlabel {
+  text-align: right;
+  font-size: 12px;
+  color: var(--text2, #8a7f63);
+  padding-right: 12px;
+  font-weight: 600;
+  border-right: 1px solid var(--line, #eae4d2);
+}
+.p13-headrow .p13-cell {
+  font-weight: 700;
+  color: var(--gold, #6d4f1f);
+  background: rgba(205,183,137,.18);
+  font-size: 13px;
+  padding: 10px 8px;
+}
+.p13-headrow .p13-rowlabel { background: rgba(205,183,137,.18); }
+/* 运柱列与本命列之间分隔 */
+.p13-col-month { border-right: 1px dashed var(--line2, rgba(180,150,90,.4)); }
+/* 选中运柱高亮 */
+.p13-cell.p13-active {
+  background: linear-gradient(180deg, rgba(212,168,67,.16), rgba(212,168,67,.05));
+}
+.p13-gz {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  line-height: 1.1;
+}
+.p13-hidden {
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
+  margin: 0 2px;
+  line-height: 1.5;
+}
+.p13-na { font-size: 11px; color: var(--text2, #8a7f63); }
+.p13-god { font-size: 12px; color: var(--text2, #6d6250); }
+
+/* 三段横滚栏 */
+.p13-scrolls { display: flex; flex-direction: column; gap: 12px; }
+.p13-group { display: flex; align-items: flex-start; gap: 10px; }
+.p13-group-label {
+  flex: 0 0 44px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold, #6d4f1f);
+  padding-top: 6px;
+  text-align: center;
+}
+.p13-track {
+  flex: 1;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.p13-item {
+  flex: 0 0 auto;
+  border: 1px solid var(--line, #d8d2c0);
+  background: var(--card2, rgba(255,255,255,.45));
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--text, #3a3428);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.p13-item .p13-item-gz { font-weight: 700; font-size: 14px; }
+.p13-item .p13-item-meta { display: block; font-size: 11px; color: var(--text2, #8a7f63); }
+.p13-item:hover { border-color: var(--gold, #b8922f); }
+.p13-item.selected {
+  border-color: var(--gold, #b8922f);
+  background: rgba(212,168,67,.16);
+}
+.p13-item.current .p13-item-meta { color: #c62828; }
+html.dark .p13-item.current .p13-item-meta { color: #ef9a9a; }
+.p13-item:disabled { opacity: .5; cursor: default; }
+
+@media (max-width: 680px) {
+  .p13-table { min-width: 620px; }
+  .p13-gz { font-size: 18px; }
+  .p13-cell { padding: 5px 6px; font-size: 12px; }
+}
