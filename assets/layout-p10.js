@@ -1,6 +1,6 @@
-/* ===== P10 问真式三栏布局 · DOM 重组 =====
-   左侧边栏 = 现有 tab 按钮迁移；右侧面板 = 临时切 luck tab 提取起运交运+大运数据。
-   不改 app.js，旺衰喜忌模块保留在中间主列。 */
+/* ===== P10/P12 两栏布局 · DOM 重组 =====
+   左侧边栏 = 现有 tab 按钮迁移；起运/大运横条并入主区（旺衰喜忌下方）。
+   不改 app.js，旺衰喜忌模块保留在主区。 */
 (function () {
   'use strict';
   var results = document.getElementById('results');
@@ -24,11 +24,16 @@
       sideNav.appendChild(tabs);
     }
 
-    // 右侧面板
+    // 起运/大运横条：并入主区，插在旺衰喜忌(overview-panel)之后
     var sidePanel = document.createElement('aside');
     sidePanel.className = 'side-panel';
     sidePanel.innerHTML = '<div class="sp-inner"><div class="sp-loading">正在加载起运信息…</div></div>';
-    layout.appendChild(sidePanel);
+    var overview = primary.querySelector('#overview-panel');
+    if (overview && overview.nextSibling) {
+      primary.insertBefore(sidePanel, overview.nextSibling);
+    } else {
+      primary.appendChild(sidePanel);
+    }
   }
 
   // 从大运 tab 提取数据到右侧面板
