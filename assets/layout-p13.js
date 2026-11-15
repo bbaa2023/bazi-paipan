@@ -27,17 +27,24 @@
     var bd = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(fd.get('birthdate') || ''));
     if (!bd) return null;
     var year = +bd[1], month = +bd[2], day = +bd[3];
-    var hourRaw = fd.get('hour'), hour = hourRaw === '' ? null : Number(hourRaw);
+    function numOrNull(raw) {
+      if (raw == null || raw === '') return null;
+      var n = Number(raw);
+      return Number.isFinite(n) ? n : null;
+    }
+    var hourRaw = fd.get('hour'), hour = (hourRaw == null || hourRaw === '') ? null : Number(hourRaw);
     var minute = Number(fd.get('minute'));
-    var lngRaw = fd.get('longitude');
+    var longitude = numOrNull(fd.get('longitude'));
+    var tz = Number(fd.get('tzOffsetHours'));
+    var sect = Number(fd.get('sect'));
     var genderRaw = fd.get('gender');
     return {
       year: year, month: month, day: day, hour: hour, minute: minute,
-      longitude: lngRaw === '' ? null : Number(lngRaw),
-      tzOffsetHours: Number(fd.get('tzOffsetHours')),
+      longitude: longitude,
+      tzOffsetHours: Number.isFinite(tz) ? tz : 8,
       unknownTime: hour === null,
-      sect: Number(fd.get('sect')),
-      gender: genderRaw === '' ? null : Number(genderRaw)
+      sect: Number.isFinite(sect) ? sect : 1,
+      gender: (genderRaw == null || genderRaw === '') ? null : Number(genderRaw)
     };
   }
 
@@ -236,7 +243,7 @@
         return '<button type="button" class="p13-item' + (sel ? ' selected' : '') + cur + '" data-zone="luck" data-value="' + esc(p.index) + '">' +
           '<span class="p13-item-gz">' + esc(p.ganzhi || '—') + '</span>' +
           (meta ? '<span class="p13-item-meta">' + esc(meta) + '</span>' : '') + '</button>';
-      }).join('') : '<span class="p13-item-meta">指定性别后显示大运</span>';
+      }).join('') : '<span class="p13-item-meta">大运需区分男女顺逆，请在上方选择性别（男 / 女）后自动显示</span>';
     }
     // 流年
     var annualTrack = document.getElementById('p13-annual');
