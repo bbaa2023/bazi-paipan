@@ -1,0 +1,79 @@
+/* ===== P17 出生时间滚轮选择器 ===== */
+.p17-hidden { display: none !important; }
+
+/* 合并后的出生时间入口 */
+.p17-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.p17-field-title { color: #526071; font-size: 12px; font-weight: 650; }
+.p17-time-btn {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  height: 42px; padding: 0 14px; border: 1px solid var(--gold, #d5b77e);
+  border-radius: 10px; background: #fffdf8; color: var(--text, #34455a);
+  font-size: 14px; cursor: pointer; text-align: left;
+}
+.p17-time-btn:hover { border-color: #a9782e; }
+.p17-time-text { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.p17-time-arrow { color: #a9782e; font-size: 13px; }
+
+/* 弹窗 */
+.p17-modal { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: flex-end; justify-content: center; }
+.p17-mask { position: absolute; inset: 0; background: rgba(20, 26, 38, .5); }
+.p17-sheet {
+  position: relative; width: 100%; max-width: 520px; background: #fbf8f1;
+  border-radius: 18px 18px 0 0; padding: 16px 16px 20px; box-shadow: 0 -10px 40px rgba(20,26,38,.28);
+}
+@media (min-width: 680px) {
+  .p17-modal { align-items: center; }
+  .p17-sheet { border-radius: 18px; margin: 20px; }
+}
+
+/* 顶部 tab */
+.p17-tabs { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+.p17-tab {
+  flex: 0 0 auto; padding: 8px 20px; border: 1px solid var(--gold, #d5b77e); border-radius: 999px;
+  background: transparent; color: #526071; font-size: 14px; cursor: pointer;
+}
+.p17-tab.active { background: linear-gradient(135deg, #c7a05e, #b98b45); color: #fffdf8; font-weight: 700; border-color: #a9782e; }
+.p17-close { margin-left: auto; width: 34px; height: 34px; border: none; background: transparent; color: #526071; font-size: 22px; cursor: pointer; border-radius: 8px; }
+.p17-close:hover { background: rgba(0,0,0,.06); }
+
+/* 五列滚轮 */
+.p17-cols { display: flex; gap: 6px; }
+.p17-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; position: relative; }
+.p17-col-label { font-size: 12px; color: #8a94a6; margin-bottom: 8px; }
+.p17-col-list {
+  position: relative; height: 180px; width: 100%; overflow-y: auto; scrollbar-width: none;
+  mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 72%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 72%, transparent);
+}
+.p17-col-list::-webkit-scrollbar { display: none; }
+.p17-opt {
+  height: 36px; line-height: 36px; text-align: center; font-size: 15px; color: #526071;
+  border-radius: 8px; cursor: pointer;
+}
+.p17-opt.active { color: #8a5a17; font-weight: 700; background: rgba(213, 183, 126, .18); }
+/* 中间高亮参考带 */
+.p17-col::before {
+  content: ""; position: absolute; top: 50%; transform: translateY(-50%);
+  height: 36px; width: 92%; border-top: 1px solid rgba(169,120,46,.25); border-bottom: 1px solid rgba(169,120,46,.25);
+  pointer-events: none;
+}
+
+/* 底部按钮 */
+.p17-actions { display: flex; gap: 12px; margin-top: 16px; }
+.p17-btn { flex: 1; height: 46px; border-radius: 999px; font-size: 15px; cursor: pointer; }
+.p17-cancel { background: transparent; border: 1px solid #c9d1dc; color: #526071; }
+.p17-ok { background: #141a26; color: #f3e2b8; border: 1px solid #141a26; font-weight: 700; }
+
+body.p17-locked { overflow: hidden; }
+
+/* 暗色适配 */
+html.dark .p17-field-title { color: var(--text, #e0e6f0); }
+html.dark .p17-time-btn { background: var(--card2, #152238); color: var(--text, #e0e6f0); }
+html.dark .p17-sheet { background: #16233a; }
+html.dark .p17-tab { color: var(--text, #e0e6f0); }
+html.dark .p17-tab.active { color: #0a1628; }
+html.dark .p17-close { color: var(--text, #e0e6f0); }
+html.dark .p17-col-label { color: #93a1b8; }
+html.dark .p17-opt { color: #c6d0e0; }
+html.dark .p17-opt.active { color: #f3e2b8; background: rgba(213,183,126,.16); }
+html.dark .p17-cancel { border-color: #33445c; color: var(--text, #e0e6f0); }
