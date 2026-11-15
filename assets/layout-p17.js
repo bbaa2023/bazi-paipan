@@ -179,22 +179,20 @@
   function renderAll() { COLS.forEach(function (c) { renderCol(c.key); }); }
 
   function bindCol(key, list) {
-    var timer = null;
-    function pickFromScroll() {
-      if (silent) return;
+    // 滚轮：每个滚动事件只走一项，避免惯性一次跳两项；点击选项直达定位。
+    list.addEventListener('wheel', function (ev) {
+      ev.preventDefault();
       var values = colValues(key);
-      var idx = Math.max(0, Math.min(values.length - 1, Math.round(list.scrollTop / ITEM_H)));
-      var v = values[idx];
-      if (currentVal(key) !== v) {
-        setVal(key, v);
-        markActive(key);
-        if (key === 'y' || key === 'm') renderCol('d');
-      }
-    }
-    list.addEventListener('scroll', function () {
-      clearTimeout(timer);
-      timer = setTimeout(pickFromScroll, 80);
-    });
+      var idx = values.indexOf(currentVal(key));
+      if (idx < 0) idx = 0;
+      var dir = ev.deltaY > 0 ? 1 : -1;
+      var n = Math.max(0, Math.min(values.length - 1, idx + dir));
+      if (n === idx) return;
+      setVal(key, values[n]);
+      markActive(key);
+      silent = true; list.scrollTop = n * ITEM_H; silent = false;
+      if (key === 'y' || key === 'm') renderCol('d');
+    }, { passive: false });
     list.addEventListener('click', function (ev) {
       var opt = ev.target.closest('.p17-opt'); if (!opt) return;
       var v = Number(opt.getAttribute('data-v'));
