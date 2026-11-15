@@ -1,0 +1,27 @@
+/* ===== P16 性别分段单选（替代下拉菜单） =====
+   不改主 CSS：性别改为男 / 女两个可点按钮，选中态金色高亮。 */
+.form-gender { display: flex; flex-direction: column; gap: 6px; min-width: 0; color: #526071; font-size: 12px; font-weight: 650; }
+.form-gender-title { color: inherit; }
+.gender-seg { display: flex; gap: 8px; height: 42px; }
+.gender-opt { flex: 1; position: relative; display: flex; }
+.gender-opt input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.gender-opt span {
+  flex: 1; display: flex; align-items: center; justify-content: center; height: 42px;
+  border: 1px solid var(--gold, #d5b77e); border-radius: 10px;
+  background: #fffdf8; color: var(--text, #34455a); font-size: 13px;
+  transition: border-color .18s, background-color .18s, color .18s, box-shadow .18s;
+}
+.gender-opt:hover span { border-color: #a9782e; }
+.gender-opt input:checked + span {
+  border-color: #a9782e;
+  background: linear-gradient(135deg, #c7a05e, #b98b45);
+  color: #fffdf8; font-weight: 700;
+  box-shadow: 0 2px 10px #b98b4526;
+}
+.gender-opt input:focus-visible + span { box-shadow: 0 0 0 3px #b98b452b; }
+html.dark .gender-opt span { background: var(--card2, #152238); color: var(--text, #e0e6f0); }
+html.dark .gender-opt input:checked + span { color: #0a1628; }
+@media (max-width: 680px) {
+  .gender-seg { height: 41px; }
+  .gender-opt span { height: 41px; }
+}
