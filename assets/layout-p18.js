@@ -1,8 +1,8 @@
 /* ===== P18 出生地址三列滚轮选择器 · 独立脚本 =====
    不改 app.js：保留隐藏的原生 city 下拉作为数据载体，
-   表单上合并为一个“出生地址”入口，弹窗内 省份 / 城市 / 区县 三列上下滚轮，
-   分 国内 / 海外 两个页签并支持城市搜索。选定后写回 city 下拉并派发 change，
-   由既有逻辑自动填入经度与 UTC 时区；经纬度沿用内置城市级数据。 */
+   表单上合并为一个“出生地址”入口，弹窗内 省份 / 城市 / 区县 三列滚轮，
+   分 国内 / 海外 两个页签并支持城市搜索。城市经纬度来自 city-data.js。
+   滚轮按整项步进：每个滚动事件只移动一项，避免惯性一次跳两项；点击选项直达定位。 */
 (function () {
   'use strict';
   var form = document.getElementById('birth-form');
@@ -18,17 +18,41 @@
     return e;
   }
 
-  // ---- 从既有下拉解析 省/组 -> 城市（含经度、时区），不重复硬编码 ----
-  var domestic = [], overseas = [];
-  Array.prototype.forEach.call(citySelect.querySelectorAll('optgroup'), function (g) {
-    var cities = Array.prototype.map.call(g.querySelectorAll('option'), function (o) {
-      if (!o.value) return null;
-      var p = o.value.split('|');
-      return { name: o.textContent.trim(), value: o.value, lng: Number(p[1]), tz: Number(p[2]) };
-    }).filter(Boolean);
-    if (g.label === '海外') overseas.push({ name: '海外', cities: cities });
-    else domestic.push({ name: g.label, cities: cities });
-  });
+  // ---- 数据：优先 city-data.js；回退解析既有下拉 ----
+  function buildFromData() {
+    var d = window.CITY_DATA;
+    if (!d) return null;
+    var domestic = d.domestic.map(function (g) {
+      return {
+        name: g.p,
+        cities: g.c.map(function (x) {
+          return { name: x[0], lng: x[1], tz: 8, value: x[0] + '|' + x[1] + '|8' };
+        })
+      };
+    });
+    var overseas = [{
+      name: '海外',
+      cities: d.overseas.map(function (x) {
+        return { name: x[0], lng: x[1], tz: x[2], value: x[0] + '|' + x[1] + '|' + x[2] };
+      })
+    }];
+    return { domestic: domestic, overseas: overseas };
+  }
+  function buildFromSelect() {
+    var domestic = [], overseas = [];
+    Array.prototype.forEach.call(citySelect.querySelectorAll('optgroup'), function (g) {
+      var cities = Array.prototype.map.call(g.querySelectorAll('option'), function (o) {
+        if (!o.value) return null;
+        var p = o.value.split('|');
+        return { name: o.textContent.trim(), value: o.value, lng: Number(p[1]), tz: Number(p[2]) };
+      }).filter(Boolean);
+      if (g.label === '海外') overseas.push({ name: '海外', cities: cities });
+      else domestic.push({ name: g.label, cities: cities });
+    });
+    return { domestic: domestic, overseas: overseas };
+  }
+  var data = buildFromData() || buildFromSelect();
+  var domestic = data.domestic, overseas = data.overseas;
   if (!overseas.length) overseas.push({ name: '海外', cities: [] });
 
   var DISTRICTS = ['全市'];
@@ -94,61 +118,58 @@
   }
   function curGroup() { var gs = visibleGroups(); return gs[state.prov] || gs[0] || { name: '', cities: [] }; }
   function curCity() { var g = curGroup(); return g.cities[state.city] || g.cities[0] || null; }
+  function provNames() { return visibleGroups().map(function (g) { return g.name; }); }
+  function cityNames() { return curGroup().cities.map(function (c) { return c.name; }); }
 
   // ---- 渲染 ----
-  function fillList(list, values, cur, onPick) {
+  function renderList(list, values, idx) {
     list.innerHTML = '';
     values.forEach(function (v) {
-      var opt = el('div', 'p18-opt' + (v === cur ? ' active' : ''), String(v));
+      var opt = el('div', 'p18-opt' + (v === values[idx] ? ' active' : ''), String(v));
       opt.setAttribute('data-v', v);
       list.appendChild(opt);
     });
-    var idx = values.indexOf(cur);
-    list.scrollTop = (idx < 0 ? 0 : idx) * ITEM_H;
-    list.onpick = onPick;
+    if (idx < 0) idx = 0;
+    list.scrollTop = idx * ITEM_H;
   }
   function renderProv() {
-    var gs = visibleGroups();
-    if (state.prov >= gs.length) state.prov = 0;
-    var names = gs.map(function (g) { return g.name; });
-    fillList(listP, names, names[state.prov], function (v) {
-      state.prov = names.indexOf(v); state.city = 0; renderCity(); renderDistrict();
-    });
+    var names = provNames();
+    if (state.prov >= names.length) state.prov = 0;
+    renderList(listP, names, state.prov);
   }
   function renderCity() {
-    var g = curGroup();
-    var names = g.cities.map(function (c) { return c.name; });
+    var names = cityNames();
     if (state.city >= names.length) state.city = 0;
-    fillList(listC, names, names[state.city], function (v) {
-      state.city = names.indexOf(v); renderDistrict();
-    });
+    renderList(listC, names, state.city);
   }
-  function renderDistrict() {
-    fillList(listD, DISTRICTS, DISTRICTS[state.district], function (v) {
-      state.district = DISTRICTS.indexOf(v);
-    });
-  }
+  function renderDistrict() { renderList(listD, DISTRICTS, state.district); }
   function renderAll() { renderProv(); renderCity(); renderDistrict(); }
 
-  function bindList(list) {
-    var timer = null;
-    function pick() {
-      var opts = [...list.children];
-      var idx = Math.max(0, Math.min(opts.length - 1, Math.round(list.scrollTop / ITEM_H)));
-      var v = opts[idx] ? opts[idx].getAttribute('data-v') : null;
-      if (v != null && typeof list.onpick === 'function') list.onpick(v);
-    }
-    list.addEventListener('scroll', function () { clearTimeout(timer); timer = setTimeout(pick, 80); });
+  // 滚轮：每个滚动事件只走一项，避免惯性跳项；点击选项直达。
+  function bindList(list, getValues, getIdx, setIdx, onPick, renderSelf) {
+    list.addEventListener('wheel', function (ev) {
+      ev.preventDefault();
+      var len = getValues().length;
+      if (!len) return;
+      var dir = ev.deltaY > 0 ? 1 : -1;
+      var n = Math.max(0, Math.min(len - 1, getIdx() + dir));
+      if (n !== getIdx()) { setIdx(n); renderSelf(); onPick(n); }
+    }, { passive: false });
     list.addEventListener('click', function (ev) {
       var opt = ev.target.closest('.p18-opt'); if (!opt) return;
-      var v = opt.getAttribute('data-v');
-      var vals = [...list.children].map(function (o) { return o.getAttribute('data-v'); });
-      var idx = vals.indexOf(v);
-      list.scrollTop = idx * ITEM_H;
-      if (typeof list.onpick === 'function') list.onpick(v);
+      var vals = getValues();
+      var idx = vals.indexOf(opt.getAttribute('data-v'));
+      if (idx < 0) return;
+      setIdx(idx); renderSelf(); onPick(idx);
     });
   }
-  bindList(listP); bindList(listC); bindList(listD);
+  bindList(listP, provNames, function () { return state.prov; }, function (i) { state.prov = i; }, function () {
+    state.city = 0; renderCity(); renderDistrict();
+  }, renderProv);
+  bindList(listC, cityNames, function () { return state.city; }, function (i) { state.city = i; }, function () {
+    renderDistrict();
+  }, renderCity);
+  bindList(listD, function () { return DISTRICTS; }, function () { return state.district; }, function (i) { state.district = i; }, function () {}, renderDistrict);
 
   // ---- 页签 / 搜索 ----
   tabs.addEventListener('click', function (ev) {
@@ -200,6 +221,12 @@
   okBtn.addEventListener('click', function () {
     var c = curCity();
     if (!c) { closeModal(); return; }
+    // 原生 select 只接受已有 option 的值；新数据城市先补齐对应 option 再写回
+    var hit = Array.prototype.find.call(citySelect.options, function (o) { return o.value === c.value; });
+    if (!hit) {
+      var opt = el('option'); opt.value = c.value; opt.textContent = c.name;
+      citySelect.appendChild(opt);
+    }
     citySelect.value = c.value;
     // 派发 change：复用既有 app.js 逻辑自动填入经度与时区
     citySelect.dispatchEvent(new Event('change', { bubbles: true }));
