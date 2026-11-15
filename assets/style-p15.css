@@ -37,3 +37,30 @@
 
 /* 桌面端属性标签保持紧凑 */
 .pillar-attr > b { display: inline-flex; align-items: center; gap: 1px; }
+
+/* ===== P15b 属性小图标：五行图形符号 =====
+   后方小字已写明「阴阳 + 五行」汉字，前方圆形图标不再重复汉字，
+   改用对应五行图形符号（木=树 / 火=焰 / 土=山 / 金=齿轮 / 水=水滴）。 */
+.w5-sym {
+  background: transparent !important;
+  border: 1px solid #ddd2bc !important;
+  box-shadow: none !important;
+}
+.w5-sym::before { display: none; }
+.w5-sym::after {
+  font: inherit !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  text-shadow: none !important;
+  filter: none;
+}
+.w5-木::after { content: "🌳"; }
+.w5-火::after { content: "🔥"; }
+.w5-土::after { content: "⛰️"; }
+.w5-金::after { content: "⚙️"; }
+.w5-水::after { content: "💧"; }
+
+@media (max-width: 680px) {
+  .pillar-attr .w5-sym { font-size: 12px; }
+  .pillar-attr .w5-sym::after { font-size: 12px !important; }
+}
