@@ -1,0 +1,39 @@
+/* ===== P15 回退原生四柱卡片 · 样式补丁 =====
+   撤销 P9 横表替换、P10 两栏侧栏后的收口：
+   - 四柱恢复 app.js 原生卡片（藏干 / 纳音 / 神煞 / 阴阳五行属性齐全）；
+   - 手机端补回天干、地支的「阴阳 + 五行」文字标签；
+   - 结果区单栏排布，不保留左右空列。颜色走变量，暗色自动跟随。 */
+
+/* 单栏兜底：结果区不出现侧边空列（覆盖任何残留的多栏规则） */
+.results-layout { display: block !important; }
+.results-primary { width: 100% !important; min-width: 0; }
+.results-side { display: none !important; }
+
+/* 原生四柱卡片正常显示（兜底，防止横表残留隐藏规则） */
+#pillars { display: grid !important; }
+#pillars-table { display: none !important; }
+
+/* 手机端：不再隐藏天干/地支的阴阳五行文字（覆盖 style.css 旧的仅图标规则） */
+@media (max-width: 680px) {
+  .pillar-attr {
+    gap: 2px;
+    padding: 2px 4px;
+    white-space: nowrap;
+  }
+  .pillar-attr > b {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 1px;
+    font-size: 8px;
+    line-height: 1.2;
+  }
+  .pillar-attr > i {
+    display: inline-block;
+    font-size: 11px;
+    line-height: 1;
+  }
+  .pillar-attr .polarity { font-weight: 800; }
+}
+
+/* 桌面端属性标签保持紧凑 */
+.pillar-attr > b { display: inline-flex; align-items: center; gap: 1px; }
