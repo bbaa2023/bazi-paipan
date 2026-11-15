@@ -349,7 +349,8 @@
   function init() {
     try {
       if (results.hidden) { clearPanel(); return; }
-      if (!document.getElementById('pillars-table')) return;
+      var pillarsBox = document.getElementById('pillars');
+      if (!pillarsBox || !pillarsBox.querySelectorAll('article.pillar').length) return;
       var ok = computeAll();
       if (!ok) { clearPanel(); return; }
       buildPanel();
