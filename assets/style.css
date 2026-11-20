@@ -678,3 +678,20 @@ body{font-family:var(--sans);background-image:
 .fy-final-geju-caveat{margin:0;color:#9b968a;font-size:11px;line-height:1.7}
 @media(max-width:680px){.fy-final-geju{padding:12px 13px}.fy-final-geju-head{flex-wrap:wrap;gap:8px}.fy-final-geju-head>b{margin-left:0}.fy-final-geju-meta{gap:9px 12px}.fy-final-geju-note{font-size:11px}.fy-final-geju-caveat{font-size:10px}}
 
+
+
+/* P23：原局柱位落点说明 */
+.relation-position-note{
+  display:flex;align-items:flex-start;flex-wrap:wrap;gap:7px;
+  margin-top:11px;padding:9px 11px;border-radius:9px;
+  background:#faf6ed;border:1px solid #eee3d0;
+  font-size:12px;line-height:1.6
+}
+.relation-position-note>strong{color:#735b32;flex:0 0 auto}
+.relation-position-item{display:inline-flex;align-items:center;flex-wrap:wrap;gap:5px}
+.relation-position-chip{display:inline-flex;padding:2px 7px;border-radius:6px;background:#eee1c8;color:#735b32;font-weight:700}
+.relation-position-scope{color:var(--muted,#777);overflow-wrap:anywhere}
+@media(max-width:680px){
+  .relation-position-note{gap:6px;padding:8px}
+  .relation-position-item{width:100%;align-items:flex-start}
+}
