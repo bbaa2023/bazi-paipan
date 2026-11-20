@@ -695,3 +695,12 @@ body{font-family:var(--sans);background-image:
   .relation-position-note{gap:6px;padding:8px}
   .relation-position-item{width:100%;align-items:flex-start}
 }
+
+
+/* P24：多支组合状态层级 */
+.relation-group-card h4{margin:0 0 7px}
+.relation-group-card>p strong{color:#80612f}
+.relation-group-card .relation-group-members{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0}
+@media(max-width:680px){
+  .relation-group-card .relation-group-members{grid-template-columns:1fr}
+}
