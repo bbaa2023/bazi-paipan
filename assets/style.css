@@ -704,3 +704,9 @@ body{font-family:var(--sans);background-image:
 @media(max-width:680px){
   .relation-group-card .relation-group-members{grid-template-columns:1fr}
 }
+
+
+/* 岁运两两关系：作用层级提示 */
+.relation-stage-note{margin:10px 0 8px;padding:7px 10px;border-left:3px solid #b99a63;border-radius:0 7px 7px 0;background:#faf6ed;color:#725a34;font-size:12px;line-height:1.6}
+.relation-stage-note strong{font-weight:800}
+@media(max-width:680px){.relation-stage-note{margin:8px 0;padding:7px 9px;font-size:11px}}
