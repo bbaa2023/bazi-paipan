@@ -765,8 +765,10 @@
         });
       });
       if(Array.isArray(selectedProfile.relations)){
+        // yearProfile.relations 是流年对十二地支的规则索引；只有本命实际出现该地支时，才算作本命犯太岁信号。
+        const natalBranchSet=new Set(natal.map(p=>p.gz&&p.gz[1]).filter(Boolean));
         selectedProfile.relations.forEach(r=>{
-          if(!Array.isArray(r.kinds))return;
+          if(!r||!natalBranchSet.has(r.branch)||!Array.isArray(r.kinds))return;
           r.kinds.forEach(k=>{
             const t=taiSuiSignal[k];if(!t)return;
             if(t==='bad')bad++;
