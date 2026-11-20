@@ -619,6 +619,18 @@
       else if(p.id==='annual-selected') attrs=' data-locate-kind="annual" data-locate-value="'+safe(p.year)+'"';
       return '<button type="button" class="relation-locator"'+attrs+'>'+safe(p.layer)+' · '+safe(p.label)+' '+safe(p.gz)+'<span aria-hidden="true"> ↗</span></button>';
     }
+    // 四柱位置说明采用常见传统宫位口径，仅提示关系落点，不据此推断具体事件。
+    const pillarPosition={
+      year:{name:'年柱',scope:'家族背景、早年环境'},
+      month:{name:'月柱',scope:'成长环境、父母手足与事业环境'},
+      day:{name:'日柱',scope:'自身状态与伴侣关系'},
+      time:{name:'时柱',scope:'子女、晚年与后续发展'}
+    };
+    function positionNote(p){
+      if(!p||!p.key||!pillarPosition[p.key])return '';
+      const info=pillarPosition[p.key];
+      return '<span class="relation-position-chip">'+safe(info.name)+'</span><span class="relation-position-scope">'+safe(info.scope)+'</span>';
+    }
     const buckets=[
       {id:'natal-internal',label:'原局内部',description:'四柱之间的关系',items:[]},
       {id:'natal-luck',label:'原局 × 大运',description:'所选大运与原局各柱的关系',items:[]},
@@ -643,7 +655,11 @@
         const hits=stems.map(x=>'天干 · '+x.type+(x.element?'（'+x.element+'）':''))
           .concat(branches.map(x=>'地支 · '+x.type+(x.kind?'（'+x.kind+'）':'')+(x.element?'（'+x.element+'）':'')));
         if(!hits.length)continue;
-        bucket.items.push('<article class="data-card relation-result"><div class="relation-participants">'+locate(a)+'<span class="relation-connector">与</span>'+locate(b)+'</div><div class="relation-result-items">'+hits.map(x=>'<div class="relation-explanation"><span class="chip">'+safe(x)+'</span></div>').join('')+'</div><p class="muted">这里只表示传统干支关系规则命中，不代表已经合化，也不单独判定吉凶。</p></article>');
+        const natalPositions=[a,b].filter(p=>p.key&&pillarPosition[p.key]);
+        const positionHtml=natalPositions.length
+          ? '<div class="relation-position-note"><strong>原局落点</strong>'+natalPositions.map(p=>'<span class="relation-position-item">'+positionNote(p)+'</span>').join('')+'</div>'
+          : '<div class="relation-position-note"><strong>原局落点</strong><span class="relation-position-scope">此项为大运与流年之间的关系，不直接落在某一原局柱位。</span></div>';
+        bucket.items.push('<article class="data-card relation-result"><div class="relation-participants">'+locate(a)+'<span class="relation-connector">与</span>'+locate(b)+'</div>'+positionHtml+'<div class="relation-result-items">'+hits.map(x=>'<div class="relation-explanation"><span class="chip">'+safe(x)+'</span></div>').join('')+'</div><p class="muted">柱位含义属于传统位置参考；这里只说明关系出现在哪一柱，不代表该宫位必然发生某种事件，也不代表已经合化或可单独判定吉凶。</p></article>');
       }
     }
     const branchSources=participants.map(p=>({branch:p.gz[1],participant:p}));
