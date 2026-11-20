@@ -684,6 +684,16 @@
         bucket.items.push('<article class="data-card relation-result"><div class="relation-participants">'+locate(a)+'<span class="relation-connector">与</span>'+locate(b)+'</div>'+positionHtml+'<div class="relation-stage-note"><strong>作用阶段：</strong>'+safe(pairStage)+'</div><div class="relation-result-items">'+hits.map(x=>'<div class="relation-explanation"><span class="chip">'+safe(x)+'</span></div>').join('')+'</div><p class="muted">这里只标明两柱之间已收录的干支关系及其来源层级。六害亦有称相穿的用法；六破与六合在部分地支组合中可能并列出现，本站分别展示。关系不等于合化，也不单独代表吉凶。</p></article>');
       }
     }
+    const pillarGroups=[
+      {key:'year',label:'年柱',scope:'家族背景、早年环境'},
+      {key:'month',label:'月柱',scope:'成长环境、父母手足与事业环境'},
+      {key:'day',label:'日柱',scope:'自身状态与伴侣关系'},
+      {key:'time',label:'时柱',scope:'子女、晚年与后续发展'}
+    ].filter(g=>!(g.key==='time'&&lastBirth&&lastBirth.unknownTime)).map(g=>{
+      const natalId='natal-'+g.key;
+      const related=buckets.filter(b=>b.id==='natal-luck'||b.id==='natal-annual').flatMap(b=>b.items).filter(card=>card.includes('data-locate-key="'+g.key+'"'));
+      return {...g,items:related};
+    });
     const branchSources=participants.map(p=>({branch:p.gz[1],participant:p}));
     const combinations=[];
     function groupCard(name,group,present,state,note,stage){
@@ -741,8 +751,10 @@
     });
     const selectedLuckText=luck?'已选 '+luck.ganzhi:'未指定大运';
     const selectedAnnualText=profile?'已选 '+profile.ganzhi:'流年资料暂不可用';
-    const sections=buckets.map(b=>'<section class="relation-category"><div class="relation-category-heading"><div><h4>'+safe(b.label)+'</h4><p class="muted">'+safe(b.description)+'</p></div><span class="relation-count">'+b.items.length+' 项</span></div><div class="relation-category-grid">'+(b.items.join('')||'<p class="muted">当前未命中已收录的两两关系。</p>')+'</div></section>').join('');
-    return '<section class="layer-linkage"><h3 class="subhead">本命 · 大运 · 流年联动</h3><div class="data-card"><div class="annual-relations"><span class="chip">本命 '+participants.filter(p=>p.id.indexOf('natal-')===0).length+' 柱</span><span class="chip">'+safe(selectedLuckText)+'</span><span class="chip">'+safe(selectedAnnualText)+'</span></div><p class="muted">所选时间层会与原局四柱逐柱对照；切换大运或流年后，本区域同步更新。关系命中只作结构资料，不等同合化或吉凶结论。</p></div>'+sections+(combinations.length?'<section class="relation-category"><div class="relation-category-heading"><div><h4>多支组合与形成阶段</h4><p class="muted">区分原局已有结构，以及大运、流年加入后新增的成员；同支重复出现不重复计数</p></div><span class="relation-count">'+combinations.length+' 组</span></div><div class="relation-category-grid">'+combinations.join('')+'</div></section>':'')+'</section>';
+    const pillarSections=pillarGroups.map(g=>'<section class="relation-category pillar-relation-category"><div class="relation-category-heading"><div><h4>'+safe(g.label)+' · 岁运作用</h4><p class="muted">'+safe(g.scope)+' · 分别查看大运、流年与本柱的关系</p></div><span class="relation-count">'+g.items.length+' 项</span></div><div class="relation-category-grid">'+(g.items.join('')||'<p class="muted">所选大运与流年暂未发现本柱对应的已收录关系。</p>')+'</div></section>').join('');
+    const summaryBuckets=buckets.filter(b=>b.id==='natal-internal'||b.id==='luck-annual');
+    const sections=summaryBuckets.map(b=>'<section class="relation-category"><div class="relation-category-heading"><div><h4>'+safe(b.label)+'</h4><p class="muted">'+safe(b.description)+'</p></div><span class="relation-count">'+b.items.length+' 项</span></div><div class="relation-category-grid">'+(b.items.join('')||'<p class="muted">当前未命中已收录的两两关系。</p>')+'</div></section>').join('');
+    return '<section class="layer-linkage"><h3 class="subhead">本命 · 大运 · 流年联动</h3><div class="data-card"><div class="annual-relations"><span class="chip">本命 '+participants.filter(p=>p.id.indexOf('natal-')===0).length+' 柱</span><span class="chip">'+safe(selectedLuckText)+'</span><span class="chip">'+safe(selectedAnnualText)+'</span></div><p class="muted">先按年、月、日、时柱查看岁运对本柱的作用，再查看原局内部及大运与流年的直接关系。切换时间后同步更新；关系命中只作结构资料，不等同合化或吉凶结论。</p></div><section class="relation-category"><div class="relation-category-heading"><div><h4>逐柱查看岁运作用</h4><p class="muted">每一柱分别列出所选大运、流年与本柱发生的关系</p></div><span class="relation-count">'+pillarGroups.reduce((n,g)=>n+g.items.length,0)+' 项</span></div>'+pillarSections+'</section>'+sections+(combinations.length?'<section class="relation-category"><div class="relation-category-heading"><div><h4>多支组合与形成阶段</h4><p class="muted">区分原局已有结构，以及大运、流年加入后新增的成员；同支重复出现不重复计数</p></div><span class="relation-count">'+combinations.length+' 组</span></div><div class="relation-category-grid">'+combinations.join('')+'</div></section>':'')+'</section>';
   }
 
   function renderLuck() {
