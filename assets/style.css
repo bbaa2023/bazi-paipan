@@ -710,3 +710,9 @@ body{font-family:var(--sans);background-image:
 .relation-stage-note{margin:10px 0 8px;padding:7px 10px;border-left:3px solid #b99a63;border-radius:0 7px 7px 0;background:#faf6ed;color:#725a34;font-size:12px;line-height:1.6}
 .relation-stage-note strong{font-weight:800}
 @media(max-width:680px){.relation-stage-note{margin:8px 0;padding:7px 9px;font-size:11px}}
+
+/* P25：逐柱岁运关系总览 */
+.pillar-relation-category{margin:10px 0 0;padding:12px;border:1px solid #e8dfcf;border-radius:12px;background:rgba(250,247,239,.62)}
+.pillar-relation-category .relation-category-heading{margin-bottom:9px}
+.pillar-relation-category .relation-category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:10px}
+@media(max-width:680px){.pillar-relation-category{padding:9px}.pillar-relation-category .relation-category-grid{grid-template-columns:1fr}}
