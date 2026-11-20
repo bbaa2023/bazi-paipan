@@ -672,26 +672,43 @@
     }
     const branchSources=participants.map(p=>({branch:p.gz[1],participant:p}));
     const combinations=[];
-    function groupCard(name,group,present,state,note){
+    function groupCard(name,group,present,state,note,stage){
       const members=Array.isArray(group.branches)?group.branches:[];
       const sources=members.filter(branch=>present.includes(branch)).map(branch=>{
         const found=branchSources.filter(x=>x.branch===branch);
         return '<div class="relation-group-member"><strong>'+safe(branch)+'</strong>'+found.map(x=>locate(x.participant)).join('')+'</div>';
       });
-      return '<article class="data-card relation-group-card"><h4>'+safe(name)+' · '+safe(group.element||group.kind||'')+'</h4><p><strong>'+safe(state)+'</strong>　成员：'+safe(present.join('、'))+'</p><div class="relation-group-members">'+sources.join('')+'</div><p class="muted">'+safe(note)+'</p></article>';
+      return '<article class="data-card relation-group-card"><h4>'+safe(name)+' · '+safe(group.element||group.kind||'')+'</h4><p><strong>'+safe(state)+'</strong>　成员：'+safe(present.join('、'))+'</p><p class="relation-group-stage"><span class="chip">形成阶段：'+safe(stage||'当前结构')+'</span></p><div class="relation-group-members">'+sources.join('')+'</div><p class="muted">'+safe(note)+'</p></article>';
     }
     const presentBranches=[...new Set(branchSources.map(x=>x.branch))];
+    const natalBranches=new Set(branchSources.filter(x=>x.participant.id.indexOf('natal-')===0).map(x=>x.branch));
+    const beforeAnnualBranches=new Set(branchSources.filter(x=>x.participant.id.indexOf('annual-')!==0).map(x=>x.branch));
+    function formationStage(members,requiredCount){
+      const countIn=set=>members.filter(branch=>set.has(branch)).length;
+      const natalCount=countIn(natalBranches);
+      const beforeAnnualCount=countIn(beforeAnnualBranches);
+      const totalCount=countIn(new Set(presentBranches));
+      if(natalCount>=requiredCount){
+        const repeated=branchSources.some(x=>x.participant.id.indexOf('natal-')!==0&&members.includes(x.branch));
+        return repeated?'原局固有 · 岁运同支再现':'原局固有';
+      }
+      if(beforeAnnualCount>=requiredCount)return requiredCount===3?'大运加入后形成完整组合':'大运加入后出现第二支';
+      if(totalCount>=requiredCount)return requiredCount===3?'流年加入后形成完整组合':'流年加入后出现第二支';
+      if(natalCount>0)return '原局已有部分成员';
+      if(beforeAnnualCount>0)return '大运参与后出现部分成员';
+      return '流年参与后出现部分成员';
+    }
     // 三合：三支齐备记完整三合；两支含中神为半三合，缺中神为拱合。
     (Array.isArray(engine.BRANCH_TRINE)?engine.BRANCH_TRINE:[]).forEach(group=>{
       const members=Array.isArray(group.branches)?group.branches:[];
       if(members.length!==3)return;
       const present=members.filter(branch=>presentBranches.includes(branch));
       if(present.length===3){
-        combinations.push(groupCard('三合',group,present,'三支齐备','三合成员已齐；是否合化仍须结合月令、旺衰及全局条件判断。'));
+        combinations.push(groupCard('三合',group,present,'三支齐备','三合成员已齐；是否合化仍须结合月令、旺衰及全局条件判断。',formationStage(members,3)));
       }else if(present.length===2){
         const hasCenter=present.includes(members[1]);
         combinations.push(groupCard(hasCenter?'半三合':'拱合',group,present,hasCenter?'半三合':'拱合（缺中神）',
-          hasCenter?'两支同属一组三合且包含中神，作为半三合结构提示。':'两支同属一组三合但缺少中神，作为拱合结构提示；不等同完整三合。'));
+          hasCenter?'两支同属一组三合且包含中神，作为半三合结构提示。':'两支同属一组三合但缺少中神，作为拱合结构提示；不等同完整三合。',formationStage(members,2)));
       }
     });
     // 三会：两支同方仅提示方位相连，三支齐备才列为完整三会。
@@ -699,19 +716,19 @@
       const members=Array.isArray(group.branches)?group.branches:[];
       if(members.length!==3)return;
       const present=members.filter(branch=>presentBranches.includes(branch));
-      if(present.length===3)combinations.push(groupCard('三会',group,present,'三支齐备','三会成员已齐；这里只提示结构，不据此认定会化或吉凶。'));
-      else if(present.length===2)combinations.push(groupCard('同方两支',group,present,'两支同方（未成三会）','两支属于同一方位组合，但第三支未出现，因此不称完整三会。'));
+      if(present.length===3)combinations.push(groupCard('三会',group,present,'三支齐备','三会成员已齐；这里只提示结构，不据此认定会化或吉凶。',formationStage(members,3)));
+      else if(present.length===2)combinations.push(groupCard('同方两支',group,present,'两支同方（未成三会）','两支属于同一方位组合，但第三支未出现，因此不称完整三会。',formationStage(members,2)));
     });
     // 三刑必须检查三支成员是否同时出现；两支之间的相刑仍保留在上方两两关系中。
     (Array.isArray(engine.PUNISH_GROUPS)?engine.PUNISH_GROUPS:[]).forEach(group=>{
       const members=Array.isArray(group.branches)?group.branches:[];
       if(members.length!==3||!members.every(branch=>presentBranches.includes(branch)))return;
-      combinations.push(groupCard('三刑',group,members,'三支齐备',group.note||'三刑成员已齐；具体作用仍须结合全局判断。'));
+      combinations.push(groupCard('三刑',group,members,'三支齐备',group.note||'三刑成员已齐；具体作用仍须结合全局判断。',formationStage(members,3)));
     });
     const selectedLuckText=luck?'已选 '+luck.ganzhi:'未指定大运';
     const selectedAnnualText=profile?'已选 '+profile.ganzhi:'流年资料暂不可用';
     const sections=buckets.map(b=>'<section class="relation-category"><div class="relation-category-heading"><div><h4>'+safe(b.label)+'</h4><p class="muted">'+safe(b.description)+'</p></div><span class="relation-count">'+b.items.length+' 项</span></div><div class="relation-category-grid">'+(b.items.join('')||'<p class="muted">当前未命中已收录的两两关系。</p>')+'</div></section>').join('');
-    return '<section class="layer-linkage"><h3 class="subhead">本命 · 大运 · 流年联动</h3><div class="data-card"><div class="annual-relations"><span class="chip">本命 '+participants.filter(p=>p.id.indexOf('natal-')===0).length+' 柱</span><span class="chip">'+safe(selectedLuckText)+'</span><span class="chip">'+safe(selectedAnnualText)+'</span></div><p class="muted">所选时间层会与原局四柱逐柱对照；切换大运或流年后，本区域同步更新。关系命中只作结构资料，不等同合化或吉凶结论。</p></div>'+sections+(combinations.length?'<section class="relation-category"><div class="relation-category-heading"><div><h4>跨层三合 / 三会</h4><p class="muted">检查原局、大运、流年合在一起后，三支成员是否齐备</p></div><span class="relation-count">'+combinations.length+' 组</span></div><div class="relation-category-grid">'+combinations.join('')+'</div></section>':'')+'</section>';
+    return '<section class="layer-linkage"><h3 class="subhead">本命 · 大运 · 流年联动</h3><div class="data-card"><div class="annual-relations"><span class="chip">本命 '+participants.filter(p=>p.id.indexOf('natal-')===0).length+' 柱</span><span class="chip">'+safe(selectedLuckText)+'</span><span class="chip">'+safe(selectedAnnualText)+'</span></div><p class="muted">所选时间层会与原局四柱逐柱对照；切换大运或流年后，本区域同步更新。关系命中只作结构资料，不等同合化或吉凶结论。</p></div>'+sections+(combinations.length?'<section class="relation-category"><div class="relation-category-heading"><div><h4>多支组合与形成阶段</h4><p class="muted">区分原局已有结构，以及大运、流年加入后新增的成员；同支重复出现不重复计数</p></div><span class="relation-count">'+combinations.length+' 组</span></div><div class="relation-category-grid">'+combinations.join('')+'</div></section>':'')+'</section>';
   }
 
   function renderLuck() {
