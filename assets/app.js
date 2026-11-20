@@ -653,7 +653,15 @@
         try{if(typeof engine.stemRelation==='function')stems=engine.stemRelation(a.gz[0],b.gz[0])||[];}catch(_){}
         try{if(typeof engine.branchRelations==='function')branches=engine.branchRelations(a.gz[1],b.gz[1])||[];}catch(_){}
         const hits=stems.map(x=>'天干 · '+x.type+(x.element?'（'+x.element+'）':''))
-          .concat(branches.map(x=>'地支 · '+x.type+(x.kind?'（'+x.kind+'）':'')+(x.element?'（'+x.element+'）':'')));
+          .concat(branches.map(x=>{
+            let type=x.type;
+            // 三合缺中神时为拱合；含中神的两支才标作半三合，避免把两种结构混称。
+            if(type==='半三合'&&Array.isArray(engine.BRANCH_TRINE)){
+              const group=engine.BRANCH_TRINE.find(g=>Array.isArray(g.branches)&&g.branches.includes(a.gz[1])&&g.branches.includes(b.gz[1]));
+              if(group&&group.branches[1]!==a.gz[1]&&group.branches[1]!==b.gz[1])type='拱合';
+            }
+            return '地支 · '+type+(x.kind?'（'+x.kind+'）':'')+(x.element?'（'+x.element+'）':'');
+          }));
         if(!hits.length)continue;
         const natalPositions=[a,b].filter(p=>p.key&&pillarPosition[p.key]);
         const positionHtml=natalPositions.length
@@ -664,17 +672,41 @@
     }
     const branchSources=participants.map(p=>({branch:p.gz[1],participant:p}));
     const combinations=[];
-    [['三合',engine.BRANCH_TRINE],['三会',engine.BRANCH_MEETING]].forEach(([name,defs])=>{
-      if(!Array.isArray(defs))return;
-      defs.forEach(group=>{
-        const members=Array.isArray(group.branches)?group.branches:[];
-        if(members.length!==3||!members.every(branch=>branchSources.some(x=>x.branch===branch)))return;
-        const sources=members.map(branch=>{
-          const found=branchSources.filter(x=>x.branch===branch);
-          return '<div class="relation-group-member"><strong>'+safe(branch)+'</strong>'+found.map(x=>locate(x.participant)).join('')+'</div>';
-        });
-        combinations.push('<article class="data-card relation-group-card"><h4>'+safe(name)+' · '+safe(group.element||'')+'</h4><p>组合成员：'+safe(members.join('、'))+'</p><div class="relation-group-members">'+sources.join('')+'</div><p class="muted">三个成员已分别出现在本命、大运或流年中；这里只提示组合齐备，不判断合化成立与否。</p></article>');
+    function groupCard(name,group,present,state,note){
+      const members=Array.isArray(group.branches)?group.branches:[];
+      const sources=members.filter(branch=>present.includes(branch)).map(branch=>{
+        const found=branchSources.filter(x=>x.branch===branch);
+        return '<div class="relation-group-member"><strong>'+safe(branch)+'</strong>'+found.map(x=>locate(x.participant)).join('')+'</div>';
       });
+      return '<article class="data-card relation-group-card"><h4>'+safe(name)+' · '+safe(group.element||group.kind||'')+'</h4><p><strong>'+safe(state)+'</strong>　成员：'+safe(present.join('、'))+'</p><div class="relation-group-members">'+sources.join('')+'</div><p class="muted">'+safe(note)+'</p></article>';
+    }
+    const presentBranches=[...new Set(branchSources.map(x=>x.branch))];
+    // 三合：三支齐备记完整三合；两支含中神为半三合，缺中神为拱合。
+    (Array.isArray(engine.BRANCH_TRINE)?engine.BRANCH_TRINE:[]).forEach(group=>{
+      const members=Array.isArray(group.branches)?group.branches:[];
+      if(members.length!==3)return;
+      const present=members.filter(branch=>presentBranches.includes(branch));
+      if(present.length===3){
+        combinations.push(groupCard('三合',group,present,'三支齐备','三合成员已齐；是否合化仍须结合月令、旺衰及全局条件判断。'));
+      }else if(present.length===2){
+        const hasCenter=present.includes(members[1]);
+        combinations.push(groupCard(hasCenter?'半三合':'拱合',group,present,hasCenter?'半三合':'拱合（缺中神）',
+          hasCenter?'两支同属一组三合且包含中神，作为半三合结构提示。':'两支同属一组三合但缺少中神，作为拱合结构提示；不等同完整三合。'));
+      }
+    });
+    // 三会：两支同方仅提示方位相连，三支齐备才列为完整三会。
+    (Array.isArray(engine.BRANCH_MEETING)?engine.BRANCH_MEETING:[]).forEach(group=>{
+      const members=Array.isArray(group.branches)?group.branches:[];
+      if(members.length!==3)return;
+      const present=members.filter(branch=>presentBranches.includes(branch));
+      if(present.length===3)combinations.push(groupCard('三会',group,present,'三支齐备','三会成员已齐；这里只提示结构，不据此认定会化或吉凶。'));
+      else if(present.length===2)combinations.push(groupCard('同方两支',group,present,'两支同方（未成三会）','两支属于同一方位组合，但第三支未出现，因此不称完整三会。'));
+    });
+    // 三刑必须检查三支成员是否同时出现；两支之间的相刑仍保留在上方两两关系中。
+    (Array.isArray(engine.PUNISH_GROUPS)?engine.PUNISH_GROUPS:[]).forEach(group=>{
+      const members=Array.isArray(group.branches)?group.branches:[];
+      if(members.length!==3||!members.every(branch=>presentBranches.includes(branch)))return;
+      combinations.push(groupCard('三刑',group,members,'三支齐备',group.note||'三刑成员已齐；具体作用仍须结合全局判断。'));
     });
     const selectedLuckText=luck?'已选 '+luck.ganzhi:'未指定大运';
     const selectedAnnualText=profile?'已选 '+profile.ganzhi:'流年资料暂不可用';
