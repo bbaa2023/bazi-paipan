@@ -591,6 +591,81 @@
     const helpDrainCn=strength==='身弱'?'以印比帮身为喜、财官食伤为忌':'以财官食伤泄耗为喜、印比为忌';
     return {grade,tone,reason:'当前命局判定为'+strength+'（'+helpDrainCn+'）。综合五行方向与十神喜忌：'+detail.join('；')+'。据此给出一档倾向供传统文化参考，不作具体断语。'};
   }
+  // 统一的本命—大运—流年联动视图：只呈现引擎已收录的两两干支关系及三支组合成员，不推断合化或具体吉凶。
+  function renderLayerLinkage() {
+    const engine=window.BaziEngine||{};
+    const participants=[];
+    const natalLabels=[['year','年柱'],['month','月柱'],['day','日柱'],['time','时柱']];
+    natalLabels.filter(([key])=>key!=='time'||!(lastBirth&&lastBirth.unknownTime)).forEach(([key,label])=>{
+      const p=lastChart&&lastChart.pillars&&lastChart.pillars[key];
+      if(p&&p.ganzhi&&p.ganzhi.length>=2) participants.push({id:'natal-'+key,layer:'本命',label,gz:p.ganzhi,key});
+    });
+    const luck=getSelectedLuckPillar();
+    if(luck&&luck.ganzhi&&luck.ganzhi.length>=2) participants.push({
+      id:'luck-selected',layer:'所选大运',label:'第'+luck.index+'步大运',gz:luck.ganzhi,index:luck.index
+    });
+    const annualInfo=getCurrentAnnualInfo();
+    const year=selectedAnnualYear==null?annualInfo.year:selectedAnnualYear;
+    let profile=null;
+    if(year!=null&&typeof engine.yearProfile==='function'){try{profile=engine.yearProfile(year);}catch(_){}}
+    if(profile&&profile.ganzhi&&profile.ganzhi.length>=2) participants.push({
+      id:'annual-selected',layer:'所选流年',label:'流年 '+profile.year,gz:profile.ganzhi,year
+    });
+
+    function locate(p){
+      let attrs='';
+      if(p.id.indexOf('natal-')===0) attrs=' data-locate-kind="natal" data-locate-key="'+safe(p.key)+'"';
+      else if(p.id==='luck-selected') attrs=' data-locate-kind="luck" data-locate-value="'+safe(p.index)+'"';
+      else if(p.id==='annual-selected') attrs=' data-locate-kind="annual" data-locate-value="'+safe(p.year)+'"';
+      return '<button type="button" class="relation-locator"'+attrs+'>'+safe(p.layer)+' · '+safe(p.label)+' '+safe(p.gz)+'<span aria-hidden="true"> ↗</span></button>';
+    }
+    const buckets=[
+      {id:'natal-internal',label:'原局内部',description:'四柱之间的关系',items:[]},
+      {id:'natal-luck',label:'原局 × 大运',description:'所选大运与原局各柱的关系',items:[]},
+      {id:'natal-annual',label:'原局 × 流年',description:'所选流年与原局各柱的关系',items:[]},
+      {id:'luck-annual',label:'大运 × 流年',description:'所选大运与所选流年的关系',items:[]}
+    ];
+    function bucketFor(a,b){
+      const an=a.id.indexOf('natal-')===0,bn=b.id.indexOf('natal-')===0;
+      if(an&&bn)return buckets[0];
+      if((an&&b.id==='luck-selected')||(bn&&a.id==='luck-selected'))return buckets[1];
+      if((an&&b.id==='annual-selected')||(bn&&a.id==='annual-selected'))return buckets[2];
+      if((a.id==='luck-selected'&&b.id==='annual-selected')||(b.id==='luck-selected'&&a.id==='annual-selected'))return buckets[3];
+      return null;
+    }
+    for(let i=0;i<participants.length;i++){
+      for(let j=i+1;j<participants.length;j++){
+        const a=participants[i],b=participants[j],bucket=bucketFor(a,b);
+        if(!bucket)continue;
+        let stems=[],branches=[];
+        try{if(typeof engine.stemRelation==='function')stems=engine.stemRelation(a.gz[0],b.gz[0])||[];}catch(_){}
+        try{if(typeof engine.branchRelations==='function')branches=engine.branchRelations(a.gz[1],b.gz[1])||[];}catch(_){}
+        const hits=stems.map(x=>'天干 · '+x.type+(x.element?'（'+x.element+'）':''))
+          .concat(branches.map(x=>'地支 · '+x.type+(x.kind?'（'+x.kind+'）':'')+(x.element?'（'+x.element+'）':'')));
+        if(!hits.length)continue;
+        bucket.items.push('<article class="data-card relation-result"><div class="relation-participants">'+locate(a)+'<span class="relation-connector">与</span>'+locate(b)+'</div><div class="relation-result-items">'+hits.map(x=>'<div class="relation-explanation"><span class="chip">'+safe(x)+'</span></div>').join('')+'</div><p class="muted">这里只表示传统干支关系规则命中，不代表已经合化，也不单独判定吉凶。</p></article>');
+      }
+    }
+    const branchSources=participants.map(p=>({branch:p.gz[1],participant:p}));
+    const combinations=[];
+    [['三合',engine.BRANCH_TRINE],['三会',engine.BRANCH_MEETING]].forEach(([name,defs])=>{
+      if(!Array.isArray(defs))return;
+      defs.forEach(group=>{
+        const members=Array.isArray(group.branches)?group.branches:[];
+        if(members.length!==3||!members.every(branch=>branchSources.some(x=>x.branch===branch)))return;
+        const sources=members.map(branch=>{
+          const found=branchSources.filter(x=>x.branch===branch);
+          return '<div class="relation-group-member"><strong>'+safe(branch)+'</strong>'+found.map(x=>locate(x.participant)).join('')+'</div>';
+        });
+        combinations.push('<article class="data-card relation-group-card"><h4>'+safe(name)+' · '+safe(group.element||'')+'</h4><p>组合成员：'+safe(members.join('、'))+'</p><div class="relation-group-members">'+sources.join('')+'</div><p class="muted">三个成员已分别出现在本命、大运或流年中；这里只提示组合齐备，不判断合化成立与否。</p></article>');
+      });
+    });
+    const selectedLuckText=luck?'已选 '+luck.ganzhi:'未指定大运';
+    const selectedAnnualText=profile?'已选 '+profile.ganzhi:'流年资料暂不可用';
+    const sections=buckets.map(b=>'<section class="relation-category"><div class="relation-category-heading"><div><h4>'+safe(b.label)+'</h4><p class="muted">'+safe(b.description)+'</p></div><span class="relation-count">'+b.items.length+' 项</span></div><div class="relation-category-grid">'+(b.items.join('')||'<p class="muted">当前未命中已收录的两两关系。</p>')+'</div></section>').join('');
+    return '<section class="layer-linkage"><h3 class="subhead">本命 · 大运 · 流年联动</h3><div class="data-card"><div class="annual-relations"><span class="chip">本命 '+participants.filter(p=>p.id.indexOf('natal-')===0).length+' 柱</span><span class="chip">'+safe(selectedLuckText)+'</span><span class="chip">'+safe(selectedAnnualText)+'</span></div><p class="muted">所选时间层会与原局四柱逐柱对照；切换大运或流年后，本区域同步更新。关系命中只作结构资料，不等同合化或吉凶结论。</p></div>'+sections+(combinations.length?'<section class="relation-category"><div class="relation-category-heading"><div><h4>跨层三合 / 三会</h4><p class="muted">检查原局、大运、流年合在一起后，三支成员是否齐备</p></div><span class="relation-count">'+combinations.length+' 组</span></div><div class="relation-category-grid">'+combinations.join('')+'</div></section>':'')+'</section>';
+  }
+
   function renderLuck() {
     if (lastBirth.gender === null || lastBirth.gender === undefined) return '<div class="empty">请在上方选择性别并重新排盘，才能计算大运。</div>';
     if (!lastLuck) return '<div class="empty">当前暂时无法显示大运资料，请重新排盘或稍后再试。</div>';
@@ -598,7 +673,8 @@
     const direction=lastLuck.direction&&typeof lastLuck.direction==='object'?(lastLuck.direction.forward?'顺排':'逆排'):(lastLuck.direction||'—');
     const items=Array.isArray(lastLuck.pillars)?lastLuck.pillars:[];
     const selectedLuck=getSelectedLuckPillar();
-    const selector=renderTimelineSelectors({luck:true});
+    const annualInfoForLinkage=getCurrentAnnualInfo();
+    const selector=renderTimelineSelectors({luck:true,annual:annualInfoForLinkage.year!=null,annualYears:annualInfoForLinkage.year==null?[]:Array.from({length:6},(_,i)=>annualInfoForLinkage.year+i)});
     const selectedLuckSummary=selectedLuck?'<div class="data-card selected-time-context"><h3>当前关系对照大运：第'+safe(selectedLuck.index)+'步 · '+safe(selectedLuck.ganzhi)+'</h3><p>时间范围：'+safe(selectedLuck.yearLabel||'年份未返回')+' · 虚岁 '+safe(selectedLuck.startAgeSui??'—')+'–'+safe(selectedLuck.endAgeSui??'—')+'</p><p>天干十神：'+safe(selectedLuck.stemTenGod&&selectedLuck.stemTenGod.god||'—')+'　地支十神：'+safe(selectedLuck.branchTenGod&&selectedLuck.branchTenGod.god||'—')+'</p><p>藏干：'+safe(Array.isArray(selectedLuck.hideGan)?selectedLuck.hideGan.join('、'):'—')+'　十二长生：'+safe(selectedLuck.stage||'—')+'</p><p class="muted">该大运将与本命及所选流年共同参与关系对照。</p></div>':'<div class="data-card selected-time-context"><h3>当前关系对照大运：未指定</h3><p class="muted">选择一部大运后，才会把它加入关系对照；本命和所选流年仍可单独参与。</p></div>';
     const selectedTrend=selectedLuck?getBasicLuckTrend(selectedLuck):null;
     const selectedTrendCard=selectedTrend?'<div class="data-card luck-trend-card"><div class="luck-trend-heading"><h3>基础大运趋势</h3><span class="luck-trend-label '+selectedTrend.tone+'">'+safe(selectedTrend.grade)+'</span></div><p>'+safe(selectedTrend.reason)+'</p><p class="muted">仅依据本站简化扶抑参考与大运天干、地支主气五行生成；不进行月令司令、格局、调候、通关及刑冲合会的综合分析；简化参考本身包含月柱权重。</p></div>':'';
@@ -611,7 +687,7 @@
       unknownNote='<div class="data-card"><h3>未知时辰：起运范围提示</h3><p>上方起运日期与年龄按中午参考时刻计算，不应视为精确结果。</p><p>按当天时辰范围估算：较早端约 '+fmt(lo)+'；较晚端约 '+fmt(hi)+'。</p><p>节气是否跨界：'+(unknown.jieAmbiguous?'当天不同时间可能对应不同节气，年/月柱及起运依据需重点复核。':'当前扫描范围未发现前后节气名称变化，但起运时间仍可能随出生时刻变化。')+'</p><p class="muted">要缩小范围，请补充出生时辰；若出生时刻接近立春或节气交界，建议按准确时刻重新排盘。</p></div>';
     }
     const todayNote=lastLuck.today?'<p class="muted">当前大运判断日期：北京时间 '+safe(lastLuck.today)+'（按日期判断当前大运步，不使用当天具体时分）。</p>':'';
-    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">起运日期和年龄会因出生时间及采用的起运方法不同而有所差异。</p></div>'+unknownNote+'</div>'+todayNote+selector+selectedLuckSummary+selectedTrendCard+'<h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="luck-timeline">'+(cards||'<div class="empty">暂时没有可显示的大运序列。</div>')+'</div>';
+    return '<h3 class="subhead">起运信息</h3><div class="data-grid"><div class="data-card"><p>大运方向：'+safe(direction)+'</p><p>起运日期：'+safe(s.startDateTime||s.startDate||'—')+'</p><p>起运年龄：'+safe(chosen.years??'—')+'年 '+safe(chosen.months??0)+'个月 '+safe(chosen.days??0)+'天</p><p>起运前：'+safe(pre.startYear||'—')+' 至 '+safe(pre.endYear||'—')+' 年</p><p class="muted">起运日期和年龄会因出生时间及采用的起运方法不同而有所差异。</p></div>'+unknownNote+'</div>'+todayNote+selector+selectedLuckSummary+selectedTrendCard+renderLayerLinkage()+'<h3 class="subhead" style="margin-top:20px">十年大运时间轴</h3><div class="luck-timeline">'+(cards||'<div class="empty">暂时没有可显示的大运序列。</div>')+'</div>';
   }
   function renderAnnual() {
     const engine=window.BaziEngine||{};
@@ -729,8 +805,8 @@
     if(selectedProfile){try{selectedGod=engine.tenGodOf(dayGan,selectedProfile.stem)||'—';}catch(_){}}
     const selectedAnnualSummary=selectedProfile?'<div class="data-card selected-time-context"><h3>当前关系对照流年：'+safe(selectedProfile.year)+' · '+safe(selectedProfile.ganzhi)+'</h3><p>天干十神：'+safe(selectedGod)+'　五行：'+safe(selectedProfile.stemElement)+' / '+safe(selectedProfile.branchElement)+'</p><p>纳音：'+safe(selectedProfile.nayin||'—')+'　生肖：'+safe(selectedProfile.zodiacCn||selectedProfile.branch||'—')+'</p><p>立春资料：'+safe(selectedProfile.lichun&&selectedProfile.lichun.text||'未返回')+'</p><p class="muted">该流年将与本命及所选大运共同参与关系对照。</p></div>':'<div class="data-card selected-time-context"><h3>所选流年资料暂不可用</h3><p class="muted">该年份的资料暂不完整，因此暂不加入关系对照。</p></div>';
     const timeText=beijingNow.year+'-'+String(beijingNow.month).padStart(2,'0')+'-'+String(beijingNow.day).padStart(2,'0')+' '+String(beijingNow.hour).padStart(2,'0')+':'+String(beijingNow.minute).padStart(2,'0');
-    const annualSelector=renderTimelineSelectors({annual:true,annualYears:Array.from({length:6},(_,i)=>currentYear+i)});
-    return '<h3 class="subhead">当前流年与未来五年</h3>'+annualSelector+selectedAnnualSummary+'<p class="muted">查询时刻：北京时间 '+safe(timeText)+'。当前干支年按立春时间判断；立春前仍归上一干支年。当前流年起点：'+safe(currentYear)+' 年。流年天干十神以本命日主为参照；关系区域仅列出本命与流年之间符合条件的干支关系。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">暂时没有可显示的流年资料。</div>')+'</div>'+taiSuiSection+annualOmenSection+(monthRows.length?'<h3 class="subhead" style="margin-top:20px">所选流年 '+safe(activeYear)+' 的十二节月资料</h3><p class="muted">以下为所选流年的节月干支与节令名称。当前资料未提供十二个交节的精确时刻，因此不标记当前节月，也不把节月序号当作公历月份边界。</p><div class="annual-month-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'+monthRows.join('')+'</div>':'');
+    const annualSelector=renderTimelineSelectors({luck:Array.isArray(lastLuck?.pillars)&&lastLuck.pillars.length>0,annual:true,annualYears:Array.from({length:6},(_,i)=>currentYear+i)});
+    return '<h3 class="subhead">当前流年与未来五年</h3>'+annualSelector+selectedAnnualSummary+renderLayerLinkage()+'<p class="muted">查询时刻：北京时间 '+safe(timeText)+'。当前干支年按立春时间判断；立春前仍归上一干支年。当前流年起点：'+safe(currentYear)+' 年。流年天干十神以本命日主为参照；关系区域仅列出本命与流年之间符合条件的干支关系。</p><div class="annual-timeline">'+(cards.join('')||'<div class="empty">暂时没有可显示的流年资料。</div>')+'</div>'+taiSuiSection+annualOmenSection+(monthRows.length?'<h3 class="subhead" style="margin-top:20px">所选流年 '+safe(activeYear)+' 的十二节月资料</h3><p class="muted">以下为所选流年的节月干支与节令名称。当前资料未提供十二个交节的精确时刻，因此不标记当前节月，也不把节月序号当作公历月份边界。</p><div class="annual-month-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'+monthRows.join('')+'</div>':'');
   }
     function renderSidePanels() {
     // 五行总览保留在主命盘下方；大运与流年只在下方标签中按需展开。
