@@ -652,9 +652,23 @@
         let stems=[],branches=[];
         try{if(typeof engine.stemRelation==='function')stems=engine.stemRelation(a.gz[0],b.gz[0])||[];}catch(_){}
         try{if(typeof engine.branchRelations==='function')branches=engine.branchRelations(a.gz[1],b.gz[1])||[];}catch(_){}
+        // 六破在引擎独立规则表中；这里补入逐柱关系展示，不改动排盘引擎。
+        if(engine.BRANCH_BREAK&&engine.BRANCH_BREAK[a.gz[1]]===b.gz[1]){
+          branches.push({type:'六破',typeEn:'six break'});
+        }
+        const pairStage=(()=>{
+          const an=a.id.indexOf('natal-')===0,bn=b.id.indexOf('natal-')===0;
+          if(an&&bn)return '原局固有';
+          if((an&&b.id==='luck-selected')||(bn&&a.id==='luck-selected'))return '大运与原局该柱发生作用';
+          if((an&&b.id==='annual-selected')||(bn&&a.id==='annual-selected'))return '流年与原局该柱发生作用';
+          if((a.id==='luck-selected'&&b.id==='annual-selected')||(b.id==='luck-selected'&&a.id==='annual-selected'))return '大运与流年直接作用';
+          return '跨层关系';
+        })();
         const hits=stems.map(x=>'天干 · '+x.type+(x.element?'（'+x.element+'）':''))
           .concat(branches.map(x=>{
             let type=x.type;
+            // 六害在部分命理语境中也称相穿；并列标明，避免把术语差异误认为另一组地支。
+            if(type==='六害')type='六害（又称相穿）';
             // 三合缺中神时为拱合；含中神的两支才标作半三合，避免把两种结构混称。
             if(type==='半三合'&&Array.isArray(engine.BRANCH_TRINE)){
               const group=engine.BRANCH_TRINE.find(g=>Array.isArray(g.branches)&&g.branches.includes(a.gz[1])&&g.branches.includes(b.gz[1]));
@@ -667,7 +681,7 @@
         const positionHtml=natalPositions.length
           ? '<div class="relation-position-note"><strong>原局落点</strong>'+natalPositions.map(p=>'<span class="relation-position-item">'+positionNote(p)+'</span>').join('')+'</div>'
           : '<div class="relation-position-note"><strong>原局落点</strong><span class="relation-position-scope">此项为大运与流年之间的关系，不直接落在某一原局柱位。</span></div>';
-        bucket.items.push('<article class="data-card relation-result"><div class="relation-participants">'+locate(a)+'<span class="relation-connector">与</span>'+locate(b)+'</div>'+positionHtml+'<div class="relation-result-items">'+hits.map(x=>'<div class="relation-explanation"><span class="chip">'+safe(x)+'</span></div>').join('')+'</div><p class="muted">柱位含义属于传统位置参考；这里只说明关系出现在哪一柱，不代表该宫位必然发生某种事件，也不代表已经合化或可单独判定吉凶。</p></article>');
+        bucket.items.push('<article class="data-card relation-result"><div class="relation-participants">'+locate(a)+'<span class="relation-connector">与</span>'+locate(b)+'</div>'+positionHtml+'<div class="relation-stage-note"><strong>作用阶段：</strong>'+safe(pairStage)+'</div><div class="relation-result-items">'+hits.map(x=>'<div class="relation-explanation"><span class="chip">'+safe(x)+'</span></div>').join('')+'</div><p class="muted">这里只标明两柱之间已收录的干支关系及其来源层级。六害亦有称相穿的用法；六破与六合在部分地支组合中可能并列出现，本站分别展示。关系不等于合化，也不单独代表吉凶。</p></article>');
       }
     }
     const branchSources=participants.map(p=>({branch:p.gz[1],participant:p}));
